@@ -153,10 +153,14 @@ public:
 	}
 	// Return base class image. Tasks that can restrict themselves to using
 	// multi_img_base functionality should use this function.
-	multi_img_base &getBase() {
+    multi_img_base &getBase() {
 		assert(data);
 		return *data;
 	}
+
+    multi_img_base* base() {
+        return data;
+    }
 
 	// implement the boost::Lockable concept
 	void lock() { mutex.lock(); }

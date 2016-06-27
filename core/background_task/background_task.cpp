@@ -6,36 +6,48 @@
 	find it here: http://www.gnu.org/licenses/gpl.html
 */
 
-#ifdef WITH_BOOST_THREAD
+
+
+//#ifdef WITH_BOOST_THREAD
 #include "background_task.h"
 
-void BackgroundTask::update(int percent)
-{
-#ifdef WITH_QT
-	emit progress(description, percent);
-#endif
-}
+//void BackgroundTask::update(int percent)
+//{
+//#ifdef WITH_QT
+//	emit progress(description, percent);
+//#endif
+//}
 
-void BackgroundTask::done(bool success)
-{
-	Lock lock(guard);
-	terminated = true;
-	this->success = success;
-	lock.unlock(); // Unlock to prevent deadlock when signalling the condition.
-	future.notify_all();
-#ifdef WITH_QT
-	emit progress(description, 100);
-	emit finished(success);
-#endif
-}
+//void BackgroundTask::processDone(bool success)
+//{
+//    boost::unique_lock<std::mutex> lock(guard);
+//    terminated = true;
+//    this->success = success;
+//    lock.unlock();
+//    cv.notify_all();
+//    emit finished(success);
+//}
 
-bool BackgroundTask::wait()
-{
-	Lock lock(guard);
-	if (!terminated) {
-		future.wait(lock); // Yields lock until signalled.
-	}
-	return success;
-}
+//void BackgroundTask::done(bool success)
+//{
+//	Lock lock(guard);
+//	terminated = true;
+//	this->success = success;
+//	lock.unlock(); // Unlock to prevent deadlock when signalling the condition.
+//	future.notify_all();
+//#ifdef WITH_QT
+//	emit progress(description, 100);
+//	emit finished(success);
+//#endif
+//}
 
-#endif
+//bool BackgroundTask::wait()
+//{
+//	Lock lock(guard);
+//	if (!terminated) {
+//		future.wait(lock); // Yields lock until signalled.
+//	}
+//	return success;
+//}
+
+//#endif

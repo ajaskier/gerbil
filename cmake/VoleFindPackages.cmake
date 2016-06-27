@@ -31,6 +31,22 @@ vole_check_package(OPENCV
 	"${OpenCV_LIBS}"
 )
 
+# GTest
+find_package(GTest)
+if(GTest_FOUND)
+    message(STATUS "Found GTest")
+endif()
+
+# GMock
+find_package(GMOCK)
+vole_check_package(GMOCK
+        "GMOCK"
+        "Please install GMock"
+        GMOCK_FOUND
+        "${GMOCK_INCLUDE_DIRS}"
+        "${GMOCK_LIBRARIES}"
+)
+
 # Thread Building Blocks
 find_package(TBB)
 vole_check_package(TBB

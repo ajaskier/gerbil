@@ -22,24 +22,26 @@ vole_compile_library(
 	multi_img/cieobserver
 	background_task/background_task
 	background_task/background_task_queue
-	background_task/tasks/cuda/gradientcuda
-	background_task/tasks/cuda/clampcuda
-	background_task/tasks/cuda/datarangecuda
-	background_task/tasks/cuda/illuminantcuda
-	background_task/tasks/cuda/normrangecuda
-	background_task/tasks/tbb/gradienttbb
-	background_task/tasks/tbb/norml2tbb
-	background_task/tasks/tbb/clamptbb
-	background_task/tasks/tbb/datarangetbb
-	background_task/tasks/tbb/illuminanttbb
-	background_task/tasks/tbb/rescaletbb
-	background_task/tasks/tbb/normrangetbb
-	background_task/tasks/tbb/pcatbb
-	background_task/tasks/tbb/specsimtbb
+        background_task/background_worker
+        background_task/background_executor
+        #background_task/tasks/cuda/gradientcuda
+        #background_task/tasks/cuda/clampcuda
+        #background_task/tasks/cuda/datarangecuda
+        #background_task/tasks/cuda/illuminantcuda
+        #background_task/tasks/cuda/normrangecuda
+        #background_task/tasks/tbb/gradienttbb
+        #background_task/tasks/tbb/norml2tbb
+        #background_task/tasks/tbb/clamptbb
+        #background_task/tasks/tbb/datarangetbb
+        #background_task/tasks/tbb/illuminanttbb
+        #background_task/tasks/tbb/rescaletbb
+        #background_task/tasks/tbb/normrangetbb
+        #background_task/tasks/tbb/pcatbb
+        #background_task/tasks/tbb/specsimtbb
 	background_task/tasks/tbb/band2qimagetbb
-	background_task/tasks/tbb/rgbqttbb
-	background_task/tasks/tbb/bgrtbb
-	background_task/tasks/scopeimage
+        #background_task/tasks/tbb/rgbqttbb
+        #background_task/tasks/tbb/bgrtbb
+        #background_task/tasks/scopeimage
 
 	labeling
 	progress_observer
@@ -53,6 +55,8 @@ if(QT_FOUND)
 vole_moc_library(
 	background_task/background_task.h
 	background_task/background_task_queue.h
+        background_task/background_worker.h
+        background_task/background_executor.h
 )
 endif()
 

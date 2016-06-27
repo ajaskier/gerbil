@@ -4,8 +4,11 @@
 
 bool Band2QImageTbb::run()
 {
+
 	if (band >= (*multi)->size()) {
-		return false;
+        //emit done(false);
+        //return;
+        return false;
 	}
 
 	multi_img::Band &source = (*multi)->bands[band];
@@ -16,11 +19,13 @@ bool Band2QImageTbb::run()
 
 	if (stopper.is_group_execution_cancelled()) {
 		delete target;
-		return false;
+        //emit done(false);
+        return false;
 	} else {
 		SharedDataSwapLock lock(image->mutex);
 		image->replace(target);
-		return true;
+        //emit done(true);
+        return true;
 	}
 }
 

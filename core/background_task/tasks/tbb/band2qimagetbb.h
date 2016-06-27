@@ -27,10 +27,15 @@ class Band2QImageTbb : public BackgroundTask {
 
 public:
     Band2QImageTbb(SharedMultiImgPtr multi, qimage_ptr image, size_t band)
-        : BackgroundTask(), multi(multi), image(image), band(band) {}
+        : BackgroundTask(), multi(multi), image(image), band(band)
+    {
+    }
     virtual ~Band2QImageTbb() {}
     virtual bool run();
-    virtual void cancel() { stopper.cancel_group_execution(); }
+    virtual void cancel() {
+        stopper.cancel_group_execution();
+        //emit done(false);
+    }
 
 protected:
     tbb::task_group_context stopper;
