@@ -27,9 +27,10 @@ void MainWindow::initCrucials()
 
     imageModel = new ImageModel(false, sm, scheduler, this);
     imageModel->setFilename("/home/olek/gerbil_data/peppers_descriptor.txt");
-    imgSub = SubscriptionFactory::create(Dependency("image", SubscriptionType::READ),
+    imgSub = std::unique_ptr<Subscription>(SubscriptionFactory::create(Dependency("image", SubscriptionType::READ),
                                          SubscriberType::READER, this,
-                                         std::bind(&MainWindow::imgUpdated, this));
+                                         std::bind(&MainWindow::imgUpdated, this)));
+   // initRest();
 }
 
 void MainWindow::initRest()
@@ -55,7 +56,8 @@ void MainWindow::initRest()
 MainWindow::~MainWindow()
 {
     delete ui;
-    imgIMG_Sub->end();
+    //delete imgIMG_Sub;
+    //imgIMG_Sub->end();
 }
 
 void MainWindow::dockAVisibilityChanged(bool visible)
@@ -64,9 +66,9 @@ void MainWindow::dockAVisibilityChanged(bool visible)
         dataASub = SubscriptionFactory::create(Dependency("DATA_A", SubscriptionType::READ),
                                                SubscriberType::READER, this,
                                                std::bind(&MainWindow::displayA, this));
-
     } else {
-        dataASub->end();
+        //dataASub->end();
+        delete dataASub;
     }
 
 }
@@ -75,7 +77,7 @@ void MainWindow::displayA()
 {
     qDebug() << "displayA";
 
-    Subscription::Lock<Data> lock(dataASub);
+    Subscription::Lock<Data> lock(*dataASub);
     int num = lock().num;
 
     ui->outputA->setText(QString::number(num));
@@ -83,10 +85,10 @@ void MainWindow::displayA()
 
 void MainWindow::imgUpdated()
 {
-    qDebug() << "img updated";
+    //qDebug() << "img updated";
 
     {
-        Subscription::Lock<multi_img> lock(imgSub);
+        Subscription::Lock<multi_img> lock(*imgSub);
         multi_img& img = lock();
         imageModel->setROI(img.roi);
     }
@@ -96,10 +98,11 @@ void MainWindow::imgUpdated()
 
 cv::Rect MainWindow::getDimensions()
 {
-    Subscription::Lock<multi_img_base> lock(imgSub);
-    multi_img_base& img = lock();
+    //Subscription::Lock<multi_img_base> lock(imgSub);
+    //multi_img_base& img = lock();
 
-    return cv::Rect(0, 0, img.width, img.height);
+    //return cv::Rect(0, 0, img.width, img.height);
+    return cv::Rect(0, 0, 0, 0);
 }
 
 void MainWindow::dockBVisibilityChanged(bool visible)
@@ -114,8 +117,10 @@ void MainWindow::dockBVisibilityChanged(bool visible)
                                                std::bind(&MainWindow::displayD, this));
 
     } else {
-        dataBSub->end();
-        dataDSub->end();
+        //dataBSub->end();
+        //dataDSub->end();
+        delete dataBSub;
+        delete dataDSub;
     }
 }
 
@@ -123,7 +128,7 @@ void MainWindow::displayB()
 {
     qDebug() << "displayB";
 
-    Subscription::Lock<Data> lock(dataBSub);
+    Subscription::Lock<Data> lock(*dataBSub);
     int num = lock().num;
 
     ui->outputB->setText(QString::number(num));
@@ -137,7 +142,8 @@ void MainWindow::dockCVisibilityChanged(bool visible)
                                                std::bind(&MainWindow::displayC, this));
 
     } else {
-        dataCSub->end();
+       // dataCSub->end();
+        delete dataCSub;
     }
 }
 
@@ -145,7 +151,7 @@ void MainWindow::displayC()
 {
     qDebug() << "displayC";
 
-    Subscription::Lock<Data> lock(dataCSub);
+    Subscription::Lock<Data> lock(*dataCSub);
     int num = lock().num;
 
     ui->outputC->setText(QString::number(num));
@@ -154,7 +160,7 @@ void MainWindow::displayC()
 void MainWindow::displayD()
 {
     qDebug() << "displayD";
-    Subscription::Lock<Data> lock(dataDSub);
+    Subscription::Lock<Data> lock(*dataDSub);
     int num = lock().num;
 
     ui->outputD->setText(QString::number(num));
@@ -221,16 +227,16 @@ void MainWindow::on_computeDButton_clicked()
 
 void MainWindow::on_imageModelButton_clicked()
 {
-    imgIMG_Sub = SubscriptionFactory::create(Dependency("image.IMG",
+    imgIMG_Sub = std::unique_ptr<Subscription>(SubscriptionFactory::create(Dependency("image.IMG",
                                                         SubscriptionType::READ),
                                              SubscriberType::READER, this,
-                                             std::bind(&MainWindow::imgIMG_updated, this));
+                                             std::bind(&MainWindow::imgIMG_updated, this)));
 }
 
 void MainWindow::imgIMG_updated()
 {
     qDebug() << "did I crash?!";
-    Subscription::Lock<multi_img> lock(imgIMG_Sub);
+    Subscription::Lock<multi_img> lock(*imgIMG_Sub);
     multi_img& img = lock();
 
     QPixmap pix = QPixmap::fromImage(img.export_qt(1));

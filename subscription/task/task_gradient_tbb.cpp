@@ -21,14 +21,8 @@ void TaskGradientTbb::run()
 
 }
 
-void TaskGradientTbb::setSubscription(QString id, Subscription *sub)
+void TaskGradientTbb::setSubscription(QString id, std::unique_ptr<Subscription> sub)
 {
-    if(id == "image.IMG") imgIMGSub = sub;
-    else if(id == "image.GRAD") imgGRADSub = sub;
-}
-
-void TaskGradientTbb::endSubscriptions()
-{
-    imgIMGSub->end();
-    imgGRADSub->end();
+    if(id == "image.IMG") imgIMGSub = std::move(sub);
+    else if(id == "image.GRAD") imgGRADSub = std::move(sub);
 }

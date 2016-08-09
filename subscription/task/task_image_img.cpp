@@ -1,13 +1,6 @@
 #include "task_image_img.h"
 #include "subscription.h"
-#include "lock.h"
-
-#include "multi_img.h"
-#include "multi_img/multi_img_tbb.h"
-
-#include <tbb/blocked_range.h>
-#include <tbb/blocked_range2d.h>
-#include <tbb/parallel_for.h>
+#include "subscription_factory.h"
 
 #include "task_scope_image.h"
 #include "task_rescale_tbb.h"
@@ -27,24 +20,31 @@ TaskImageIMG::~TaskImageIMG()
 
 void TaskImageIMG::run()
 {
-    std::shared_ptr<multi_img> scoped(new multi_img());
-    TaskScopeImage scopeImage(imgSub, roi, scoped);
+    TaskScopeImage scopeImage(roi);
+    createSubscriptions(&scopeImage);
     scopeImage.start();
 
-    TaskRescaleTbb rescaleTbb(imgSub, imgIMGSub, scoped, bands, roiBands,
-                              includecache);
+    qDebug() << "halfway there";
+
+    TaskRescaleTbb rescaleTbb(bands, roiBands, includecache);
+    createSubscriptions(&rescaleTbb);
     rescaleTbb.start();
-    qDebug() << "imageIMG finished";
 }
 
-void TaskImageIMG::setSubscription(QString id, Subscription *sub)
+void TaskImageIMG::setSubscription(QString id, std::unique_ptr<Subscription> sub)
 {
-    if(id == "image") imgSub = sub;
-    else if(id == "image.IMG") imgIMGSub = sub;
+    if (id == "image") sourceSub = std::move(sub);
+    else if (id == "image.IMG") targetSub = std::move(sub);
 }
 
-void TaskImageIMG::endSubscriptions()
+void TaskImageIMG::createSubscriptions(Task *task)
 {
-    imgSub->end();
-    imgIMGSub->end();
+    auto dependencies = task->getDependencies();
+    for(auto& dependency : dependencies) {
+
+        std::unique_ptr<Subscription> s(SubscriptionFactory::create(dependency,
+                                                                    SubscriberType::TASK));
+        task->setSubscription(dependency.dataId, std::move(s));
+    }
 }
+

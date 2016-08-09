@@ -32,8 +32,12 @@ private:
     SubscriptionManager sm;
     TaskScheduler* scheduler;
 
+    std::unique_ptr<Subscription> imgSub;
+    std::unique_ptr<Subscription> imgIMG_Sub;
+    /*
     Subscription* imgSub;
     Subscription* imgIMG_Sub;
+    */
 
     Subscription* dataASub;
     Subscription* dataBSub;

@@ -23,7 +23,6 @@ public:
     virtual ~Subscription() override;
     void returnData();
     void forceUpdate();
-    void end();
     int getId() { return id; }
     SubscriberType getSubscriberType() { return subscriberType; }
 
@@ -46,8 +45,10 @@ private:
     SubscriberType subscriberType;
     SubscriptionManager& sm;
     const int id;
-    static int idCounter;
+    static int spawnCounter;
+    static int destroyCounter;
 
+    bool ended = false;
     friend class SubscriptionFactory;
 };
 

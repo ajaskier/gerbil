@@ -12,29 +12,25 @@ class TaskRescaleTbb : public Task
 {
     Q_OBJECT
 public:
-    explicit TaskRescaleTbb(Subscription* imgSub, Subscription* imgIMGSub,
-                            std::shared_ptr<multi_img> scoped, size_t bands, size_t roiBands,
+    explicit TaskRescaleTbb(size_t bands, size_t roiBands,
                             bool includecache = true, QObject* parent = nullptr);
     virtual ~TaskRescaleTbb();
 
     virtual void run() override;
-    virtual void endSubscriptions() override;
 
 private:
 
-    virtual void setSubscription(QString id, Subscription *sub) override;
+    virtual void setSubscription(QString id, std::unique_ptr<Subscription> sub) override;
 
-    Subscription* imgSub;
-    Subscription* imgIMGSub;
+    std::unique_ptr<Subscription> sourceSub;
+    std::unique_ptr<Subscription> currentSub;
 
     size_t bands;
     size_t roiBands;
     size_t newsize;
     bool includecache;
     tbb::task_group_context stopper;
-    std::shared_ptr<multi_img> scoped;
 
 };
-
 
 #endif // TASK_RESCALE_TBB_H

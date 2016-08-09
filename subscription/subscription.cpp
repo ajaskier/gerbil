@@ -1,14 +1,20 @@
 #include "subscription.h"
 #include "subscription_manager.h"
 
-int Subscription::idCounter = 0;
-
+int Subscription::spawnCounter = 0;
+int Subscription::destroyCounter = 0;
 
 Subscription::Subscription(Dependency dependency,  SubscriberType subscriberType,
                            int id, SubscriptionManager& sm) :
     QObject(), dependency(dependency), subscriberType(subscriberType), sm(sm),
     id(id)
 {
+    {
+        spawnCounter++;
+        qDebug() << "created" << spawnCounter << "subs";
+    }
+
+
     sm.subscribe(dependency.dataId, dependency.subscription, this);
 }
 
@@ -18,6 +24,11 @@ Subscription::Subscription(Dependency dependency, SubscriberType subscriberType,
     : QObject(), dependency(dependency), subscriberType(subscriberType), sm(sm),
       id(id)
 {
+    {
+        spawnCounter++;
+        qDebug() << "created" << spawnCounter << "subs";
+    }
+
     connect(this, &Subscription::update, requester, updateSlot,
             Qt::QueuedConnection);
     sm.subscribe(dependency.dataId, dependency.subscription, this);
@@ -26,6 +37,11 @@ Subscription::Subscription(Dependency dependency, SubscriberType subscriberType,
 Subscription::~Subscription()
 {
     //qDebug() << "sub" << id << "deleted";
+    sm.unsubscribe(dependency.dataId, dependency.subscription, this);
+    {
+        destroyCounter++;
+        qDebug() << "deleted" << destroyCounter << "subs";
+    }
 }
 
 void Subscription::returnData()
@@ -37,12 +53,6 @@ void Subscription::returnData()
 void Subscription::forceUpdate()
 {
     emit update();
-}
-
-void Subscription::end()
-{
-    sm.unsubscribe(dependency.dataId, dependency.subscription, this);
-    this->deleteLater();
 }
 
 any_sptr Subscription::leaseData() {

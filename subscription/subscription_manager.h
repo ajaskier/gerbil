@@ -22,10 +22,13 @@ class SubscriptionManager : public QObject
     Q_OBJECT
 public:
 
-    explicit SubscriptionManager() : QObject() {}
+    explicit SubscriptionManager(QObject* parent = nullptr);
     void registerCreator(Model* creator, QString dataId, std::vector<QString> dependencies);
     void subscribe(QString dataId, SubscriptionType sub, Subscription* subObj);
     void unsubscribe(QString dataId, SubscriptionType sub, Subscription* subObj);
+
+signals:
+    void triggerTask(QString id);
 
 private:
 

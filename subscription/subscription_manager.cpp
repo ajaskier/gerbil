@@ -8,6 +8,13 @@
 
 #include <QDebug>
 
+SubscriptionManager::SubscriptionManager(QObject *parent)
+    : QObject(parent)
+{
+    connect(this, &SubscriptionManager::triggerTask, this, &SubscriptionManager::askModelForTask,
+            Qt::QueuedConnection);
+}
+
 void SubscriptionManager::registerCreator(Model* creator, QString dataId,
                                           std::vector<QString> dependencies) {
 
@@ -41,6 +48,7 @@ void SubscriptionManager::subscribeRead(QString dataId, Subscription* subObj)
     dataPool[dataId].willReads++;
     if(dataPool[dataId].validity == ValidityState::INVALID && !dataPool[dataId].willWrite) {
         askModelForTask(dataId);
+        //emit triggerTask(dataId);
     } else if(dataPool[dataId].access != AccessState::WRITE && instantRequest
               && dataPool[dataId].initialized) {
         sendUpdate(dataId);
@@ -63,7 +71,12 @@ void SubscriptionManager::unsubscribe(QString dataId, SubscriptionType sub,
 
     dataPool[dataId].currentSubs.erase(subObj->getId());
     if(sub == SubscriptionType::READ) dataPool[dataId].willReads--;
-    else dataPool[dataId].willWrite = false;
+    else {
+        dataPool[dataId].willWrite = false;
+        updateState(dataId);
+        sendUpdate(dataId);
+        propagateChange(dataId);
+    }
 }
 
 any_sptr SubscriptionManager::doSubscription(QString id, SubscriptionType sub) {
@@ -117,14 +130,15 @@ void SubscriptionManager::endDoWriteSubscription(QString id)
     dataPool[id].endWrite();
 
     updateState(id);
-    sendUpdate(id);
-    propagateChange(id);
+//    sendUpdate(id);
+//    propagateChange(id);
 }
 
 void SubscriptionManager::propagateChange(QString id) {
-    for(QString& data: dataPool[id].dependants) {
+    for(QString data: dataPool[id].dependants) {
         if(hasWillReads(data) && !dataPool[data].willWrite) {
-            askModelForTask(data);
+            //askModelForTask(data);
+            emit triggerTask(data);
         }
         propagateChange(data);
     }

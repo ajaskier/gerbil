@@ -22,19 +22,14 @@ void TaskA::run()
 
     Data data;
     data.num = a;
-    Subscription::Lock<Data> lock(dataASub);
+    Subscription::Lock<Data> lock(*dataASub);
     qDebug() << "got dataA";
     lock.swap(data);
 
     qDebug() << "swapped";
 }
 
-void TaskA::setSubscription(QString id, Subscription *sub)
+void TaskA::setSubscription(QString id, std::unique_ptr<Subscription> sub)
 {
-    if(id == "DATA_A") dataASub = sub;
-}
-
-void TaskA::endSubscriptions()
-{
-    dataASub->end();
+    if(id == "DATA_A") dataASub = std::move(sub);
 }

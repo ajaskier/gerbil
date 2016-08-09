@@ -3,7 +3,6 @@
 
 #include <QObject>
 #include <task/task.h>
-
 #include <opencv2/core/core.hpp>
 #include "multi_img.h"
 
@@ -11,20 +10,19 @@ class TaskScopeImage : public Task
 {
     Q_OBJECT
 public:
-    explicit TaskScopeImage(Subscription* imgSub, cv::Rect roi, std::shared_ptr<multi_img> target,
-                            QObject* parent = nullptr);
+    explicit TaskScopeImage(cv::Rect roi, QObject* parent = nullptr);
     virtual ~TaskScopeImage();
 
     virtual void run() override;
-    virtual void endSubscriptions() override;
 
 private:
 
-    virtual void setSubscription(QString id, Subscription *sub) override;
+    virtual void setSubscription(QString id,
+                                 std::unique_ptr<Subscription> sub) override;
 
-    Subscription* imgSub;
+    std::unique_ptr<Subscription> source;
+    std::unique_ptr<Subscription> target;
     cv::Rect roi;
-    std::shared_ptr<multi_img> target;
 };
 
 

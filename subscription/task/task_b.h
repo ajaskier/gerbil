@@ -13,15 +13,14 @@ public:
     virtual ~TaskB();
 
     virtual void run() override;
-    virtual void endSubscriptions() override;
 
 private:
 
-    virtual void setSubscription(QString id, Subscription *sub) override;
+    virtual void setSubscription(QString id, std::unique_ptr<Subscription> sub) override;
 
     int b;
-    Subscription* dataASub;
-    Subscription* dataBSub;
+    std::unique_ptr<Subscription> dataASub;
+    std::unique_ptr<Subscription> dataBSub;
 };
 
 #endif // TASK_B_H

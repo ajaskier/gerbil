@@ -20,26 +20,20 @@ void TaskB::run()
     Data data;
     //read phase
     {
-        Subscription::Lock<Data> lock(dataASub);
+        Subscription::Lock<Data> lock(*dataASub);
         data.num = b+lock().num;
         //QThread::sleep(5);
     }
     //write phase
     {
-        Subscription::Lock<Data> lock(dataBSub);
+        Subscription::Lock<Data> lock(*dataBSub);
         lock.swap(data);
     }
 
 }
 
-void TaskB::setSubscription(QString id, Subscription *sub)
+void TaskB::setSubscription(QString id, std::unique_ptr<Subscription> sub)
 {
-    if(id == "DATA_A") dataASub = sub;
-    else if(id == "DATA_B") dataBSub = sub;
-}
-
-void TaskB::endSubscriptions()
-{
-    dataASub->end();
-    dataBSub->end();
+    if(id == "DATA_A") dataASub = std::move(sub);
+    else if(id == "DATA_B") dataBSub = std::move(sub);
 }

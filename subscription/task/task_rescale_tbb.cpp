@@ -11,13 +11,14 @@
 #include <QDebug>
 
 
-TaskRescaleTbb::TaskRescaleTbb(Subscription* imgSub, Subscription* imgIMGSub,
-                               std::shared_ptr<multi_img> scoped, size_t bands, size_t roiBands,
+TaskRescaleTbb::TaskRescaleTbb(size_t bands, size_t roiBands,
                                bool includecache, QObject *parent)
-    : Task("rescaleImage", parent), imgSub(imgSub), imgIMGSub(imgIMGSub),
-      scoped(scoped), bands(bands), roiBands(roiBands),
+    : Task("rescaleImage", parent), bands(bands), roiBands(roiBands),
       includecache(includecache)
-{}
+{
+    dependencies = {Dependency("image", SubscriptionType::READ),
+                   Dependency("image.IMG", SubscriptionType::WRITE)};
+}
 
 TaskRescaleTbb::~TaskRescaleTbb()
 {}
@@ -26,8 +27,8 @@ void TaskRescaleTbb::run()
 {
     qDebug() << "rescale started";
     {
-        Subscription::Lock<multi_img_base> img_lock(imgSub);
-        multi_img_base& img = img_lock();
+        Subscription::Lock<multi_img_base> source(*sourceSub);
+        multi_img_base& img = source();
         int numBandsFull = img.size();
 
         if( (bands < 1 && roiBands < 1)
@@ -40,9 +41,11 @@ void TaskRescaleTbb::run()
         }
     }
 
-    multi_img* temp = new multi_img(*scoped, cv::Rect(0,0, scoped->width,
-                                                      scoped->height));
-    temp->roi = scoped->roi;
+    Subscription::Lock<multi_img> current(*currentSub);
+
+    multi_img* temp = new multi_img(current(), cv::Rect(0,0, current().width,
+                                                      current().height));
+    temp->roi = current().roi;
     RebuildPixels rebuildPixels(*temp);
     tbb::parallel_for(tbb::blocked_range<size_t>(0, temp->size()),
                       rebuildPixels, tbb::auto_partitioner(), stopper);
@@ -52,7 +55,7 @@ void TaskRescaleTbb::run()
 
     multi_img *target = nullptr;
     if(newsize != temp->size()) {
-        target = new multi_img(scoped->height, scoped->width,
+        target = new multi_img(current().height, current().width,
                                newsize);
         target->minval = temp->minval;
         target->maxval = temp->maxval;
@@ -95,16 +98,15 @@ void TaskRescaleTbb::run()
         delete target;
         return;
     } else {
-        Subscription::Lock<multi_img> img_lock(imgIMGSub);
-        img_lock.swap(*target);
+        current.swap(*target);
     }
 
     qDebug() << "rescale finished";
 
 }
 
-void TaskRescaleTbb::setSubscription(QString id, Subscription *sub)
-{}
-
-void TaskRescaleTbb::endSubscriptions()
-{}
+void TaskRescaleTbb::setSubscription(QString id, std::unique_ptr<Subscription> sub)
+{
+    if (id == "image") sourceSub = std::move(sub);
+    else if (id == "image.IMG") currentSub = std::move(sub);
+}

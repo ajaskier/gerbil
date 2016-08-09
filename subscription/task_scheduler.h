@@ -14,9 +14,6 @@ public:
     TaskScheduler(SubscriptionManager& sm);
     void pushTask(Task* task);
 
-protected slots:
-    void taskFinished(Task *task);
-
 protected:
     void checkTaskPool();
     void startTask(Task* task);

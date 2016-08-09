@@ -13,12 +13,8 @@ void TaskImageRepresentationImg::run()
 
 }
 
-void TaskImageRepresentationImg::setSubscription(QString id, Subscription *sub)
+void TaskImageRepresentationImg::setSubscription(QString id,
+                                                 std::unique_ptr<Subscription> sub)
 {
-    this->sub = sub;
-}
-
-void TaskImageRepresentationImg::endSubscriptions()
-{
-    sub->end();
+    this->sub = std::move(sub);
 }

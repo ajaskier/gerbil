@@ -26,24 +26,19 @@ void TaskImageLim::run()
         multi_img_offloaded offloaded = multi_img_offloaded(filelist.first,
                                                             filelist.second);
 
-        Subscription::Lock<multi_img_offloaded> lock(sub);
+        Subscription::Lock<multi_img_offloaded> lock(*sub);
         lock.swap(offloaded);
     } else {
         imginput::ImgInputConfig inputConfig;
         inputConfig.file = fn;
         multi_img::ptr img = imginput::ImgInput(inputConfig).execute();
 
-        Subscription::Lock<multi_img> lock(sub);
+        Subscription::Lock<multi_img> lock(*sub);
         lock.swap(*img);
     }
 }
 
-void TaskImageLim::setSubscription(QString id, Subscription *sub)
+void TaskImageLim::setSubscription(QString id, std::unique_ptr<Subscription> sub)
 {
-    this->sub = sub;
-}
-
-void TaskImageLim::endSubscriptions()
-{
-    sub->end();
+    this->sub = std::move(sub);
 }

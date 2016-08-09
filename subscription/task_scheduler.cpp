@@ -23,9 +23,10 @@ void TaskScheduler::createSubscriptions(Task *task)
 {
     auto dependencies = task->getDependencies();
     for(auto& dependency : dependencies) {
-        Subscription* s = SubscriptionFactory::create(dependency,
-                                                      SubscriberType::TASK);
-        task->setSubscription(dependency.dataId, s);
+
+        std::unique_ptr<Subscription> s(
+                    SubscriptionFactory::create(dependency,SubscriberType::TASK));
+        task->setSubscription(dependency.dataId, std::move(s));
     }
 }
 
@@ -41,6 +42,7 @@ void TaskScheduler::removeRelated(QString id)
                         }))
         {
             qDebug() << "need to remove " << (*it)->getId();
+            delete *it;
             it = taskPool.erase(it);
         } else {
             ++it;
@@ -67,17 +69,11 @@ void TaskScheduler::checkTaskPool()
 void TaskScheduler::startTask(Task *task)
 {
     qDebug() << "starting task" << task->getId();
-    connect(task, SIGNAL(finished(Task*)), this, SLOT(taskFinished(Task*)),
+    connect(task, &Task::finished, task, &Task::deleteLater);
+    connect(task, &Task::destroyed, this, &TaskScheduler::checkTaskPool,
             Qt::QueuedConnection);
-    WorkerThread *thread = new WorkerThread(task);
-    connect(thread, SIGNAL(finished()), thread, SLOT(deleteLater()));
-    thread->start();
-}
 
-void TaskScheduler::taskFinished(Task* task)
-{
-    qDebug() << "task" << task->getId() << "finished";
-    task->endSubscriptions();
-    task->deleteLater();
-    checkTaskPool();
+    WorkerThread *thread = new WorkerThread(task);
+    connect(thread, &WorkerThread::finished, thread, &WorkerThread::deleteLater);
+    thread->start();
 }

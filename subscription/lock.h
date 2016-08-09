@@ -9,7 +9,7 @@ template <class T>
 class Subscription::Lock
 {
 public:
-    Lock(Subscription* sub) : sub(sub), data_ptr(sub->leaseData()) {}
+    Lock(Subscription& sub) : sub(sub), data_ptr(sub.leaseData()) {}
     Lock(const Lock&) = delete;
     Lock(Lock&&) = delete;
     Lock& operator=(const Lock &) = delete;
@@ -30,12 +30,12 @@ public:
     }
 
     void release() {
-        sub->returnData();
+        sub.returnData();
         released = true;
     }
 
 private:
-    Subscription* sub;
+    Subscription& sub;
     any_sptr data_ptr;
     bool released = false;
 };

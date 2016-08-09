@@ -21,28 +21,20 @@ void TaskC::run()
 
     Data data;
     {
-        Subscription::Lock<Data> lockA(dataASub);
-        Subscription::Lock<Data> lockB(dataBSub);
+        Subscription::Lock<Data> lockA(*dataASub);
+        Subscription::Lock<Data> lockB(*dataBSub);
         //QThread::sleep(3);
         data.num = c + lockA().num + lockB().num;
     }
 
-    Subscription::Lock<Data> lockC(dataCSub);
+    Subscription::Lock<Data> lockC(*dataCSub);
     lockC.swap(data);
 
 }
 
-void TaskC::setSubscription(QString id, Subscription *sub)
+void TaskC::setSubscription(QString id, std::unique_ptr<Subscription> sub)
 {
-    if(id == "DATA_A") dataASub = sub;
-    else if(id == "DATA_B") dataBSub = sub;
-    else if(id == "DATA_C") dataCSub = sub;
+    if(id == "DATA_A") dataASub = std::move(sub);
+    else if(id == "DATA_B") dataBSub = std::move(sub);
+    else if(id == "DATA_C") dataCSub = std::move(sub);
 }
-
-void TaskC::endSubscriptions()
-{
-    dataASub->end();
-    dataBSub->end();
-    dataCSub->end();
-}
-

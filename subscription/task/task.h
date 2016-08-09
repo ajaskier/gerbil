@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QDebug>
+#include <memory>
 #include "dependency.h"
 
 class SubscriptionManager;
@@ -23,17 +24,16 @@ public:
     }
     virtual void start() {
         run();
-        emit finished(this);
+        emit finished();
     }
     std::vector<Dependency>& getDependencies() {
         return dependencies;
     }
     QString getId() { return id; }
-    virtual void setSubscription(QString id, Subscription* sub) = 0;
-    virtual void endSubscriptions() = 0;
+    virtual void setSubscription(QString id, std::unique_ptr<Subscription> sub) = 0;
 
 signals:
-    void finished(Task* task);
+    void finished();
 
 protected:
     virtual void run() = 0;

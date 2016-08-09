@@ -12,13 +12,12 @@ public:
     virtual ~TaskImageRepresentationImg();
 
     virtual void run() override;
-    virtual void endSubscriptions() override;
 
 private:
 
-    virtual void setSubscription(QString id, Subscription *sub) override;
+    virtual void setSubscription(QString id, std::unique_ptr<Subscription> sub) override;
 
-    Subscription* sub;
+    std::unique_ptr<Subscription> sub;
 };
 
 

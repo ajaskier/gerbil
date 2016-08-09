@@ -5,24 +5,30 @@
 #include "multi_img.h"
 #include <QDebug>
 
-TaskScopeImage::TaskScopeImage(Subscription *imgSub, cv::Rect roi,
-                               std::shared_ptr<multi_img> target,
-                               QObject *parent)
-    : Task("scopedImage", parent), imgSub(imgSub), roi(roi), target(target)
-{}
+TaskScopeImage::TaskScopeImage(cv::Rect roi, QObject *parent)
+    : Task("scopedImage", parent), roi(roi)
+{
+    dependencies = {Dependency("image", SubscriptionType::READ),
+                   Dependency("image.IMG", SubscriptionType::WRITE)};
+}
 
 TaskScopeImage::~TaskScopeImage()
 {}
 
 void TaskScopeImage::run()
 {
-    Subscription::Lock<multi_img> img_lock(imgSub);
-    *target = multi_img(img_lock(), roi);
+    Subscription::Lock<multi_img> source_lock(*source);
+
+    multi_img tmp(source_lock(), roi);
+
+    Subscription::Lock<multi_img> target_lock(*target);
+    target_lock.swap(tmp);
+
     qDebug() << "scoped finished!";
 }
 
-void TaskScopeImage::setSubscription(QString id, Subscription *sub)
-{}
-
-void TaskScopeImage::endSubscriptions()
-{}
+void TaskScopeImage::setSubscription(QString id, std::unique_ptr<Subscription> sub)
+{
+    if (id == "image") source = std::move(sub);
+    else if (id == "image.IMG") target = std::move(sub);
+}

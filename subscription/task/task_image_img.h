@@ -3,9 +3,7 @@
 
 #include <QObject>
 #include <task/task.h>
-
 #include <opencv2/core/core.hpp>
-#include <tbb/tbb.h>
 
 class TaskImageIMG : public Task
 {
@@ -14,16 +12,15 @@ public:
     explicit TaskImageIMG(cv::Rect roi, size_t bands, size_t roiBands,
                           bool includecache = true, QObject* parent = nullptr);
     virtual ~TaskImageIMG();
-
     virtual void run() override;
-    virtual void endSubscriptions() override;
 
 private:
 
-    virtual void setSubscription(QString id, Subscription *sub) override;
+    virtual void setSubscription(QString id, std::unique_ptr<Subscription> sub) override;
+    void createSubscriptions(Task* task);
 
-    Subscription* imgSub;
-    Subscription* imgIMGSub;
+    std::unique_ptr<Subscription> sourceSub;
+    std::unique_ptr<Subscription> targetSub;
 
     //scope
     cv::Rect roi;
@@ -31,7 +28,7 @@ private:
     //rescale
     size_t bands;
     size_t roiBands;
-    size_t newsize;
+    //size_t newsize;
     bool includecache;
 };
 
