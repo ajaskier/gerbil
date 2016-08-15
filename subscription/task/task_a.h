@@ -12,13 +12,12 @@ public:
     virtual ~TaskA();
 
     virtual void run() override;
+    virtual void setSubscription(QString id, std::shared_ptr<Subscription> sub) override;
 
 private:
 
-    virtual void setSubscription(QString id, std::unique_ptr<Subscription> sub) override;
-
     int a;
-    std::unique_ptr<Subscription> dataASub;
+    std::shared_ptr<Subscription> dataASub;
 
 };
 

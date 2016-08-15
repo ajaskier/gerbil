@@ -38,7 +38,7 @@ void TaskImageLim::run()
     }
 }
 
-void TaskImageLim::setSubscription(QString id, std::unique_ptr<Subscription> sub)
+void TaskImageLim::setSubscription(QString id, std::shared_ptr<Subscription> sub)
 {
-    this->sub = std::move(sub);
+    this->sub = sub;
 }

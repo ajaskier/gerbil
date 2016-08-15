@@ -14,12 +14,12 @@ public:
     virtual ~TaskNormL2Tbb();
 
     virtual void run() override;
+    virtual void setSubscription(QString id, std::shared_ptr<Subscription> sub) override;
 
 private:
-    virtual void setSubscription(QString id, std::unique_ptr<Subscription> sub) override;
 
-    std::unique_ptr<Subscription> imgNORMSub;
-    std::unique_ptr<Subscription> imgIMGSub;
+    std::shared_ptr<Subscription> imgNORMSub;
+    std::shared_ptr<Subscription> imgIMGSub;
     tbb::task_group_context stopper;
 };
 

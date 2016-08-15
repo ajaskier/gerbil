@@ -105,8 +105,8 @@ void TaskRescaleTbb::run()
 
 }
 
-void TaskRescaleTbb::setSubscription(QString id, std::unique_ptr<Subscription> sub)
+void TaskRescaleTbb::setSubscription(QString id, std::shared_ptr<Subscription> sub)
 {
-    if (id == "image") sourceSub = std::move(sub);
-    else if (id == "image.IMG") currentSub = std::move(sub);
+    if (id == "image") sourceSub = sub;
+    else if (id == "image.IMG") currentSub = sub;
 }

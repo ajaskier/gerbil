@@ -13,14 +13,12 @@ public:
                           bool includecache = true, QObject* parent = nullptr);
     virtual ~TaskImageIMG();
     virtual void run() override;
+    virtual void setSubscription(QString id, std::shared_ptr<Subscription> sub) override;
 
 private:
 
-    virtual void setSubscription(QString id, std::unique_ptr<Subscription> sub) override;
-    void createSubscriptions(Task* task);
-
-    std::unique_ptr<Subscription> sourceSub;
-    std::unique_ptr<Subscription> targetSub;
+    std::shared_ptr<Subscription> sourceSub;
+    std::shared_ptr<Subscription> targetSub;
 
     //scope
     cv::Rect roi;

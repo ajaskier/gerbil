@@ -30,7 +30,7 @@ public:
         return dependencies;
     }
     QString getId() { return id; }
-    virtual void setSubscription(QString id, std::unique_ptr<Subscription> sub) = 0;
+    virtual void setSubscription(QString id, std::shared_ptr<Subscription> sub) = 0;
 
 signals:
     void finished();

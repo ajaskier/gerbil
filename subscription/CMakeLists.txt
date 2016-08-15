@@ -29,7 +29,6 @@ vole_compile_library(
 	task/task_c
 	task/task_d
         task/task_image_lim
-        task/task_image_representation_img
         task/task_scope_image
         task/task_rescale_tbb
         task/task_norml2tbb
@@ -56,7 +55,6 @@ vole_moc_library(
 	task/task_c.h
 	task/task_d.h
         task/task_image_lim.h
-        task/task_image_representation_img.h
         task/task_scope_image.h
         task/task_rescale_tbb.h
         task/task_norml2tbb.h

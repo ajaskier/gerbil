@@ -29,7 +29,7 @@ void TaskA::run()
     qDebug() << "swapped";
 }
 
-void TaskA::setSubscription(QString id, std::unique_ptr<Subscription> sub)
+void TaskA::setSubscription(QString id, std::shared_ptr<Subscription> sub)
 {
-    if(id == "DATA_A") dataASub = std::move(sub);
+    if(id == "DATA_A") dataASub = sub;
 }

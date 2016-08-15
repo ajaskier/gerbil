@@ -1,6 +1,5 @@
 #include "task_image_img.h"
 #include "subscription.h"
-#include "subscription_factory.h"
 
 #include "task_scope_image.h"
 #include "task_rescale_tbb.h"
@@ -21,30 +20,21 @@ TaskImageIMG::~TaskImageIMG()
 void TaskImageIMG::run()
 {
     TaskScopeImage scopeImage(roi);
-    createSubscriptions(&scopeImage);
+    scopeImage.setSubscription("image", sourceSub);
+    scopeImage.setSubscription("image.IMG", targetSub);
     scopeImage.start();
 
     qDebug() << "halfway there";
 
     TaskRescaleTbb rescaleTbb(bands, roiBands, includecache);
-    createSubscriptions(&rescaleTbb);
+    rescaleTbb.setSubscription("image", sourceSub);
+    rescaleTbb.setSubscription("image.IMG", targetSub);
     rescaleTbb.start();
 }
 
-void TaskImageIMG::setSubscription(QString id, std::unique_ptr<Subscription> sub)
+void TaskImageIMG::setSubscription(QString id, std::shared_ptr<Subscription> sub)
 {
-    if (id == "image") sourceSub = std::move(sub);
-    else if (id == "image.IMG") targetSub = std::move(sub);
-}
-
-void TaskImageIMG::createSubscriptions(Task *task)
-{
-    auto dependencies = task->getDependencies();
-    for(auto& dependency : dependencies) {
-
-        std::unique_ptr<Subscription> s(SubscriptionFactory::create(dependency,
-                                                                    SubscriberType::TASK));
-        task->setSubscription(dependency.dataId, std::move(s));
-    }
+    if (id == "image") sourceSub = sub;
+    else if (id == "image.IMG") targetSub = sub;
 }
 

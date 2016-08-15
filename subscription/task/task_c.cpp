@@ -32,9 +32,9 @@ void TaskC::run()
 
 }
 
-void TaskC::setSubscription(QString id, std::unique_ptr<Subscription> sub)
+void TaskC::setSubscription(QString id, std::shared_ptr<Subscription> sub)
 {
-    if(id == "DATA_A") dataASub = std::move(sub);
-    else if(id == "DATA_B") dataBSub = std::move(sub);
-    else if(id == "DATA_C") dataCSub = std::move(sub);
+    if(id == "DATA_A") dataASub = sub;
+    else if(id == "DATA_B") dataBSub = sub;
+    else if(id == "DATA_C") dataCSub = sub;
 }

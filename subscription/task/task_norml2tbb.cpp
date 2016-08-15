@@ -32,8 +32,8 @@ void TaskNormL2Tbb::run()
 
 }
 
-void TaskNormL2Tbb::setSubscription(QString id, std::unique_ptr<Subscription> sub)
+void TaskNormL2Tbb::setSubscription(QString id, std::shared_ptr<Subscription> sub)
 {
-    if(id == "image.NORM") imgNORMSub = std::move(sub);
-    else if(id == "image.IMG") imgIMGSub = std::move(sub);
+    if(id == "image.NORM") imgNORMSub = sub;
+    else if(id == "image.IMG") imgIMGSub = sub;
 }

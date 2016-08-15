@@ -14,13 +14,12 @@ public:
     virtual ~TaskGradientTbb();
 
     virtual void run() override;
+    virtual void setSubscription(QString id, std::shared_ptr<Subscription> sub) override;
 
 private:
 
-    virtual void setSubscription(QString id, std::unique_ptr<Subscription> sub) override;
-
-    std::unique_ptr<Subscription> imgIMGSub;
-    std::unique_ptr<Subscription> imgGRADSub;
+    std::shared_ptr<Subscription> imgIMGSub;
+    std::shared_ptr<Subscription> imgGRADSub;
     bool includecache;
 };
 

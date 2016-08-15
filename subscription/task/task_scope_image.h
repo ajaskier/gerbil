@@ -14,14 +14,13 @@ public:
     virtual ~TaskScopeImage();
 
     virtual void run() override;
+    virtual void setSubscription(QString id,
+                                 std::shared_ptr<Subscription> sub) override;
 
 private:
 
-    virtual void setSubscription(QString id,
-                                 std::unique_ptr<Subscription> sub) override;
-
-    std::unique_ptr<Subscription> source;
-    std::unique_ptr<Subscription> target;
+    std::shared_ptr<Subscription> source;
+    std::shared_ptr<Subscription> target;
     cv::Rect roi;
 };
 

@@ -27,8 +27,8 @@ void TaskScopeImage::run()
     qDebug() << "scoped finished!";
 }
 
-void TaskScopeImage::setSubscription(QString id, std::unique_ptr<Subscription> sub)
+void TaskScopeImage::setSubscription(QString id, std::shared_ptr<Subscription> sub)
 {
-    if (id == "image") source = std::move(sub);
-    else if (id == "image.IMG") target = std::move(sub);
+    if (id == "image") source = sub;
+    else if (id == "image.IMG") target = sub;
 }

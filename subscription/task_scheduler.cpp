@@ -24,7 +24,7 @@ void TaskScheduler::createSubscriptions(Task *task)
     auto dependencies = task->getDependencies();
     for(auto& dependency : dependencies) {
 
-        std::unique_ptr<Subscription> s(
+        std::shared_ptr<Subscription> s(
                     SubscriptionFactory::create(dependency,SubscriberType::TASK));
         task->setSubscription(dependency.dataId, std::move(s));
     }

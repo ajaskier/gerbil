@@ -17,13 +17,12 @@ public:
     virtual ~TaskRescaleTbb();
 
     virtual void run() override;
+    virtual void setSubscription(QString id, std::shared_ptr<Subscription> sub) override;
 
 private:
 
-    virtual void setSubscription(QString id, std::unique_ptr<Subscription> sub) override;
-
-    std::unique_ptr<Subscription> sourceSub;
-    std::unique_ptr<Subscription> currentSub;
+    std::shared_ptr<Subscription> sourceSub;
+    std::shared_ptr<Subscription> currentSub;
 
     size_t bands;
     size_t roiBands;

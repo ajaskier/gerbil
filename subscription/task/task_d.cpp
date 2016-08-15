@@ -31,8 +31,8 @@ void TaskD::run()
 
 }
 
-void TaskD::setSubscription(QString id, std::unique_ptr<Subscription> sub)
+void TaskD::setSubscription(QString id, std::shared_ptr<Subscription> sub)
 {
-    if(id == "DATA_A") dataASub = std::move(sub);
-    else if(id == "DATA_D") dataDSub = std::move(sub);
+    if(id == "DATA_A") dataASub = sub;
+    else if(id == "DATA_D") dataDSub = sub;
 }
