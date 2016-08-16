@@ -10,9 +10,8 @@
 #include <tbb/blocked_range2d.h>
 #include <tbb/parallel_for.h>
 
-TaskPcaTbb::TaskPcaTbb(unsigned int components, bool includecache,
-                       QObject *parent)
-    : Task("image.IMGPCA", parent), components(components),
+TaskPcaTbb::TaskPcaTbb(unsigned int components, bool includecache)
+    : Task("image.IMGPCA"), components(components),
       includecache(includecache)
 {
     dependencies = {Dependency("image.IMG", SubscriptionType::READ),

@@ -9,9 +9,9 @@
 
 class TaskGradientTbb : public Task
 {
-    Q_OBJECT
+
 public:
-    explicit TaskGradientTbb(bool includecache = true, QObject* parent = nullptr);
+    explicit TaskGradientTbb(bool includecache = true);
     virtual ~TaskGradientTbb();
 
     virtual void run() override;

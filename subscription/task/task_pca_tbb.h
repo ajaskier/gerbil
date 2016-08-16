@@ -9,10 +9,9 @@
 
 class TaskPcaTbb : public Task
 {
-    Q_OBJECT
+
 public:
-    explicit TaskPcaTbb(unsigned int components = 0, bool includecache = true,
-                        QObject* parent = nullptr);
+    explicit TaskPcaTbb(unsigned int components = 0, bool includecache = true);
     virtual ~TaskPcaTbb();
 
     virtual void run() override;

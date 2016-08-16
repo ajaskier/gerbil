@@ -6,8 +6,8 @@
 #include <QDebug>
 
 TaskImageIMG::TaskImageIMG(cv::Rect roi, size_t bands, size_t roiBands,
-                               bool includecache, QObject *parent)
-    : Task("image.IMG", parent), roi(roi), bands(bands), roiBands(roiBands),
+                               bool includecache)
+    : Task("image.IMG"), roi(roi), bands(bands), roiBands(roiBands),
       includecache(includecache)
 {
     dependencies = {Dependency("image.IMG", SubscriptionType::WRITE),

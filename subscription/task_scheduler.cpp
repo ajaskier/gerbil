@@ -69,11 +69,11 @@ void TaskScheduler::checkTaskPool()
 void TaskScheduler::startTask(Task *task)
 {
     qDebug() << "starting task" << task->getId();
-    connect(task, &Task::finished, task, &Task::deleteLater);
-    connect(task, &Task::destroyed, this, &TaskScheduler::checkTaskPool,
-            Qt::QueuedConnection);
 
     WorkerThread *thread = new WorkerThread(task);
     connect(thread, &WorkerThread::finished, thread, &WorkerThread::deleteLater);
+    connect(thread, &WorkerThread::finished, this, &TaskScheduler::checkTaskPool,
+            Qt::QueuedConnection);
+
     thread->start();
 }

@@ -49,19 +49,6 @@ vole_moc_library(
 	model/model_a.h
 	model/model_b.h
 	model/model_d.h
-	
-	task/task.h
-	task/task_a.h
-	task/task_b.h
-	task/task_c.h
-	task/task_d.h
-        task/task_image_lim.h
-        task/task_scope_image.h
-        task/task_rescale_tbb.h
-        task/task_norml2tbb.h
-        task/task_gradient_tbb.h
-        task/task_image_img.h
-        task/task_pca_tbb.h
 
         imagemodel.h
 )

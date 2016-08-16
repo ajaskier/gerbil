@@ -12,28 +12,24 @@ enum class SubscriptionType;
 class Subscription;
 
 
-class Task : public QObject
+class Task
 {
-    Q_OBJECT
 
 public:
-    explicit Task(QString id, QObject *parent = 0)
-        : QObject(parent), id(id) {}
+    explicit Task(QString id) : id(id) {}
     virtual ~Task() {
         qDebug() << "deleting task" << id;
     }
     virtual void start() {
         run();
-        emit finished();
     }
+
     std::vector<Dependency>& getDependencies() {
         return dependencies;
     }
     QString getId() { return id; }
     virtual void setSubscription(QString id, std::shared_ptr<Subscription> sub) = 0;
 
-signals:
-    void finished();
 
 protected:
     virtual void run() = 0;

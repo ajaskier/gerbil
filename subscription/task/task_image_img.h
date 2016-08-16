@@ -7,10 +7,10 @@
 
 class TaskImageIMG : public Task
 {
-    Q_OBJECT
+
 public:
     explicit TaskImageIMG(cv::Rect roi, size_t bands, size_t roiBands,
-                          bool includecache = true, QObject* parent = nullptr);
+                          bool includecache = true);
     virtual ~TaskImageIMG();
     virtual void run() override;
     virtual void setSubscription(QString id, std::shared_ptr<Subscription> sub) override;

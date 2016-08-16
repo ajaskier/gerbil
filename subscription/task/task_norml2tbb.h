@@ -8,9 +8,9 @@
 
 class TaskNormL2Tbb : public Task
 {
-    Q_OBJECT
+
 public:
-    explicit TaskNormL2Tbb(QObject* parent = nullptr);
+    explicit TaskNormL2Tbb();
     virtual ~TaskNormL2Tbb();
 
     virtual void run() override;

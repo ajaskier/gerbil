@@ -10,10 +10,16 @@ class WorkerThread : public QThread
 
     void run() override {
         t->start();
+        delete t;
+
+        emit finished();
     }
 
 public:
     WorkerThread(Task* t, QObject* parent = 0) : QThread(parent), t(t) {}
+
+signals:
+    void finished();
 
 private:
    Task* t;

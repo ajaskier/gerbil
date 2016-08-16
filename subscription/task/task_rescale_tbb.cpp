@@ -12,8 +12,8 @@
 
 
 TaskRescaleTbb::TaskRescaleTbb(size_t bands, size_t roiBands,
-                               bool includecache, QObject *parent)
-    : Task("rescaleImage", parent), bands(bands), roiBands(roiBands),
+                               bool includecache)
+    : Task("rescaleImage"), bands(bands), roiBands(roiBands),
       includecache(includecache)
 {
     dependencies = {Dependency("image", SubscriptionType::READ),

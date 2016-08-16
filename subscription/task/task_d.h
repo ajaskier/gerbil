@@ -7,9 +7,9 @@
 
 class TaskD : public Task
 {
-    Q_OBJECT
+
 public:
-    explicit TaskD(int d, QObject* parent = 0);
+    explicit TaskD(int d);
     virtual ~TaskD();
 
     virtual void run() override;

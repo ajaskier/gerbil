@@ -6,8 +6,8 @@
 #include "multi_img/multi_img_offloaded.h"
 #include "imginput.h"
 
-TaskImageLim::TaskImageLim(const QString &filename, bool limitedMode, QObject *parent)
-    : Task("image", parent), filename(filename), limitedMode(limitedMode)
+TaskImageLim::TaskImageLim(const QString &filename, bool limitedMode)
+    : Task("image"), filename(filename), limitedMode(limitedMode)
 {
     dependencies = {Dependency("image", SubscriptionType::WRITE)};
 }

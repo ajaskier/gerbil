@@ -6,10 +6,9 @@
 
 class TaskImageLim : public Task
 {
-    Q_OBJECT
+
 public:
-    explicit TaskImageLim(const QString &filename, bool limitedMode,
-                          QObject* parent = nullptr);
+    explicit TaskImageLim(const QString &filename, bool limitedMode);
     virtual ~TaskImageLim();
 
     virtual void run() override;

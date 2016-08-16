@@ -10,8 +10,8 @@
 #include <tbb/blocked_range2d.h>
 #include <tbb/parallel_for.h>
 
-TaskNormL2Tbb::TaskNormL2Tbb(QObject *parent)
-    : Task("image.NORM", parent)
+TaskNormL2Tbb::TaskNormL2Tbb()
+    : Task("image.NORM")
 {
     dependencies = {Dependency("image.NORM", SubscriptionType::WRITE),
                     Dependency("image.IMG", SubscriptionType::READ)};

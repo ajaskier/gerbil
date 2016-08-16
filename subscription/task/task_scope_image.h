@@ -8,9 +8,9 @@
 
 class TaskScopeImage : public Task
 {
-    Q_OBJECT
+
 public:
-    explicit TaskScopeImage(cv::Rect roi, QObject* parent = nullptr);
+    explicit TaskScopeImage(cv::Rect roi);
     virtual ~TaskScopeImage();
 
     virtual void run() override;

@@ -10,8 +10,8 @@
 #include <tbb/blocked_range2d.h>
 #include <tbb/parallel_for.h>
 
-TaskGradientTbb::TaskGradientTbb(bool includecache, QObject *parent)
-    : Task("image.GRAD", parent), includecache(includecache)
+TaskGradientTbb::TaskGradientTbb(bool includecache)
+    : Task("image.GRAD"), includecache(includecache)
 {
     dependencies = {Dependency("image.IMG", SubscriptionType::READ),
                     Dependency("image.GRAD", SubscriptionType::WRITE)};

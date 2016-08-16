@@ -10,10 +10,10 @@
 
 class TaskRescaleTbb : public Task
 {
-    Q_OBJECT
+
 public:
     explicit TaskRescaleTbb(size_t bands, size_t roiBands,
-                            bool includecache = true, QObject* parent = nullptr);
+                            bool includecache = true);
     virtual ~TaskRescaleTbb();
 
     virtual void run() override;

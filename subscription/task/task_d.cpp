@@ -4,8 +4,8 @@
 #include <QThread>
 #include "data.h"
 
-TaskD::TaskD(int d, QObject *parent)
-    : Task("DATA_D", parent), d(d)
+TaskD::TaskD(int d)
+    : Task("DATA_D"), d(d)
 {
     dependencies = { Dependency("DATA_D", SubscriptionType::WRITE),
                    Dependency("DATA_A", SubscriptionType::READ) };

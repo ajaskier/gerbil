@@ -6,8 +6,8 @@
 #include <memory>
 #include "lock.h"
 
-TaskA::TaskA(int a, QObject* parent)
-    : Task("DATA_A", parent), a(a)
+TaskA::TaskA(int a)
+    : Task("DATA_A"), a(a)
 {
     dependencies = {Dependency("DATA_A", SubscriptionType::WRITE)};
 }

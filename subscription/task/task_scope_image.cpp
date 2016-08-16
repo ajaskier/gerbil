@@ -5,8 +5,8 @@
 #include "multi_img.h"
 #include <QDebug>
 
-TaskScopeImage::TaskScopeImage(cv::Rect roi, QObject *parent)
-    : Task("scopedImage", parent), roi(roi)
+TaskScopeImage::TaskScopeImage(cv::Rect roi)
+    : Task("scopedImage"), roi(roi)
 {
     dependencies = {Dependency("image", SubscriptionType::READ),
                    Dependency("image.IMG", SubscriptionType::WRITE)};
