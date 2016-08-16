@@ -21,7 +21,7 @@ void TaskD::run()
     Data data;
     {
         Subscription::Lock<Data> lockA(*dataASub);
-        data.num = d + lockA().num + 1;
+        data.num = d + lockA()->num + 1;
         //QThread::sleep(3);
     }
 
@@ -33,6 +33,6 @@ void TaskD::run()
 
 void TaskD::setSubscription(QString id, std::shared_ptr<Subscription> sub)
 {
-    if(id == "DATA_A") dataASub = sub;
-    else if(id == "DATA_D") dataDSub = sub;
+    if (id == "DATA_A") dataASub = sub;
+    else if (id == "DATA_D") dataDSub = sub;
 }

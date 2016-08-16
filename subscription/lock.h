@@ -15,12 +15,19 @@ public:
     Lock& operator=(const Lock &) = delete;
     Lock& operator=(Lock&&) = delete;
     ~Lock() {
-        if(!released) release();
+        if (!released) release();
     }
 
-    T& operator()() {
-        T& data = boost::dynamic_any_cast<T&>(*data_ptr);
-        return data;
+    T* operator()() {
+
+        try {
+            T& data = boost::dynamic_any_cast<T&>(*data_ptr);
+            return &data;
+        }
+        catch (...) {
+            return nullptr;
+        }
+
     }
 
     void swap(T& target) {

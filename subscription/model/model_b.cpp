@@ -19,9 +19,9 @@ ModelB::ModelB(int b, int c, SubscriptionManager &sm, TaskScheduler* scheduler,
 void ModelB::delegateTask(QString id)
 {
     Task* task;
-    if(id == "DATA_B") {
+    if (id == "DATA_B") {
         task = new TaskB(b);
-    } else if(id == "DATA_C") {
+    } else if (id == "DATA_C") {
         task = new TaskC(c);
     }
     scheduler->pushTask(task);

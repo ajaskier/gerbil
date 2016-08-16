@@ -15,7 +15,7 @@ ModelD::ModelD(int d, SubscriptionManager &sm, TaskScheduler* scheduler,
 
 void ModelD::delegateTask(QString id)
 {
-    if(id == "DATA_D") {
+    if (id == "DATA_D") {
         Task* task = new TaskD(d);
         scheduler->pushTask(task);
     }

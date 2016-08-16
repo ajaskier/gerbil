@@ -21,7 +21,7 @@ void TaskB::run()
     //read phase
     {
         Subscription::Lock<Data> lock(*dataASub);
-        data.num = b+lock().num;
+        data.num = b+lock()->num;
         //QThread::sleep(5);
     }
     //write phase
@@ -34,6 +34,6 @@ void TaskB::run()
 
 void TaskB::setSubscription(QString id, std::shared_ptr<Subscription> sub)
 {
-    if(id == "DATA_A") dataASub = sub;
-    else if(id == "DATA_B") dataBSub = sub;
+    if (id == "DATA_A") dataASub = sub;
+    else if (id == "DATA_B") dataBSub = sub;
 }

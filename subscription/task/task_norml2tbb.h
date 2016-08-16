@@ -18,8 +18,8 @@ public:
 
 private:
 
-    std::shared_ptr<Subscription> imgNORMSub;
-    std::shared_ptr<Subscription> imgIMGSub;
+    std::shared_ptr<Subscription> sourceSub;
+    std::shared_ptr<Subscription> currentSub;
     tbb::task_group_context stopper;
 };
 

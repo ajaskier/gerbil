@@ -34,6 +34,7 @@ vole_compile_library(
         task/task_norml2tbb
         task/task_gradient_tbb
         task/task_image_img
+        task/task_pca_tbb
 
         imagemodel
 )
@@ -60,6 +61,7 @@ vole_moc_library(
         task/task_norml2tbb.h
         task/task_gradient_tbb.h
         task/task_image_img.h
+        task/task_pca_tbb.h
 
         imagemodel.h
 )

@@ -34,7 +34,7 @@ void SubscriptionManager::subscribe(QString dataId, SubscriptionType sub,
 {
     dataPool[dataId].currentSubs[subObj->getId()] = subObj;
 
-    if(sub == SubscriptionType::READ) subscribeRead(dataId, subObj);
+    if (sub == SubscriptionType::READ) subscribeRead(dataId, subObj);
     else subscribeWrite(dataId);
 
     updateState(dataId);
@@ -46,10 +46,10 @@ void SubscriptionManager::subscribeRead(QString dataId, Subscription* subObj)
 
     bool instantRequest = subObj->getSubscriberType() == SubscriberType::READER;
     dataPool[dataId].willReads++;
-    if(dataPool[dataId].validity == ValidityState::INVALID && !dataPool[dataId].willWrite) {
+    if (dataPool[dataId].validity == ValidityState::INVALID && !dataPool[dataId].willWrite) {
         askModelForTask(dataId);
         //emit triggerTask(dataId);
-    } else if(dataPool[dataId].access != AccessState::WRITE && instantRequest
+    } else if (dataPool[dataId].access != AccessState::WRITE && instantRequest
               && dataPool[dataId].initialized) {
         sendUpdate(dataId);
     }
@@ -70,7 +70,7 @@ void SubscriptionManager::unsubscribe(QString dataId, SubscriptionType sub,
     std::unique_lock<std::recursive_mutex> lock(mu);
 
     dataPool[dataId].currentSubs.erase(subObj->getId());
-    if(sub == SubscriptionType::READ) dataPool[dataId].willReads--;
+    if (sub == SubscriptionType::READ) dataPool[dataId].willReads--;
     else {
         dataPool[dataId].willWrite = false;
         updateState(dataId);
@@ -80,7 +80,7 @@ void SubscriptionManager::unsubscribe(QString dataId, SubscriptionType sub,
 }
 
 any_sptr SubscriptionManager::doSubscription(QString id, SubscriptionType sub) {
-    if(sub == SubscriptionType::READ) return doReadSubscription(id);
+    if (sub == SubscriptionType::READ) return doReadSubscription(id);
     else return doWriteSubscription(id);
 }
 
@@ -109,7 +109,7 @@ any_sptr SubscriptionManager::doWriteSubscription(QString id)
 
 void SubscriptionManager::endDoSubscription(QString id, SubscriptionType sub)
 {
-    if(sub == SubscriptionType::READ) endDoReadSubscription(id);
+    if (sub == SubscriptionType::READ) endDoReadSubscription(id);
     else endDoWriteSubscription(id);
 }
 
@@ -136,7 +136,7 @@ void SubscriptionManager::endDoWriteSubscription(QString id)
 
 void SubscriptionManager::propagateChange(QString id) {
     for(QString data: dataPool[id].dependants) {
-        if(hasWillReads(data) && !dataPool[data].willWrite) {
+        if (hasWillReads(data) && !dataPool[data].willWrite) {
             //askModelForTask(data);
             emit triggerTask(data);
         }
@@ -157,17 +157,17 @@ void SubscriptionManager::updateState(QString id)
 {
     std::unique_lock<std::recursive_mutex> lock(mu);
 
-    if(dataPool[id].upToDate) dataPool[id].validity = ValidityState::VALID;
+    if (dataPool[id].upToDate) dataPool[id].validity = ValidityState::VALID;
     else dataPool[id].validity = ValidityState::INVALID;
 
-    if(!dataPool[id].doWrite && dataPool[id].doReads == 0)
+    if (!dataPool[id].doWrite && dataPool[id].doReads == 0)
     {
         dataPool[id].access = AccessState::NONE;
     }
-    else if(dataPool[id].doWrite && dataPool[id].doReads == 0)
+    else if (dataPool[id].doWrite && dataPool[id].doReads == 0)
     {
         dataPool[id].access = AccessState::WRITE;
-    } else if(!dataPool[id].doWrite && dataPool[id].doReads > 0)
+    } else if (!dataPool[id].doWrite && dataPool[id].doReads > 0)
     {
         dataPool[id].access = AccessState::READ;
     } else {
@@ -185,7 +185,7 @@ void SubscriptionManager::sendUpdate(QString id)
 
 bool SubscriptionManager::hasWillReads(QString parentId) {
 
-    if(dataPool[parentId].willReads > 0)
+    if (dataPool[parentId].willReads > 0)
         return true;
 
     auto& deps = dataPool[parentId].dependants;
@@ -208,7 +208,7 @@ bool SubscriptionManager::processDependencies(std::vector<Dependency> &dependenc
     for(Dependency& dep : dependencies) {
         QString dataId = dep.dataId;
 
-        if(dep.subscription == SubscriptionType::READ
+        if (dep.subscription == SubscriptionType::READ
                 && (dataPool[dataId].access == AccessState::WRITE
                     || dataPool[dataId].validity != ValidityState::VALID))
             return false;

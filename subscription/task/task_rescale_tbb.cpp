@@ -28,10 +28,10 @@ void TaskRescaleTbb::run()
     qDebug() << "rescale started";
     {
         Subscription::Lock<multi_img_base> source(*sourceSub);
-        multi_img_base& img = source();
-        int numBandsFull = img.size();
+        multi_img_base* img = source();
+        int numBandsFull = img->size();
 
-        if( (bands < 1 && roiBands < 1)
+        if ((bands < 1 && roiBands < 1)
                 || bands > numBandsFull) {
             newsize = numBandsFull;
         } else if (bands < 1 ) {
@@ -43,9 +43,9 @@ void TaskRescaleTbb::run()
 
     Subscription::Lock<multi_img> current(*currentSub);
 
-    multi_img* temp = new multi_img(current(), cv::Rect(0,0, current().width,
-                                                      current().height));
-    temp->roi = current().roi;
+    multi_img* temp = new multi_img(*current(), cv::Rect(0,0, current()->width,
+                                                      current()->height));
+    temp->roi = current()->roi;
     RebuildPixels rebuildPixels(*temp);
     tbb::parallel_for(tbb::blocked_range<size_t>(0, temp->size()),
                       rebuildPixels, tbb::auto_partitioner(), stopper);
@@ -54,8 +54,8 @@ void TaskRescaleTbb::run()
     temp->anydirt = false;
 
     multi_img *target = nullptr;
-    if(newsize != temp->size()) {
-        target = new multi_img(current().height, current().width,
+    if (newsize != temp->size()) {
+        target = new multi_img(current()->height, current()->width,
                                newsize);
         target->minval = temp->minval;
         target->maxval = temp->maxval;
@@ -71,7 +71,7 @@ void TaskRescaleTbb::run()
         target->dirty.setTo(0);
         target->anydirt = false;
 
-        if(!stopper.is_group_execution_cancelled()) {
+        if (!stopper.is_group_execution_cancelled()) {
             cv::Mat_<float> tmpmeta1(cv::Size(temp->meta.size(), 1)), tmpmeta2;
             std::vector<multi_img::BandDesc>::const_iterator it;
             unsigned int i;

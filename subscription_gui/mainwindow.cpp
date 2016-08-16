@@ -30,12 +30,22 @@ void MainWindow::initCrucials()
     imgSub = std::unique_ptr<Subscription>(SubscriptionFactory::create(Dependency("image", SubscriptionType::READ),
                                          SubscriberType::READER, this,
                                          std::bind(&MainWindow::imgUpdated, this)));
-   // initRest();
 }
 
 void MainWindow::initRest()
 {
     ui->setupUi(this);
+
+
+    {
+        Subscription::Lock<multi_img> lock(*imgSub);
+        multi_img* img = lock();
+        imageModel->setROI(img->roi);
+
+        QPixmap pix = QPixmap::fromImage(img->export_qt(1));
+        ui->imageLabel->setPixmap(pix);
+    }
+
 
     modelA = new ModelA(1, sm, scheduler, this);
     modelD = new ModelD(1, sm, scheduler, this);
@@ -62,7 +72,7 @@ MainWindow::~MainWindow()
 
 void MainWindow::dockAVisibilityChanged(bool visible)
 {
-    if(visible) {
+    if (visible) {
         dataASub = SubscriptionFactory::create(Dependency("DATA_A", SubscriptionType::READ),
                                                SubscriberType::READER, this,
                                                std::bind(&MainWindow::displayA, this));
@@ -78,7 +88,7 @@ void MainWindow::displayA()
     qDebug() << "displayA";
 
     Subscription::Lock<Data> lock(*dataASub);
-    int num = lock().num;
+    int num = lock()->num;
 
     ui->outputA->setText(QString::number(num));
 }
@@ -89,8 +99,8 @@ void MainWindow::imgUpdated()
 
     {
         Subscription::Lock<multi_img> lock(*imgSub);
-        multi_img& img = lock();
-        imageModel->setROI(img.roi);
+        multi_img* img = lock();
+        imageModel->setROI(img->roi);
     }
 
     initRest();
@@ -107,7 +117,7 @@ cv::Rect MainWindow::getDimensions()
 
 void MainWindow::dockBVisibilityChanged(bool visible)
 {
-    if(visible) {
+    if (visible) {
         dataBSub = SubscriptionFactory::create(Dependency("DATA_B",SubscriptionType::READ),
                                                SubscriberType::READER, this,
                                                std::bind(&MainWindow::displayB, this));
@@ -129,14 +139,14 @@ void MainWindow::displayB()
     qDebug() << "displayB";
 
     Subscription::Lock<Data> lock(*dataBSub);
-    int num = lock().num;
+    int num = lock()->num;
 
     ui->outputB->setText(QString::number(num));
 }
 
 void MainWindow::dockCVisibilityChanged(bool visible)
 {
-    if(visible) {
+    if (visible) {
         dataCSub = SubscriptionFactory::create(Dependency("DATA_C", SubscriptionType::READ),
                                                SubscriberType::READER, this,
                                                std::bind(&MainWindow::displayC, this));
@@ -152,7 +162,7 @@ void MainWindow::displayC()
     qDebug() << "displayC";
 
     Subscription::Lock<Data> lock(*dataCSub);
-    int num = lock().num;
+    int num = lock()->num;
 
     ui->outputC->setText(QString::number(num));
 }
@@ -161,7 +171,7 @@ void MainWindow::displayD()
 {
     qDebug() << "displayD";
     Subscription::Lock<Data> lock(*dataDSub);
-    int num = lock().num;
+    int num = lock()->num;
 
     ui->outputD->setText(QString::number(num));
 }
@@ -227,7 +237,7 @@ void MainWindow::on_computeDButton_clicked()
 
 void MainWindow::on_imageModelButton_clicked()
 {
-    imgIMG_Sub = std::unique_ptr<Subscription>(SubscriptionFactory::create(Dependency("image.IMG",
+    imgIMG_Sub = std::unique_ptr<Subscription>(SubscriptionFactory::create(Dependency("image.IMGPCA",
                                                         SubscriptionType::READ),
                                              SubscriberType::READER, this,
                                              std::bind(&MainWindow::imgIMG_updated, this)));
@@ -237,8 +247,8 @@ void MainWindow::imgIMG_updated()
 {
     qDebug() << "did I crash?!";
     Subscription::Lock<multi_img> lock(*imgIMG_Sub);
-    multi_img& img = lock();
+    multi_img* img = lock();
 
-    QPixmap pix = QPixmap::fromImage(img.export_qt(1));
+    QPixmap pix = QPixmap::fromImage(img->export_qt(1));
     ui->imageLabel->setPixmap(pix);
 }

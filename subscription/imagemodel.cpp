@@ -5,6 +5,8 @@
 #include "task/task_image_lim.h"
 #include "task/task_norml2tbb.h"
 #include "task/task_image_img.h"
+#include "task/task_gradient_tbb.h"
+#include "task/task_pca_tbb.h"
 
 ImageModel::ImageModel(bool limitedMode, SubscriptionManager &sm,
                        TaskScheduler *scheduler, QObject *parent)
@@ -13,17 +15,23 @@ ImageModel::ImageModel(bool limitedMode, SubscriptionManager &sm,
     registerData("image", {});
     registerData("image.IMG", {"image"});
     registerData("image.NORM", {"image.IMG"});
+    registerData("image.GRAD", {"image.IMG"});
+    registerData("image.IMGPCA", {"image.IMG"});
 }
 
 void ImageModel::delegateTask(QString id)
 {
     Task* task = nullptr;
-    if(id == "image") {
+    if (id == "image") {
         task = new TaskImageLim(filename, limitedMode);
-    } else if(id == "image.IMG") {
+    } else if (id == "image.IMG") {
         task = new TaskImageIMG(roi, rescaleBands, nBands);
-    } else if(id == "image.NORM") {
+    } else if (id == "image.NORM") {
         task = new TaskNormL2Tbb();
+    } else if (id == "image.GRAD") {
+        task = new TaskGradientTbb();
+    } else if (id == "image.IMGPCA") {
+        task = new TaskPcaTbb(10);
     }
     scheduler->pushTask(task);
 }

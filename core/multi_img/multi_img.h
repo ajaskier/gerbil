@@ -73,7 +73,10 @@ class PcaTbb;
 	friend class DataRangeTbb;\
 	friend class DataRangeCuda;\
     friend class PcaTbb;\
-    friend class TaskRescaleTbb;
+    friend class TaskRescaleTbb;\
+    friend class TaskNormL2Tbb;\
+    friend class TaskGradientTbb;\
+    friend class TaskPcaTbb;
 
 class multi_img_base {
 public:

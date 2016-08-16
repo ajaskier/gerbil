@@ -19,7 +19,7 @@ void TaskScopeImage::run()
 {
     Subscription::Lock<multi_img> source_lock(*source);
 
-    multi_img tmp(source_lock(), roi);
+    multi_img tmp(*source_lock(), roi);
 
     Subscription::Lock<multi_img> target_lock(*target);
     target_lock.swap(tmp);

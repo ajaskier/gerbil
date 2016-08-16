@@ -14,7 +14,7 @@ std::shared_ptr<boost::dynamic_any> DataEntry::read()
 void DataEntry::endRead()
 {
     //std::unique_lock<std::mutex> lock(mu);
-    if(doReads == 0) not_reading.notify_one();
+    if (doReads == 0) not_reading.notify_one();
 }
 
 std::shared_ptr<boost::dynamic_any> DataEntry::write()
@@ -30,5 +30,5 @@ std::shared_ptr<boost::dynamic_any> DataEntry::write()
 void DataEntry::endWrite()
 {
     //std::unique_lock<std::mutex> lock(mu);
-    if(!doWrite) not_writing.notify_all();
+    if (!doWrite) not_writing.notify_all();
 }

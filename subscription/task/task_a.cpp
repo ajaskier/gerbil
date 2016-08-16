@@ -31,5 +31,5 @@ void TaskA::run()
 
 void TaskA::setSubscription(QString id, std::shared_ptr<Subscription> sub)
 {
-    if(id == "DATA_A") dataASub = sub;
+    if (id == "DATA_A") dataASub = sub;
 }

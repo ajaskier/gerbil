@@ -14,7 +14,7 @@ ModelA::ModelA(int a, SubscriptionManager& sm, TaskScheduler *scheduler, QObject
 
 void ModelA::delegateTask(QString id)
 {
-    if(id == "DATA_A") {
+    if (id == "DATA_A") {
         TaskA *task= new TaskA(a);
         scheduler->pushTask(task);
     }

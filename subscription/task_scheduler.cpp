@@ -36,7 +36,7 @@ void TaskScheduler::removeRelated(QString id)
     while(it != taskPool.end()) {
 
         auto dependencies = (*it)->getDependencies();
-        if(std::any_of(dependencies.begin(), dependencies.end(),
+        if (std::any_of(dependencies.begin(), dependencies.end(),
                        [id](Dependency& dep){
                             return dep.dataId == id;
                         }))
@@ -57,7 +57,7 @@ void TaskScheduler::checkTaskPool()
     while(it != taskPool.end()) {
         Task *t = *it;
         bool ready = sm.processDependencies(t->getDependencies());
-        if(ready) {
+        if (ready) {
             it = taskPool.erase(it);
             startTask(t);
         } else {
