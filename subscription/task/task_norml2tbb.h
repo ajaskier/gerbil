@@ -14,12 +14,9 @@ public:
     virtual ~TaskNormL2Tbb();
 
     virtual bool run() override;
-    virtual void setSubscription(QString id, std::shared_ptr<Subscription> sub) override;
 
 private:
 
-    std::shared_ptr<Subscription> sourceSub;
-    std::shared_ptr<Subscription> currentSub;
     tbb::task_group_context stopper;
 };
 

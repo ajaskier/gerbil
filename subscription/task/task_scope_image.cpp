@@ -6,10 +6,8 @@
 #include <QDebug>
 
 TaskScopeImage::TaskScopeImage(cv::Rect roi)
-    : Task("scopedImage"), roi(roi)
+    : Task("image.IMG", {{"image", "source"}}), roi(roi)
 {
-    dependencies = {Dependency("image", SubscriptionType::READ),
-                   Dependency("image.IMG", SubscriptionType::WRITE)};
 }
 
 TaskScopeImage::~TaskScopeImage()
@@ -17,20 +15,14 @@ TaskScopeImage::~TaskScopeImage()
 
 bool TaskScopeImage::run()
 {
-    Subscription::Lock<multi_img> source_lock(*source);
+    Subscription::Lock<multi_img> source_lock(*sub("source"));
 
     multi_img tmp(*source_lock(), roi);
 
-    Subscription::Lock<multi_img> target_lock(*target);
-    target_lock.swap(tmp);
+    Subscription::Lock<multi_img> dest_lock(*sub("dest"));
+    dest_lock.swap(tmp);
 
     qDebug() << "scoped finished!";
 
     return true;
-}
-
-void TaskScopeImage::setSubscription(QString id, std::shared_ptr<Subscription> sub)
-{
-    if (id == "image") source = sub;
-    else if (id == "image.IMG") target = sub;
 }

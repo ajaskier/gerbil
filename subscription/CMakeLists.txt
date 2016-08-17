@@ -35,6 +35,8 @@ vole_compile_library(
         task/task_gradient_tbb
         task/task_image_img
         task/task_pca_tbb
+        task/task_band
+        task/task_band2qimage_tbb
 
         imagemodel
 )

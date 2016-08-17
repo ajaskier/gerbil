@@ -12,17 +12,12 @@ class TaskRescaleTbb : public Task
 {
 
 public:
-    explicit TaskRescaleTbb(size_t bands, size_t roiBands,
-                            bool includecache = true);
+    explicit TaskRescaleTbb(size_t bands, size_t roiBands, bool includecache = true);
     virtual ~TaskRescaleTbb();
 
     virtual bool run() override;
-    virtual void setSubscription(QString id, std::shared_ptr<Subscription> sub) override;
 
 private:
-
-    std::shared_ptr<Subscription> sourceSub;
-    std::shared_ptr<Subscription> currentSub;
 
     size_t bands;
     size_t roiBands;

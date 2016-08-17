@@ -13,11 +13,9 @@
 
 TaskRescaleTbb::TaskRescaleTbb(size_t bands, size_t roiBands,
                                bool includecache)
-    : Task("rescaleImage"), bands(bands), roiBands(roiBands),
+    : Task("image.IMG", {{"image", "source"}}), bands(bands), roiBands(roiBands),
       includecache(includecache)
 {
-    dependencies = {Dependency("image", SubscriptionType::READ),
-                   Dependency("image.IMG", SubscriptionType::WRITE)};
 }
 
 TaskRescaleTbb::~TaskRescaleTbb()
@@ -27,7 +25,7 @@ bool TaskRescaleTbb::run()
 {
     qDebug() << "rescale started";
     {
-        Subscription::Lock<multi_img_base> source(*sourceSub);
+        Subscription::Lock<multi_img_base> source(*sub("source"));
         multi_img_base* img = source();
         int numBandsFull = img->size();
 
@@ -41,11 +39,11 @@ bool TaskRescaleTbb::run()
         }
     }
 
-    Subscription::Lock<multi_img> current(*currentSub);
+    Subscription::Lock<multi_img> dest(*sub("dest"));
 
-    multi_img* temp = new multi_img(*current(), cv::Rect(0,0, current()->width,
-                                                      current()->height));
-    temp->roi = current()->roi;
+    multi_img* temp = new multi_img(*dest(), cv::Rect(0,0, dest()->width,
+                                                      dest()->height));
+    temp->roi = dest()->roi;
     RebuildPixels rebuildPixels(*temp);
     tbb::parallel_for(tbb::blocked_range<size_t>(0, temp->size()),
                       rebuildPixels, tbb::auto_partitioner(), stopper);
@@ -55,7 +53,7 @@ bool TaskRescaleTbb::run()
 
     multi_img *target = nullptr;
     if (newsize != temp->size()) {
-        target = new multi_img(current()->height, current()->width,
+        target = new multi_img(dest()->height, dest()->width,
                                newsize);
         target->minval = temp->minval;
         target->maxval = temp->maxval;
@@ -98,7 +96,7 @@ bool TaskRescaleTbb::run()
         delete target;
         return false;
     } else {
-        current.swap(*target);
+        dest.swap(*target);
         return true;
     }
 
@@ -106,8 +104,3 @@ bool TaskRescaleTbb::run()
 
 }
 
-void TaskRescaleTbb::setSubscription(QString id, std::shared_ptr<Subscription> sub)
-{
-    if (id == "image") sourceSub = sub;
-    else if (id == "image.IMG") currentSub = sub;
-}

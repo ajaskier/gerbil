@@ -13,14 +13,10 @@ public:
     virtual ~TaskD();
 
     virtual bool run() override;
-    virtual void setSubscription(QString id, std::shared_ptr<Subscription> sub) override;
 
 private:
 
     int d;
-
-    std::shared_ptr<Subscription> dataASub;
-    std::shared_ptr<Subscription> dataDSub;
 };
 
 #endif // TASK_D_H

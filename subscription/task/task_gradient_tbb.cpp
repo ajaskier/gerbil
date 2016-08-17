@@ -11,10 +11,8 @@
 #include <tbb/parallel_for.h>
 
 TaskGradientTbb::TaskGradientTbb(bool includecache)
-    : Task("image.GRAD"), includecache(includecache)
+    : Task("image.GRAD", {{"image.IMG", "source"}}), includecache(includecache)
 {
-    dependencies = {Dependency("image.IMG", SubscriptionType::READ),
-                    Dependency("image.GRAD", SubscriptionType::WRITE)};
 }
 
 TaskGradientTbb::~TaskGradientTbb()
@@ -24,18 +22,18 @@ TaskGradientTbb::~TaskGradientTbb()
 
 bool TaskGradientTbb::run()
 {
-    Subscription::Lock<multi_img> source_lock(*sourceSub);
-    Subscription::Lock<multi_img> current_lock(*currentSub);
+    Subscription::Lock<multi_img> source_lock(*sub("source"));
+    Subscription::Lock<multi_img> dest_lock(*sub("dest"));
 
     multi_img* source = source_lock();
-    multi_img* current = current_lock();
+    multi_img* dest = dest_lock();
 
     cv::Rect copyGlob;
     cv::Rect copySrc(0, 0, 0, 0);
     cv::Rect copyCur(0, 0, 0, 0);
 
-    if (current) {
-        copyGlob = source->roi & current->roi;
+    if (dest) {
+        copyGlob = source->roi & dest->roi;
 
 
         if (copyGlob.width > 0 && copyGlob.height > 0) {
@@ -44,8 +42,8 @@ bool TaskGradientTbb::run()
             copySrc.width = copyGlob.width;
             copySrc.height = copyGlob.height;
 
-            copyCur.x = copyGlob.x - current->roi.x;
-            copyCur.y = copyGlob.y - current->roi.y;
+            copyCur.x = copyGlob.x - dest->roi.x;
+            copyCur.y = copyGlob.y - dest->roi.y;
 
             copyCur.width = copyGlob.width;
             copyCur.height = copyGlob.height;
@@ -58,10 +56,10 @@ bool TaskGradientTbb::run()
     multi_img *target = new multi_img(
         source->height, source->width, source->size() - 1);
 
-    if (current) {
+    if (dest) {
         if (copyGlob.width > 0 && copyGlob.height > 0) {
             for (size_t i = 0; i < target->size(); ++i) {
-                multi_img::Band curBand = current->bands[i](copyCur);
+                multi_img::Band curBand = dest->bands[i](copyCur);
                 multi_img::Band tgtBand = target->bands[i](copySrc);
                 curBand.copyTo(tgtBand);
 
@@ -128,13 +126,7 @@ bool TaskGradientTbb::run()
         delete target;
         return false;
     } else {
-        current_lock.swap(*target);
+        dest_lock.swap(*target);
         return true;
     }
-}
-
-void TaskGradientTbb::setSubscription(QString id, std::shared_ptr<Subscription> sub)
-{
-    if (id == "image.IMG") sourceSub = sub;
-    else if (id == "image.GRAD") currentSub = sub;
 }

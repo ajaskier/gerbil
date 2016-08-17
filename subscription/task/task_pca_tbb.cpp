@@ -11,11 +11,9 @@
 #include <tbb/parallel_for.h>
 
 TaskPcaTbb::TaskPcaTbb(unsigned int components, bool includecache)
-    : Task("image.IMGPCA"), components(components),
+    : Task("image.IMGPCA", {{"image.IMG", "source"}}), components(components),
       includecache(includecache)
 {
-    dependencies = {Dependency("image.IMG", SubscriptionType::READ),
-                    Dependency("image.IMGPCA", SubscriptionType::WRITE)};
 }
 
 TaskPcaTbb::~TaskPcaTbb()
@@ -25,7 +23,7 @@ TaskPcaTbb::~TaskPcaTbb()
 
 bool TaskPcaTbb::run()
 {
-    Subscription::Lock<multi_img> source_lock(*sourceSub);
+    Subscription::Lock<multi_img> source_lock(*sub("source"));
     multi_img* source = source_lock();
 
     cv::Mat_<multi_img::Value> pixels(
@@ -65,14 +63,8 @@ bool TaskPcaTbb::run()
         delete target;
         return false;
     } else {
-        Subscription::Lock<multi_img> current_lock(*currentSub);
-        current_lock.swap(*target);
+        Subscription::Lock<multi_img> dest_lock(*sub("dest"));
+        dest_lock.swap(*target);
         return true;
     }
-}
-
-void TaskPcaTbb::setSubscription(QString id, std::shared_ptr<Subscription> sub)
-{
-    if (id == "image.IMG") sourceSub = sub;
-    else if (id == "image.IMGPCA") currentSub = sub;
 }

@@ -7,14 +7,12 @@
 #include "imginput.h"
 
 TaskImageLim::TaskImageLim(const QString &filename, bool limitedMode)
-    : Task("image"), filename(filename), limitedMode(limitedMode)
+    : Task("image", {}), filename(filename), limitedMode(limitedMode)
 {
-    dependencies = {Dependency("image", SubscriptionType::WRITE)};
 }
 
 TaskImageLim::~TaskImageLim()
 {
-
 }
 
 bool TaskImageLim::run()
@@ -26,21 +24,16 @@ bool TaskImageLim::run()
         multi_img_offloaded offloaded = multi_img_offloaded(filelist.first,
                                                             filelist.second);
 
-        Subscription::Lock<multi_img_offloaded> lock(*sub);
+        Subscription::Lock<multi_img_offloaded> lock(*sub("dest"));
         lock.swap(offloaded);
     } else {
         imginput::ImgInputConfig inputConfig;
         inputConfig.file = fn;
         multi_img::ptr img = imginput::ImgInput(inputConfig).execute();
 
-        Subscription::Lock<multi_img> lock(*sub);
+        Subscription::Lock<multi_img> lock(*sub("dest"));
         lock.swap(*img);
     }
 
     return true;
-}
-
-void TaskImageLim::setSubscription(QString id, std::shared_ptr<Subscription> sub)
-{
-    this->sub = sub;
 }

@@ -35,6 +35,7 @@ void MainWindow::initCrucials()
 void MainWindow::initRest()
 {
     ui->setupUi(this);
+    ui->bandSlider->setMaximum(maxBands-1);
 
 
     {
@@ -101,6 +102,8 @@ void MainWindow::imgUpdated()
         Subscription::Lock<multi_img> lock(*imgSub);
         multi_img* img = lock();
         imageModel->setROI(img->roi);
+        maxBands = img->size();
+        imageModel->setBandsCount(maxBands);
     }
 
     initRest();
@@ -237,7 +240,9 @@ void MainWindow::on_computeDButton_clicked()
 
 void MainWindow::on_imageModelButton_clicked()
 {
-    imgIMG_Sub = std::unique_ptr<Subscription>(SubscriptionFactory::create(Dependency("image.IMGPCA",
+    QString image = "bands." + representation + "." + QString::number(currentBand);
+
+    imgIMG_Sub = std::unique_ptr<Subscription>(SubscriptionFactory::create(Dependency(image,
                                                         SubscriptionType::READ),
                                              SubscriberType::READER, this,
                                              std::bind(&MainWindow::imgIMG_updated, this)));
@@ -246,9 +251,38 @@ void MainWindow::on_imageModelButton_clicked()
 void MainWindow::imgIMG_updated()
 {
     qDebug() << "did I crash?!";
-    Subscription::Lock<multi_img> lock(*imgIMG_Sub);
-    multi_img* img = lock();
+    Subscription::Lock<std::pair<QImage, QString>> lock(*imgIMG_Sub);
+    //multi_img* img = lock();
+    QImage img = lock()->first;
+    QString desc = lock()->second;
+    qDebug() << desc;
 
-    QPixmap pix = QPixmap::fromImage(img->export_qt(1));
+    //QPixmap pix = QPixmap::fromImage(img->export_qt(1));
+    QPixmap pix = QPixmap::fromImage(img);
     ui->imageLabel->setPixmap(pix);
+}
+
+void MainWindow::on_imgButton_clicked()
+{
+    representation = "IMG";
+}
+
+void MainWindow::on_normButton_clicked()
+{
+    representation = "NORM";
+}
+
+void MainWindow::on_gradButton_clicked()
+{
+    representation = "GRAD";
+}
+
+void MainWindow::on_pcaButton_clicked()
+{
+    representation = "IMGPCA";
+}
+
+void MainWindow::on_bandSlider_sliderMoved(int position)
+{
+    currentBand = position;
 }

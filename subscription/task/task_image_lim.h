@@ -12,13 +12,11 @@ public:
     virtual ~TaskImageLim();
 
     virtual bool run() override;
-    virtual void setSubscription(QString id, std::shared_ptr<Subscription> sub) override;
 
 private:
 
     const QString& filename;
     bool limitedMode;
-    std::shared_ptr<Subscription> sub;
 };
 
 

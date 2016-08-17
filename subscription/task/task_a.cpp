@@ -7,9 +7,8 @@
 #include "lock.h"
 
 TaskA::TaskA(int a)
-    : Task("DATA_A"), a(a)
+    : Task("DATA_A", {}), a(a)
 {
-    dependencies = {Dependency("DATA_A", SubscriptionType::WRITE)};
 }
 
 TaskA::~TaskA()
@@ -22,16 +21,11 @@ bool TaskA::run()
 
     Data data;
     data.num = a;
-    Subscription::Lock<Data> lock(*dataASub);
+    Subscription::Lock<Data> lock(*sub("dest"));
     qDebug() << "got dataA";
     lock.swap(data);
 
     qDebug() << "swapped";
 
     return true;
-}
-
-void TaskA::setSubscription(QString id, std::shared_ptr<Subscription> sub)
-{
-    if (id == "DATA_A") dataASub = sub;
 }

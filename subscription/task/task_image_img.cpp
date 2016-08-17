@@ -7,11 +7,9 @@
 
 TaskImageIMG::TaskImageIMG(cv::Rect roi, size_t bands, size_t roiBands,
                                bool includecache)
-    : Task("image.IMG"), roi(roi), bands(bands), roiBands(roiBands),
-      includecache(includecache)
+    : Task("image.IMG", {{"image", "source"}}), roi(roi), bands(bands),
+      roiBands(roiBands), includecache(includecache)
 {
-    dependencies = {Dependency("image.IMG", SubscriptionType::WRITE),
-                    Dependency("image", SubscriptionType::READ)};
 }
 
 TaskImageIMG::~TaskImageIMG()
@@ -19,24 +17,20 @@ TaskImageIMG::~TaskImageIMG()
 
 bool TaskImageIMG::run()
 {
+    auto sourceId = sub("source")->getDependency().dataId;
+    auto destId = sub("dest")->getDependency().dataId;
+
     TaskScopeImage scopeImage(roi);
-    scopeImage.setSubscription("image", sourceSub);
-    scopeImage.setSubscription("image.IMG", targetSub);
+    scopeImage.setSubscription(sourceId, sub("source"));
+    scopeImage.setSubscription(destId, sub("dest"));
     scopeImage.start();
 
     qDebug() << "halfway there";
 
     TaskRescaleTbb rescaleTbb(bands, roiBands, includecache);
-    rescaleTbb.setSubscription("image", sourceSub);
-    rescaleTbb.setSubscription("image.IMG", targetSub);
+    rescaleTbb.setSubscription(sourceId, sub("source"));
+    rescaleTbb.setSubscription(destId, sub("dest"));
     rescaleTbb.start();
 
     return true;
 }
-
-void TaskImageIMG::setSubscription(QString id, std::shared_ptr<Subscription> sub)
-{
-    if (id == "image") sourceSub = sub;
-    else if (id == "image.IMG") targetSub = sub;
-}
-

@@ -25,6 +25,7 @@ public:
     void forceUpdate();
     int getId() { return id; }
     SubscriberType getSubscriberType() { return subscriberType; }
+    Dependency getDependency() { return dependency; }
 
     template <class T>
     class Lock;

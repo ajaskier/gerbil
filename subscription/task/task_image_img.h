@@ -13,12 +13,8 @@ public:
                           bool includecache = true);
     virtual ~TaskImageIMG();
     virtual bool run() override;
-    virtual void setSubscription(QString id, std::shared_ptr<Subscription> sub) override;
 
 private:
-
-    std::shared_ptr<Subscription> sourceSub;
-    std::shared_ptr<Subscription> targetSub;
 
     //scope
     cv::Rect roi;

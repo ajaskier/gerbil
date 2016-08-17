@@ -44,6 +44,10 @@ private:
     Subscription* dataCSub;
     Subscription* dataDSub;
 
+    QString representation = "IMG";
+    int currentBand = 0;
+    size_t maxBands = 0;
+
 private slots:
 
     void initCrucials();
@@ -74,6 +78,11 @@ private slots:
     void on_computeDButton_clicked();
     void on_inputD_textChanged(const QString &arg1);
     void on_imageModelButton_clicked();
+    void on_imgButton_clicked();
+    void on_normButton_clicked();
+    void on_gradButton_clicked();
+    void on_pcaButton_clicked();
+    void on_bandSlider_sliderMoved(int position);
 };
 
 #endif // MAINWINDOW_H

@@ -5,10 +5,8 @@
 #include "data.h"
 
 TaskB::TaskB(int b)
-    : Task("DATA_B"), b(b)
+    : Task("DATA_B", {{"DATA_A", "source"}}), b(b)
 {
-    dependencies = { Dependency("DATA_B", SubscriptionType::WRITE),
-                   Dependency("DATA_A", SubscriptionType::READ) };
 }
 
 TaskB::~TaskB()
@@ -20,21 +18,15 @@ bool TaskB::run()
     Data data;
     //read phase
     {
-        Subscription::Lock<Data> lock(*dataASub);
+        Subscription::Lock<Data> lock(*sub("source"));
         data.num = b+lock()->num;
         //QThread::sleep(5);
     }
     //write phase
     {
-        Subscription::Lock<Data> lock(*dataBSub);
+        Subscription::Lock<Data> lock(*sub("dest"));
         lock.swap(data);
     }
 
     return true;
-}
-
-void TaskB::setSubscription(QString id, std::shared_ptr<Subscription> sub)
-{
-    if (id == "DATA_A") dataASub = sub;
-    else if (id == "DATA_B") dataBSub = sub;
 }

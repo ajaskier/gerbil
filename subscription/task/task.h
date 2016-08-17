@@ -1,41 +1,37 @@
 #ifndef TASK_H
 #define TASK_H
 
-#include <QObject>
-#include <QDebug>
 #include <memory>
+#include <QString>
 #include "dependency.h"
+#include <map>
 
-class SubscriptionManager;
-class TaskScheduler;
-enum class SubscriptionType;
 class Subscription;
-
 
 class Task
 {
 
 public:
-    explicit Task(QString id) : id(id) {}
-    virtual ~Task() {
-        qDebug() << "deleting task" << id;
-    }
-    virtual bool start() {
-        return run();
-    }
+    explicit Task(QString target, std::map<QString, QString> sources);
 
-    std::vector<Dependency>& getDependencies() {
-        return dependencies;
-    }
+    virtual ~Task();
+    virtual bool start() final;
+    virtual void setSubscription(QString id, std::shared_ptr<Subscription> sub) final;
+
+    std::vector<Dependency>& getDependencies() { return dependencies; }
     QString getId() { return id; }
-    virtual void setSubscription(QString id, std::shared_ptr<Subscription> sub) = 0;
 
 
 protected:
     virtual bool run() = 0;
+    virtual std::shared_ptr<Subscription> sub(QString id) final;
+
+private:
 
     QString id;
     std::vector<Dependency> dependencies;
+    std::map<QString, QString> sources;
+    std::map<QString, std::shared_ptr<Subscription>> subscriptions;
 
 };
 
