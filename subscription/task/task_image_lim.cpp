@@ -17,7 +17,7 @@ TaskImageLim::~TaskImageLim()
 
 }
 
-void TaskImageLim::run()
+bool TaskImageLim::run()
 {
     std::string fn = filename.toLocal8Bit().constData();
     if (limitedMode) {
@@ -36,6 +36,8 @@ void TaskImageLim::run()
         Subscription::Lock<multi_img> lock(*sub);
         lock.swap(*img);
     }
+
+    return true;
 }
 
 void TaskImageLim::setSubscription(QString id, std::shared_ptr<Subscription> sub)

@@ -23,7 +23,7 @@ TaskRescaleTbb::TaskRescaleTbb(size_t bands, size_t roiBands,
 TaskRescaleTbb::~TaskRescaleTbb()
 {}
 
-void TaskRescaleTbb::run()
+bool TaskRescaleTbb::run()
 {
     qDebug() << "rescale started";
     {
@@ -96,9 +96,10 @@ void TaskRescaleTbb::run()
 
     if (stopper.is_group_execution_cancelled()) {
         delete target;
-        return;
+        return false;
     } else {
         current.swap(*target);
+        return true;
     }
 
     qDebug() << "rescale finished";

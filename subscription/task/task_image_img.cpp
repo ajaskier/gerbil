@@ -17,7 +17,7 @@ TaskImageIMG::TaskImageIMG(cv::Rect roi, size_t bands, size_t roiBands,
 TaskImageIMG::~TaskImageIMG()
 {}
 
-void TaskImageIMG::run()
+bool TaskImageIMG::run()
 {
     TaskScopeImage scopeImage(roi);
     scopeImage.setSubscription("image", sourceSub);
@@ -30,6 +30,8 @@ void TaskImageIMG::run()
     rescaleTbb.setSubscription("image", sourceSub);
     rescaleTbb.setSubscription("image.IMG", targetSub);
     rescaleTbb.start();
+
+    return true;
 }
 
 void TaskImageIMG::setSubscription(QString id, std::shared_ptr<Subscription> sub)

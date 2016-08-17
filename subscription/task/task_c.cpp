@@ -16,7 +16,7 @@ TaskC::~TaskC()
 {
 }
 
-void TaskC::run()
+bool TaskC::run()
 {
 
     Data data;
@@ -30,6 +30,7 @@ void TaskC::run()
     Subscription::Lock<Data> lockC(*dataCSub);
     lockC.swap(data);
 
+    return true;
 }
 
 void TaskC::setSubscription(QString id, std::shared_ptr<Subscription> sub)

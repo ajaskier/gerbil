@@ -12,7 +12,7 @@ public:
     explicit TaskC(int c);
     virtual ~TaskC();
 
-    virtual void run() override;
+    virtual bool run() override;
     virtual void setSubscription(QString id, std::shared_ptr<Subscription> sub) override;
 
 private:

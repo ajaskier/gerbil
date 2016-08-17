@@ -9,17 +9,17 @@ class WorkerThread : public QThread
     Q_OBJECT
 
     void run() override {
-        t->start();
+        auto success = t->start();
         delete t;
 
-        emit finished();
+        emit finished(success);
     }
 
 public:
     WorkerThread(Task* t, QObject* parent = 0) : QThread(parent), t(t) {}
 
 signals:
-    void finished();
+    void finished(bool success);
 
 private:
    Task* t;

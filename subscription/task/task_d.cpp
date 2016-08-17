@@ -15,7 +15,7 @@ TaskD::~TaskD()
 {
 }
 
-void TaskD::run()
+bool TaskD::run()
 {
 
     Data data;
@@ -29,6 +29,7 @@ void TaskD::run()
     lockD.swap(data);
     lockD.release();
 
+    return true;
 }
 
 void TaskD::setSubscription(QString id, std::shared_ptr<Subscription> sub)

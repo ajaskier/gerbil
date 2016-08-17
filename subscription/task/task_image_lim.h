@@ -11,7 +11,7 @@ public:
     explicit TaskImageLim(const QString &filename, bool limitedMode);
     virtual ~TaskImageLim();
 
-    virtual void run() override;
+    virtual bool run() override;
     virtual void setSubscription(QString id, std::shared_ptr<Subscription> sub) override;
 
 private:

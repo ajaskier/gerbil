@@ -14,7 +14,7 @@ public:
     explicit TaskPcaTbb(unsigned int components = 0, bool includecache = true);
     virtual ~TaskPcaTbb();
 
-    virtual void run() override;
+    virtual bool run() override;
     virtual void setSubscription(QString id, std::shared_ptr<Subscription> sub) override;
 
 private:

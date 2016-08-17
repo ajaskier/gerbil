@@ -13,7 +13,7 @@ public:
     explicit TaskScopeImage(cv::Rect roi);
     virtual ~TaskScopeImage();
 
-    virtual void run() override;
+    virtual bool run() override;
     virtual void setSubscription(QString id,
                                  std::shared_ptr<Subscription> sub) override;
 

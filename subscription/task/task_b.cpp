@@ -15,7 +15,7 @@ TaskB::~TaskB()
 {
 }
 
-void TaskB::run()
+bool TaskB::run()
 {
     Data data;
     //read phase
@@ -30,6 +30,7 @@ void TaskB::run()
         lock.swap(data);
     }
 
+    return true;
 }
 
 void TaskB::setSubscription(QString id, std::shared_ptr<Subscription> sub)

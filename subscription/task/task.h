@@ -20,8 +20,8 @@ public:
     virtual ~Task() {
         qDebug() << "deleting task" << id;
     }
-    virtual void start() {
-        run();
+    virtual bool start() {
+        return run();
     }
 
     std::vector<Dependency>& getDependencies() {
@@ -32,7 +32,7 @@ public:
 
 
 protected:
-    virtual void run() = 0;
+    virtual bool run() = 0;
 
     QString id;
     std::vector<Dependency> dependencies;

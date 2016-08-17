@@ -22,7 +22,7 @@ TaskGradientTbb::~TaskGradientTbb()
 
 }
 
-void TaskGradientTbb::run()
+bool TaskGradientTbb::run()
 {
     Subscription::Lock<multi_img> source_lock(*sourceSub);
     Subscription::Lock<multi_img> current_lock(*currentSub);
@@ -126,10 +126,10 @@ void TaskGradientTbb::run()
 
     if (stopper.is_group_execution_cancelled()) {
         delete target;
-        return;
+        return false;
     } else {
         current_lock.swap(*target);
-        return;
+        return true;
     }
 }
 

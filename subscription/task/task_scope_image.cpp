@@ -15,7 +15,7 @@ TaskScopeImage::TaskScopeImage(cv::Rect roi)
 TaskScopeImage::~TaskScopeImage()
 {}
 
-void TaskScopeImage::run()
+bool TaskScopeImage::run()
 {
     Subscription::Lock<multi_img> source_lock(*source);
 
@@ -25,6 +25,8 @@ void TaskScopeImage::run()
     target_lock.swap(tmp);
 
     qDebug() << "scoped finished!";
+
+    return true;
 }
 
 void TaskScopeImage::setSubscription(QString id, std::shared_ptr<Subscription> sub)

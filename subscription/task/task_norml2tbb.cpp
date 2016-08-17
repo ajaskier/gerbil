@@ -22,7 +22,7 @@ TaskNormL2Tbb::~TaskNormL2Tbb()
 
 }
 
-void TaskNormL2Tbb::run()
+bool TaskNormL2Tbb::run()
 {
     Subscription::Lock<multi_img> source_lock(*sourceSub);
     Subscription::Lock<multi_img> current_lock(*currentSub);
@@ -111,10 +111,10 @@ void TaskNormL2Tbb::run()
 
     if (stopper.is_group_execution_cancelled()) {
         delete target;
-        return;
+        return false;
     } else {
         current_lock.swap(*target);
-        return;
+        return true;
     }
 
 }

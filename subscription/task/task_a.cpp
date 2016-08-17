@@ -16,7 +16,7 @@ TaskA::~TaskA()
 {
 }
 
-void TaskA::run()
+bool TaskA::run()
 {
     QThread::msleep(50);
 
@@ -27,6 +27,8 @@ void TaskA::run()
     lock.swap(data);
 
     qDebug() << "swapped";
+
+    return true;
 }
 
 void TaskA::setSubscription(QString id, std::shared_ptr<Subscription> sub)

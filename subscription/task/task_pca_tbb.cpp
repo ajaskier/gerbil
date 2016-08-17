@@ -23,7 +23,7 @@ TaskPcaTbb::~TaskPcaTbb()
 
 }
 
-void TaskPcaTbb::run()
+bool TaskPcaTbb::run()
 {
     Subscription::Lock<multi_img> source_lock(*sourceSub);
     multi_img* source = source_lock();
@@ -63,11 +63,11 @@ void TaskPcaTbb::run()
 
     if (stopper.is_group_execution_cancelled()) {
         delete target;
-        return;
+        return false;
     } else {
         Subscription::Lock<multi_img> current_lock(*currentSub);
         current_lock.swap(*target);
-        return;
+        return true;
     }
 }
 
