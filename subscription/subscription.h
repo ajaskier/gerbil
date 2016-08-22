@@ -27,7 +27,7 @@ public:
     SubscriberType getSubscriberType() { return subscriberType; }
     Dependency getDependency() { return dependency; }
 
-    template <class T>
+    template <class T1, class T2 = int>
     class Lock;
 
 signals:
@@ -40,7 +40,7 @@ private:
     explicit Subscription(Dependency dependency, SubscriberType subscriberType,
                           int id, SubscriptionManager& sm, QObject* requester,
                           std::function<void(void)> updateSlot);
-    any_sptr leaseData();
+    handle_pair leaseData();
 
     Dependency dependency;
     SubscriberType subscriberType;

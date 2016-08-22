@@ -6,6 +6,8 @@
 #include <opencv2/core/core.hpp>
 #include <model/model.h>
 
+#include "multi_img.h"
+
 class ImageModel : public Model
 {
     Q_OBJECT
@@ -18,6 +20,9 @@ public:
     void spawn(representation::t type, const cv::Rect &newROI, int bands);
     void computeBand(representation::t type, int dim);
     void setBandsCount(size_t bands);
+    void setNormalizationParameters(representation::t type,
+                                    multi_img::NormMode normMode,
+                                    multi_img_base::Range targetRange);
 
     void setFilename(QString filename);
     void setROI(cv::Rect newROI);
@@ -32,6 +37,9 @@ private:
     size_t nBands;
     size_t nBandsOld;
     size_t rescaleBands;
+
+    std::map<representation::t, multi_img::NormMode> normalizationModes;
+    std::map<representation::t, multi_img_base::Range> normalizationRanges;
 
 };
 

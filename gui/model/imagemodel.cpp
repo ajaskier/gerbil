@@ -325,7 +325,6 @@ void ImageModel::setNormalizationParameters(representation::t type,
 	**(map[type]->normRange) = targetRange;
 }
 
-
 void ImageModel::processNewImageData(representation::t type,
 									 SharedMultiImgPtr image)
 {

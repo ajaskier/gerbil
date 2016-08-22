@@ -55,6 +55,6 @@ void Subscription::forceUpdate()
     emit update();
 }
 
-any_sptr Subscription::leaseData() {
+handle_pair Subscription::leaseData() {
     return sm.doSubscription(dependency.dataId, dependency.subscription);
 }

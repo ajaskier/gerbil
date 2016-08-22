@@ -48,7 +48,7 @@ bool TaskPcaTbb::run()
     tbb::parallel_reduce(tbb::blocked_range<size_t>(0, target->size()),
         determineRange, tbb::auto_partitioner(), stopper);
 
-    if (!stopper.is_group_execution_cancelled()) {
+    if (!isCancelled()) {
         target->dirty.setTo(0);
         target->anydirt = false;
         target->minval = determineRange.GetMin();
@@ -59,7 +59,7 @@ bool TaskPcaTbb::run()
     if (!includecache)
         target->resetPixels();
 
-    if (stopper.is_group_execution_cancelled()) {
+    if (isCancelled()) {
         delete target;
         return false;
     } else {

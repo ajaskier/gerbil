@@ -20,8 +20,9 @@ void SubscriptionManager::registerCreator(Model* creator, QString dataId,
 
     assert(dataPool.find(dataId) == dataPool.end());
 
-    dataPool[dataId].handle = std::shared_ptr<boost::dynamic_any>(
-                new boost::dynamic_any());
+    dataPool[dataId].data_handle = handle(new boost::dynamic_any());
+    dataPool[dataId].meta_handle = handle(new boost::dynamic_any());
+
     dataPool[dataId].creator = creator;
 
     for(QString& s : dependencies) {
@@ -79,14 +80,14 @@ void SubscriptionManager::unsubscribe(QString dataId, SubscriptionType sub,
     }
 }
 
-any_sptr SubscriptionManager::doSubscription(QString id, SubscriptionType sub) {
+handle_pair SubscriptionManager::doSubscription(QString id, SubscriptionType sub) {
     if (sub == SubscriptionType::READ) return doReadSubscription(id);
     else return doWriteSubscription(id);
 }
 
-any_sptr SubscriptionManager::doReadSubscription(QString id)
+handle_pair SubscriptionManager::doReadSubscription(QString id)
 {
-    any_sptr data = dataPool[id].read();
+    auto data = dataPool[id].read();
 
     std::unique_lock<std::recursive_mutex> lock(mu);
     dataPool[id].doReads++;
@@ -95,9 +96,9 @@ any_sptr SubscriptionManager::doReadSubscription(QString id)
     return data;
 }
 
-any_sptr SubscriptionManager::doWriteSubscription(QString id)
+handle_pair SubscriptionManager::doWriteSubscription(QString id)
 {
-    any_sptr data = dataPool[id].write();
+    auto data = dataPool[id].write();
 
     std::unique_lock<std::recursive_mutex> lock(mu);
     dataPool[id].upToDate = false;

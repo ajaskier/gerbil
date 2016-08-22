@@ -4,12 +4,17 @@
 #include <QObject>
 #include <task/task.h>
 #include <opencv2/core/core.hpp>
+#include <multi_img.h>
+#include "model/representation.h"
 
 class TaskImageIMG : public Task
 {
 
 public:
     explicit TaskImageIMG(cv::Rect roi, size_t bands, size_t roiBands,
+                          multi_img::NormMode normMode,
+                          multi_img_base::Range normRange,
+                          representation::t type, bool update,
                           bool includecache = true);
     virtual ~TaskImageIMG();
     virtual bool run() override;
@@ -24,6 +29,12 @@ private:
     size_t roiBands;
     //size_t newsize;
     bool includecache;
+
+    //normalization
+    multi_img::NormMode normMode;
+    multi_img_base::Range normRange;
+    representation::t type;
+    bool update;
 };
 
 

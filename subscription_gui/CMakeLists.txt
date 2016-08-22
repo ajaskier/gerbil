@@ -7,14 +7,17 @@ vole_add_required_modules("subscription")
 vole_compile_library(
         main
         mainwindow
+        normdock
 )
 
 vole_moc_library(
         mainwindow.h
+        normdock.h
 )
 
 vole_ui_library(
         mainwindow.ui
+        normdock.ui
 )
 
 vole_add_executable("subscriptiongui" "main")

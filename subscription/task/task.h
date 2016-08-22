@@ -25,6 +25,7 @@ public:
 protected:
     virtual bool run() = 0;
     virtual std::shared_ptr<Subscription> sub(QString id) final;
+    virtual bool isCancelled() { return false; }
 
 private:
 

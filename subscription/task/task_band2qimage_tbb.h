@@ -17,6 +17,8 @@ public:
 
 private:
 
+    virtual bool isCancelled() { return stopper.is_group_execution_cancelled(); }
+
     size_t dim;
     tbb::task_group_context stopper;
 

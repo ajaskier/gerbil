@@ -14,11 +14,16 @@
 class Model;
 class Subscription;
 
+using handle = std::shared_ptr<boost::dynamic_any>;
+using handle_pair = std::pair<handle, handle>;
+
 class DataEntry {
 
 public:
 
-    std::shared_ptr<boost::dynamic_any> handle = nullptr;
+    handle data_handle = nullptr;
+    handle meta_handle = nullptr;
+
     AccessState access = AccessState::NONE;
     ValidityState validity = ValidityState::INVALID;
     Model* creator = nullptr;
@@ -32,9 +37,9 @@ public:
     bool upToDate = false;
     bool initialized = false;
 
-    std::shared_ptr<boost::dynamic_any> read();
+    handle_pair read();
     void endRead();
-    std::shared_ptr<boost::dynamic_any> write();
+    handle_pair write();
     void endWrite();
 
 private:

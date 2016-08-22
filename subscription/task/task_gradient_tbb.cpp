@@ -63,7 +63,7 @@ bool TaskGradientTbb::run()
                 multi_img::Band tgtBand = target->bands[i](copySrc);
                 curBand.copyTo(tgtBand);
 
-                if (stopper.is_group_execution_cancelled())
+                if (isCancelled())
                     break;
             }
         }
@@ -80,7 +80,7 @@ bool TaskGradientTbb::run()
                 computeLog, tbb::auto_partitioner(), stopper);
         }
 
-        if (stopper.is_group_execution_cancelled())
+        if (isCancelled())
             break;
     }
     temp.minval = 0.;
@@ -96,7 +96,7 @@ bool TaskGradientTbb::run()
                 computeGrad, tbb::auto_partitioner(), stopper);
         }
 
-        if (stopper.is_group_execution_cancelled())
+        if (isCancelled())
             break;
     }
     target->minval = -temp.maxval;
@@ -122,7 +122,7 @@ bool TaskGradientTbb::run()
         target->resetPixels();
     }
 
-    if (stopper.is_group_execution_cancelled()) {
+    if (isCancelled()) {
         delete target;
         return false;
     } else {

@@ -37,6 +37,11 @@ vole_compile_library(
         task/task_pca_tbb
         task/task_band
         task/task_band2qimage_tbb
+        task/task_datarange_tbb
+        task/task_normrange_tbb
+        task/task_image_norm
+        task/task_image_grad
+        task/task_image_imgpca
 
         imagemodel
 )

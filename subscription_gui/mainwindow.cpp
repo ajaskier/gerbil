@@ -12,6 +12,8 @@
 #include "subscription_factory.h"
 #include "multi_img.h"
 
+#include "normdock.h"
+
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
@@ -36,6 +38,19 @@ void MainWindow::initRest()
 {
     ui->setupUi(this);
     ui->bandSlider->setMaximum(maxBands-1);
+
+    normDock = new NormDock(this);
+//    connect(normDock, &NormDock::normalizationParametersChanged,
+//            imageModel, &ImageModel::setNormalizationParameters);
+
+    connect(normDock, &NormDock::normalizationParametersChanged,
+            this, &MainWindow::onNormalizationParametersChanged);
+    connect(this, &MainWindow::normalizationParametersChanged,
+            imageModel, &ImageModel::setNormalizationParameters);
+
+    addDockWidget(Qt::RightDockWidgetArea, normDock);
+//    ui->normDock = new NormDock(this);
+//    ui->normDock->initUi();
 
 
     {
@@ -285,4 +300,12 @@ void MainWindow::on_pcaButton_clicked()
 void MainWindow::on_bandSlider_sliderMoved(int position)
 {
     currentBand = position;
+}
+
+void MainWindow::onNormalizationParametersChanged(representation::t type,
+                                                  multi_img::NormMode normMode,
+                                                  multi_img_base::Range targetRange)
+{
+    emit normalizationParametersChanged(representation::fromStr(representation),
+                                        normMode, targetRange);
 }

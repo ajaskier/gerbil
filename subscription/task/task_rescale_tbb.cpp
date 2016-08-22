@@ -69,7 +69,7 @@ bool TaskRescaleTbb::run()
         target->dirty.setTo(0);
         target->anydirt = false;
 
-        if (!stopper.is_group_execution_cancelled()) {
+        if (!isCancelled()) {
             cv::Mat_<float> tmpmeta1(cv::Size(temp->meta.size(), 1)), tmpmeta2;
             std::vector<multi_img::BandDesc>::const_iterator it;
             unsigned int i;
@@ -92,7 +92,7 @@ bool TaskRescaleTbb::run()
     if (!includecache)
         target->resetPixels();
 
-    if (stopper.is_group_execution_cancelled()) {
+    if (isCancelled()) {
         delete target;
         return false;
     } else {

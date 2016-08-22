@@ -36,7 +36,7 @@ bool TaskBand2QImageTbb::run()
     tbb::parallel_for(tbb::blocked_range2d<int>(0, source.rows, 0, source.cols),
                       converter, tbb::auto_partitioner(), stopper);
 
-    if (stopper.is_group_execution_cancelled()) {
+    if (isCancelled()) {
         delete target;
         return false;
     } else {

@@ -15,7 +15,7 @@
 class Model;
 class Dependency;
 
-using any_sptr = std::shared_ptr<boost::dynamic_any>;
+//using any_sptr = std::shared_ptr<boost::dynamic_any>;
 
 class SubscriptionManager : public QObject
 {
@@ -44,9 +44,9 @@ private:
     void subscribeRead(QString dataId, Subscription *subObj);
     void subscribeWrite(QString dataId);
 
-    any_sptr doSubscription(QString id, SubscriptionType sub);
-    any_sptr doReadSubscription(QString id);
-    any_sptr doWriteSubscription(QString id);
+    handle_pair doSubscription(QString id, SubscriptionType sub);
+    handle_pair doReadSubscription(QString id);
+    handle_pair doWriteSubscription(QString id);
 
     void endDoSubscription(QString id, SubscriptionType sub);
     void endDoReadSubscription(QString id);

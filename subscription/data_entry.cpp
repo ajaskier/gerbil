@@ -2,13 +2,13 @@
 
 #include "subscription.h"
 
-std::shared_ptr<boost::dynamic_any> DataEntry::read()
+handle_pair DataEntry::read()
 {
     std::unique_lock<std::mutex> lock(mu);
     not_writing.wait(lock, [this]() {
         return !doWrite;
     });
-    return handle;
+    return handle_pair(data_handle, meta_handle);
 }
 
 void DataEntry::endRead()
@@ -17,14 +17,14 @@ void DataEntry::endRead()
     if (doReads == 0) not_reading.notify_one();
 }
 
-std::shared_ptr<boost::dynamic_any> DataEntry::write()
+handle_pair DataEntry::write()
 {
     std::unique_lock<std::mutex> lock(mu);
     not_reading.wait(lock, [this]() {
         return doReads == 0 && !doWrite;
     });
 
-    return handle;
+    return handle_pair(data_handle, meta_handle);
 }
 
 void DataEntry::endWrite()

@@ -5,6 +5,9 @@
 #include "task/task_image_lim.h"
 #include "task/task_norml2tbb.h"
 #include "task/task_image_img.h"
+#include "task/task_image_norm.h"
+#include "task/task_image_grad.h"
+#include "task/task_image_imgpca.h"
 #include "task/task_gradient_tbb.h"
 #include "task/task_pca_tbb.h"
 #include "task/task_band.h"
@@ -20,7 +23,6 @@ ImageModel::ImageModel(bool limitedMode, SubscriptionManager &sm,
     registerData("image.NORM", {"image.IMG"});
     registerData("image.GRAD", {"image.IMG"});
     registerData("image.IMGPCA", {"image.IMG"});
-
 
 }
 
@@ -41,25 +43,55 @@ void ImageModel::delegateTask(QString id)
     if (id == "image") {
         task = new TaskImageLim(filename, limitedMode);
     } else if (id == "image.IMG") {
-        task = new TaskImageIMG(roi, rescaleBands, nBands);
+
+        auto range = normalizationRanges[representation::IMG];
+        auto mode = normalizationModes[representation::IMG];
+
+        task = new TaskImageIMG(roi, rescaleBands, nBands, mode, range,
+                                representation::IMG, true);
     } else if (id == "image.NORM") {
-        task = new TaskNormL2Tbb();
+
+        auto range = normalizationRanges[representation::NORM];
+        auto mode = normalizationModes[representation::NORM];
+
+        task = new TaskImageNORM(mode, range, representation::NORM, true);
+
     } else if (id == "image.GRAD") {
-        task = new TaskGradientTbb();
+
+        auto range = normalizationRanges[representation::GRAD];
+        auto mode = normalizationModes[representation::GRAD];
+
+        task = new TaskImageGRAD(mode, range, representation::GRAD, true);
+
     } else if (id == "image.IMGPCA") {
-        task = new TaskPcaTbb(10);
+
+        auto range = normalizationRanges[representation::IMGPCA];
+        auto mode = normalizationModes[representation::IMGPCA];
+
+        task = new TaskImageIMGPCA(mode, range, representation::IMGPCA, true, 10);
+
     } else if (id.startsWith("bands")) {
         auto args = id.split(".");
 
         representation::t repr;
-        if (args[1] == "IMG") repr = representation::t::IMG;
-        else if (args[1] == "NORM") repr = representation::t::NORM;
-        else if (args[1] == "GRAD") repr = representation::t::GRAD;
-        else if (args[1] == "IMGPCA") repr = representation::t::IMGPCA;
+        if (args[1] == "IMG") repr = representation::IMG;
+        else if (args[1] == "NORM") repr = representation::NORM;
+        else if (args[1] == "GRAD") repr = representation::GRAD;
+        else if (args[1] == "IMGPCA") repr = representation::IMGPCA;
 
         task = new TaskBand("image."+args[1], id, args[2].toInt(), repr);
     }
     scheduler->pushTask(task);
+}
+
+void ImageModel::setNormalizationParameters(representation::t type,
+                                            multi_img::NormMode normMode,
+                                            multi_img_base::Range targetRange)
+{
+    normalizationModes[type] = normMode;
+    normalizationRanges[type] = targetRange;
+
+    delegateTask("image."+representation::str(type));
 }
 
 void ImageModel::setFilename(QString filename)

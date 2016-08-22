@@ -19,6 +19,8 @@ public:
 
 private:
 
+    virtual bool isCancelled() { return stopper.is_group_execution_cancelled(); }
+
     size_t bands;
     size_t roiBands;
     size_t newsize;

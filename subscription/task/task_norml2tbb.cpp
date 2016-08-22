@@ -63,7 +63,7 @@ bool TaskNormL2Tbb::run()
                 multi_img::Band tgtBand = target->bands[i](copySrc);
                 curBand.copyTo(tgtBand);
 
-                if (stopper.is_group_execution_cancelled())
+                if (isCancelled())
                     break;
             }
 
@@ -92,7 +92,7 @@ bool TaskNormL2Tbb::run()
                 applyCache, tbb::auto_partitioner(), stopper);
         }
 
-        if (stopper.is_group_execution_cancelled())
+        if (isCancelled())
             break;
     }
 
@@ -107,7 +107,7 @@ bool TaskNormL2Tbb::run()
     // init multi_img::meta
     target->meta = source->meta;
 
-    if (stopper.is_group_execution_cancelled()) {
+    if (isCancelled()) {
         delete target;
         return false;
     } else {

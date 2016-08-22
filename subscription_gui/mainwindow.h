@@ -8,6 +8,9 @@
 #include <model/model_b.h>
 #include <model/model_d.h>
 #include <imagemodel.h>
+#include "model/representation.h"
+
+class NormDock;
 
 namespace Ui {
 class MainWindow;
@@ -48,6 +51,15 @@ private:
     int currentBand = 0;
     size_t maxBands = 0;
 
+    NormDock* normDock;
+
+signals:
+    void normalizationParametersChanged(
+            representation::t type,
+            multi_img::NormMode normMode,
+            multi_img::Range targetRange
+            );
+
 private slots:
 
     void initCrucials();
@@ -83,6 +95,12 @@ private slots:
     void on_gradButton_clicked();
     void on_pcaButton_clicked();
     void on_bandSlider_sliderMoved(int position);
+
+    void onNormalizationParametersChanged(
+            representation::t type,
+            multi_img::NormMode normMode,
+            multi_img::Range targetRange
+            );
 };
 
 #endif // MAINWINDOW_H
