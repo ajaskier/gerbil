@@ -7,7 +7,7 @@
 #include "task/task_image_img.h"
 #include "task/task_image_norm.h"
 #include "task/task_image_grad.h"
-#include "task/task_image_imgpca.h"
+#include "task/task_image_pca.h"
 #include "task/task_gradient_tbb.h"
 #include "task/task_pca_tbb.h"
 #include "task/task_band.h"
@@ -23,12 +23,13 @@ ImageModel::ImageModel(bool limitedMode, SubscriptionManager &sm,
     registerData("image.NORM", {"image.IMG"});
     registerData("image.GRAD", {"image.IMG"});
     registerData("image.IMGPCA", {"image.IMG"});
+    registerData("image.GRADPCA", {"image.GRAD"});
 
 }
 
 void ImageModel::setBandsCount(size_t bands)
 {
-    QVector<QString> vec = {"IMG", "NORM", "GRAD", "IMGPCA"};
+    QVector<QString> vec = {"IMG", "NORM", "GRAD", "IMGPCA", "GRADPCA"};
     for (QString repr : vec) {
         for(int i = 0; i < bands; i++) {
             registerData("bands."+repr+"."+QString::number(i),
@@ -68,7 +69,16 @@ void ImageModel::delegateTask(QString id)
         auto range = normalizationRanges[representation::IMGPCA];
         auto mode = normalizationModes[representation::IMGPCA];
 
-        task = new TaskImageIMGPCA(mode, range, representation::IMGPCA, true, 10);
+        task = new TaskImagePCA("image.IMG", "image.IMGPCA",
+                    mode, range, representation::IMGPCA, true, 10);
+
+    } else if (id == "image.GRADPCA") {
+
+        auto range = normalizationRanges[representation::GRADPCA];
+        auto mode = normalizationModes[representation::GRADPCA];
+
+        task = new TaskImagePCA("image.GRAD", "image.GRADPCA",
+                                mode, range, representation::GRADPCA, 0);
 
     } else if (id.startsWith("bands")) {
         auto args = id.split(".");
@@ -78,6 +88,7 @@ void ImageModel::delegateTask(QString id)
         else if (args[1] == "NORM") repr = representation::NORM;
         else if (args[1] == "GRAD") repr = representation::GRAD;
         else if (args[1] == "IMGPCA") repr = representation::IMGPCA;
+        else if (args[1] == "GRADPCA") repr = representation::GRADPCA;
 
         task = new TaskBand("image."+args[1], id, args[2].toInt(), repr);
     }

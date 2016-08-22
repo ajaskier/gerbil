@@ -41,7 +41,7 @@ vole_compile_library(
         task/task_normrange_tbb
         task/task_image_norm
         task/task_image_grad
-        task/task_image_imgpca
+        task/task_image_pca
 
         imagemodel
 )

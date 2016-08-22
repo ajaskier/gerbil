@@ -309,3 +309,8 @@ void MainWindow::onNormalizationParametersChanged(representation::t type,
     emit normalizationParametersChanged(representation::fromStr(representation),
                                         normMode, targetRange);
 }
+
+void MainWindow::on_gradpcaButton_clicked()
+{
+    representation = "GRADPCA";
+}

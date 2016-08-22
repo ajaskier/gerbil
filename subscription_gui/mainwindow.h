@@ -101,6 +101,7 @@ private slots:
             multi_img::NormMode normMode,
             multi_img::Range targetRange
             );
+    void on_gradpcaButton_clicked();
 };
 
 #endif // MAINWINDOW_H

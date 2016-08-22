@@ -11,7 +11,8 @@ class TaskPcaTbb : public Task
 {
 
 public:
-    explicit TaskPcaTbb(unsigned int components = 0, bool includecache = true);
+    explicit TaskPcaTbb(QString sourceId, QString destId,
+                        unsigned int components = 0, bool includecache = true);
     virtual ~TaskPcaTbb();
 
     virtual bool run() override;

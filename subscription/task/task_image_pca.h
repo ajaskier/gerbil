@@ -7,15 +7,15 @@
 #include <multi_img.h>
 #include "model/representation.h"
 
-class TaskImageIMGPCA : public Task
+class TaskImagePCA : public Task
 {
 
 public:
-    explicit TaskImageIMGPCA(multi_img::NormMode normMode,
-                           multi_img_base::Range normRange,
-                           representation::t type, bool update,
-                           unsigned int components = 0, bool includecache = true);
-    virtual ~TaskImageIMGPCA();
+    explicit TaskImagePCA(QString sourceId, QString destId, multi_img::NormMode normMode,
+                          multi_img_base::Range normRange,
+                          representation::t type, bool update,
+                          unsigned int components = 0, bool includecache = true);
+    virtual ~TaskImagePCA();
     virtual bool run() override;
 
 private:
