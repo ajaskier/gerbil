@@ -72,7 +72,12 @@ class PcaTbb;
 	friend class IlluminantCuda;\
 	friend class DataRangeTbb;\
 	friend class DataRangeCuda;\
-	friend class PcaTbb;
+    friend class PcaTbb;\
+    friend class TaskRescaleTbb;\
+    friend class TaskNormL2Tbb;\
+    friend class TaskGradientTbb;\
+    friend class TaskPcaTbb;\
+    friend class TaskBand2QImageTbb;
 
 class multi_img_base {
 public:
