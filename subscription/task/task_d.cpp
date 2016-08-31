@@ -20,7 +20,7 @@ bool TaskD::run()
     {
         Subscription::Lock<Data> lockA(*sub("source"));
         data.num = d + lockA()->num + 1;
-        //QThread::sleep(3);
+        QThread::msleep(2000);
     }
 
     Subscription::Lock<Data> lockD(*sub("dest"));

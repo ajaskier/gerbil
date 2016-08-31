@@ -21,7 +21,6 @@ public:
     std::vector<Dependency>& getDependencies() { return dependencies; }
     QString getId() { return id; }
 
-
 protected:
     virtual bool run() = 0;
     virtual std::shared_ptr<Subscription> sub(QString id) final;

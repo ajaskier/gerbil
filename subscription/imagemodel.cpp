@@ -124,10 +124,12 @@ void ImageModel::spawn(representation::t type, const cv::Rect &newROI, int bands
     }
 }
 
-void ImageModel::computeBand(representation::t type, int dim) {
+//void ImageModel::computeBand(representation::t type, int dim) {
 
-}
+//}
 
 void ImageModel::setROI(cv::Rect newROI) {
     roi = newROI;
+
+    delegateTask("image.IMG");
 }

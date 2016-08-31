@@ -35,7 +35,6 @@ bool TaskNormL2Tbb::run()
     if (dest) {
         copyGlob = source->roi & dest->roi;
 
-
         if (copyGlob.width > 0 && copyGlob.height > 0) {
             copySrc.x = copyGlob.x - source->roi.x;
             copySrc.y = copyGlob.y - source->roi.y;

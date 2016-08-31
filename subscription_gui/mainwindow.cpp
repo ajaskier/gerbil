@@ -56,7 +56,7 @@ void MainWindow::initRest()
     {
         Subscription::Lock<multi_img> lock(*imgSub);
         multi_img* img = lock();
-        imageModel->setROI(img->roi);
+        //imageModel->setROI(img->roi);
 
         QPixmap pix = QPixmap::fromImage(img->export_qt(1));
         ui->imageLabel->setPixmap(pix);

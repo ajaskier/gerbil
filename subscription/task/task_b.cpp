@@ -20,6 +20,7 @@ bool TaskB::run()
     {
         Subscription::Lock<Data> lock(*sub("source"));
         data.num = b+lock()->num;
+        QThread::msleep(2000);
         //QThread::sleep(5);
     }
     //write phase

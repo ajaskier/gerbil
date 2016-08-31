@@ -20,7 +20,7 @@ bool TaskC::run()
     {
         Subscription::Lock<Data> lockA(*sub("sourceA"));
         Subscription::Lock<Data> lockB(*sub("sourceB"));
-        //QThread::sleep(3);
+        QThread::msleep(2000);
         data.num = c + lockA()->num + lockB()->num;
     }
 

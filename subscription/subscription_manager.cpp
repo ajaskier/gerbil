@@ -62,7 +62,7 @@ void SubscriptionManager::subscribeWrite(QString dataId)
     dataPool[dataId].willWrite = true;
     dataPool[dataId].upToDate = false;
     updateState(dataId);
-    invalidDependants(dataId);
+    //invalidDependants(dataId);
 }
 
 void SubscriptionManager::unsubscribe(QString dataId, SubscriptionType sub,
@@ -101,7 +101,7 @@ handle_pair SubscriptionManager::doWriteSubscription(QString id)
     auto data = dataPool[id].write();
 
     std::unique_lock<std::recursive_mutex> lock(mu);
-    dataPool[id].upToDate = false;
+    //dataPool[id].upToDate = false;
     dataPool[id].doWrite = true;
 
     updateState(id);
@@ -124,6 +124,8 @@ void SubscriptionManager::endDoReadSubscription(QString id)
 
 void SubscriptionManager::endDoWriteSubscription(QString id)
 {
+    //invalidDependants(id);
+
     std::unique_lock<std::recursive_mutex> lock(mu);
     dataPool[id].doWrite = false;
     dataPool[id].upToDate = true;
@@ -138,10 +140,11 @@ void SubscriptionManager::endDoWriteSubscription(QString id)
 void SubscriptionManager::propagateChange(QString id) {
     for(QString data: dataPool[id].dependants) {
         if (hasWillReads(data) && !dataPool[data].willWrite) {
+        //if (dataPool[data].willReads > 0 && !dataPool[data].willWrite) {
             //askModelForTask(data);
             emit triggerTask(data);
         }
-        propagateChange(data);
+        //propagateChange(data);
     }
 }
 
@@ -158,7 +161,7 @@ void SubscriptionManager::updateState(QString id)
 {
     std::unique_lock<std::recursive_mutex> lock(mu);
 
-    if (dataPool[id].upToDate) dataPool[id].validity = ValidityState::VALID;
+    if (dataPool[id].upToDate && dataPool[id].initialized) dataPool[id].validity = ValidityState::VALID;
     else dataPool[id].validity = ValidityState::INVALID;
 
     if (!dataPool[id].doWrite && dataPool[id].doReads == 0)

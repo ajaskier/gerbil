@@ -18,7 +18,7 @@ public:
 
     virtual void delegateTask(QString id) override;
     void spawn(representation::t type, const cv::Rect &newROI, int bands);
-    void computeBand(representation::t type, int dim);
+    //void computeBand(representation::t type, int dim);
     void setBandsCount(size_t bands);
     void setNormalizationParameters(representation::t type,
                                     multi_img::NormMode normMode,
