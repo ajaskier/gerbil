@@ -7,11 +7,13 @@
 class Dependency {
 
 public:
-    Dependency(QString dataId, SubscriptionType subscription)
-        : dataId(dataId), subscription(subscription) {}
+    Dependency(QString dataId, SubscriptionType subscription, int version = -1)
+        : dataId(dataId), subscription(subscription), version(version) {}
 
     QString dataId;
+    int version;
     SubscriptionType subscription;
+
 };
 
 

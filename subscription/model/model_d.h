@@ -9,10 +9,11 @@ class ModelD : public Model
 {
     Q_OBJECT
 public:
-    explicit ModelD(int d, SubscriptionManager& sm, TaskScheduler *scheduler, QObject *parent = 0);
+    explicit ModelD(int d, SubscriptionManager& sm, TaskScheduler *scheduler,
+                    QObject *parent = 0);
 
 public slots:
-    virtual void delegateTask(QString id) override;
+    virtual void delegateTask(QString id, QString parentId = "") override;
     void setD(int d) { this->d = d; }
 
 protected:

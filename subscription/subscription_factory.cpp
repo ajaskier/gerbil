@@ -25,5 +25,6 @@ Subscription* SubscriptionFactory::create(Dependency dependency,
                                           std::function<void ()> updateSlot)
 {
     assert(sm);
-    return new Subscription(dependency, subscriberType, idCounter++, *sm, requester, updateSlot);
+    return new Subscription(dependency, subscriberType, idCounter++, *sm,
+                            requester, updateSlot);
 }

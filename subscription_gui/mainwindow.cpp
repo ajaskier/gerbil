@@ -10,9 +10,15 @@
 #include "data.h"
 #include "lock.h"
 #include "subscription_factory.h"
+#include "data_condition_informer.h"
 #include "multi_img.h"
 
+#include <imagemodel.h>
+#include <fakemodel.h>
+#include <distmodel.h>
+
 #include "normdock.h"
+#include "distviewcompute_utils.h"
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -26,12 +32,17 @@ void MainWindow::initCrucials()
 {
     scheduler = new TaskScheduler(sm);
     SubscriptionFactory::init(&sm);
+    DataConditionInformer::init(&sm);
 
-    imageModel = new ImageModel(false, sm, scheduler, this);
+    imageModel = new ImgModel(false, sm, scheduler, this);
+    fakeModel = new FakeModel(sm, scheduler, this);
+   // distModel = new DistModel(sm, scheduler, this);
     imageModel->setFilename("/home/olek/gerbil_data/peppers_descriptor.txt");
     imgSub = std::unique_ptr<Subscription>(SubscriptionFactory::create(Dependency("image", SubscriptionType::READ),
                                          SubscriberType::READER, this,
                                          std::bind(&MainWindow::imgUpdated, this)));
+
+
 }
 
 void MainWindow::initRest()
@@ -46,7 +57,7 @@ void MainWindow::initRest()
     connect(normDock, &NormDock::normalizationParametersChanged,
             this, &MainWindow::onNormalizationParametersChanged);
     connect(this, &MainWindow::normalizationParametersChanged,
-            imageModel, &ImageModel::setNormalizationParameters);
+            imageModel, &ImgModel::setNormalizationParameters);
 
     addDockWidget(Qt::RightDockWidgetArea, normDock);
 //    ui->normDock = new NormDock(this);
@@ -61,6 +72,10 @@ void MainWindow::initRest()
         QPixmap pix = QPixmap::fromImage(img->export_qt(1));
         ui->imageLabel->setPixmap(pix);
     }
+
+    imageIMGSub = std::unique_ptr<Subscription>(SubscriptionFactory::create(Dependency("image.IMG", SubscriptionType::READ),
+                                               SubscriberType::READER, this,
+                                               std::bind(&MainWindow::displayImageIMG, this)));
 
 
     modelA = new ModelA(1, sm, scheduler, this);
@@ -89,14 +104,47 @@ MainWindow::~MainWindow()
 void MainWindow::dockAVisibilityChanged(bool visible)
 {
     if (visible) {
-        dataASub = SubscriptionFactory::create(Dependency("DATA_A", SubscriptionType::READ),
-                                               SubscriberType::READER, this,
-                                               std::bind(&MainWindow::displayA, this));
+
+        scheduler->stop();
+//        dataASub = SubscriptionFactory::create(Dependency("DATA_A", SubscriptionType::READ),
+//                                               SubscriberType::READER, this,
+//                                               std::bind(&MainWindow::displayA, this));
+
+
+//        roiSub = SubscriptionFactory::create(Dependency("ROI.diff", SubscriptionType::READ),
+//                                             SubscriberType::READER);
+
+//        imgIMG_Sub = std::unique_ptr<Subscription>(SubscriptionFactory::create(Dependency("image.IMG", SubscriptionType::READ),
+//                                                                               SubscriberType::READER));
+
+        roiSub = SubscriptionFactory::create(Dependency("ROI.diff", SubscriptionType::READ),
+                                                       SubscriberType::READER);
+
+        distIMGSub = SubscriptionFactory::create(Dependency("dist.IMG", SubscriptionType::READ),
+                                                 SubscriberType::READER, this,
+                                                 std::bind(&MainWindow::displayDist, this));
+
+//        imageIMGSub = SubscriptionFactory::create(Dependency("image.IMG", SubscriptionType::READ),
+//                                                   SubscriberType::READER, this,
+//                                                   std::bind(&MainWindow::displayFake, this));
+
+//        distFAKESub = SubscriptionFactory::create(Dependency("dist.FAKE", SubscriptionType::READ),
+//                                                   SubscriberType::READER, this,
+//                                                   std::bind(&MainWindow::displayDistFake, this));
+
+
+
+
+        scheduler->resume();
+
     } else {
         //dataASub->end();
-        delete dataASub;
+       // delete dataASub;
+        delete distIMGSub;
+//        delete imageFAKESub;
+//        delete distFAKESub;
+        delete roiSub;
     }
-
 }
 
 void MainWindow::displayA()
@@ -107,6 +155,47 @@ void MainWindow::displayA()
     int num = lock()->num;
 
     ui->outputA->setText(QString::number(num));
+}
+
+void MainWindow::displayImageIMG()
+{
+
+    qDebug() << "image.IMG computed";
+
+    qDebug() << "did I crash?!";
+    Subscription::Lock<multi_img> lock(*imageIMGSub);
+    multi_img* img = lock();
+    qDebug() << "height:" << img->height << "width:" << img->width;
+
+   // QPixmap pix = QPixmap::fromImage(img->export_qt(1));
+   // ui->imageIMGLabel->setPixmap(pix);
+
+
+//    Subscription::Lock<Data> lock(*imageFAKESub);
+//    int num = lock()->num;
+
+//    ui->imageFakeLabel->setText(QString::number(num));
+}
+
+void MainWindow::displayDist()
+{
+
+    qDebug() << "dist calculated";
+    Subscription::Lock<std::vector<BinSet>, ViewportCtx> lock(*distIMGSub);
+    std::vector<BinSet>* sets = lock();
+
+    qDebug() << "alright!";
+    //int num = lock()->num;
+
+    //ui->distFakeLabel->setText(QString::number(num));
+}
+
+void MainWindow::displayROI()
+{
+//    Subscription::Lock<Data> lock(*roiSub);
+//    int num = lock()->num;
+
+//    ui->roiLabel->setText(QString::number(num));
 }
 
 void MainWindow::imgUpdated()
@@ -257,7 +346,7 @@ void MainWindow::on_imageModelButton_clicked()
 {
     QString image = "bands." + representation + "." + QString::number(currentBand);
 
-    imgIMG_Sub = std::unique_ptr<Subscription>(SubscriptionFactory::create(Dependency(image,
+    bandsSub = std::unique_ptr<Subscription>(SubscriptionFactory::create(Dependency(image,
                                                         SubscriptionType::READ),
                                              SubscriberType::READER, this,
                                              std::bind(&MainWindow::imgIMG_updated, this)));
@@ -266,7 +355,7 @@ void MainWindow::on_imageModelButton_clicked()
 void MainWindow::imgIMG_updated()
 {
     qDebug() << "did I crash?!";
-    Subscription::Lock<std::pair<QImage, QString>> lock(*imgIMG_Sub);
+    Subscription::Lock<std::pair<QImage, QString>> lock(*bandsSub);
     //multi_img* img = lock();
     QImage img = lock()->first;
     QString desc = lock()->second;
@@ -280,21 +369,25 @@ void MainWindow::imgIMG_updated()
 void MainWindow::on_imgButton_clicked()
 {
     representation = "IMG";
+    emit normalizationParametersChanged(representation::fromStr(representation), current_normMode, current_targetRange);
 }
 
 void MainWindow::on_normButton_clicked()
 {
     representation = "NORM";
+    emit normalizationParametersChanged(representation::fromStr(representation), current_normMode, current_targetRange);
 }
 
 void MainWindow::on_gradButton_clicked()
 {
     representation = "GRAD";
+    emit normalizationParametersChanged(representation::fromStr(representation), current_normMode, current_targetRange);
 }
 
 void MainWindow::on_pcaButton_clicked()
 {
     representation = "IMGPCA";
+    emit normalizationParametersChanged(representation::fromStr(representation), current_normMode, current_targetRange);
 }
 
 void MainWindow::on_bandSlider_sliderMoved(int position)
@@ -306,11 +399,36 @@ void MainWindow::onNormalizationParametersChanged(representation::t type,
                                                   multi_img::NormMode normMode,
                                                   multi_img_base::Range targetRange)
 {
+    current_normMode = normMode;
+    current_targetRange = targetRange;
     emit normalizationParametersChanged(representation::fromStr(representation),
                                         normMode, targetRange);
+
+
 }
 
 void MainWindow::on_gradpcaButton_clicked()
 {
     representation = "GRADPCA";
+    emit onNormalizationParametersChanged(representation::fromStr(representation), current_normMode, current_targetRange);
+}
+
+void MainWindow::on_fakeButton_clicked()
+{
+    scheduler->stop();
+    imageModel->runImg();
+    scheduler->resume();
+}
+
+void MainWindow::on_roiButton_clicked()
+{
+//    roiSub = SubscriptionFactory::create(Dependency("ROI.diff", SubscriptionType::READ),
+//                                         SubscriberType::READER);
+
+
+   // scheduler->stop();
+    imageModel->setROI(cv::Rect(5, 5, 50, 50), false);
+    imageModel->calculateROIdiff();
+    imageModel->runImg();
+ //   scheduler->resume();
 }

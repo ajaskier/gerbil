@@ -44,6 +44,14 @@ public:
         }
     }
 
+    int version() {
+        return get_version();
+    }
+
+    void setVersion(int newVersion) {
+        get_version() = newVersion;
+    }
+
     void swapMeta(T2& target) {
         boost::dynamic_any newany(target);
         std::swap(*get_meta(), newany);
@@ -56,11 +64,12 @@ public:
 
 private:
 
-    handle get_data() { return handles.first; }
-    handle get_meta() { return handles.second; }
+    handle get_data() { return std::get<0>(handles); }
+    handle get_meta() { return std::get<1>(handles); }
+    int& get_version() { return std::get<2>(handles); }
 
     Subscription& sub;
-    handle_pair handles;
+    handle_tuple handles;
     bool released = false;
 };
 

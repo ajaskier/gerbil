@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>811</width>
-    <height>775</height>
+    <width>1342</width>
+    <height>1484</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -23,6 +23,19 @@
    <layout class="QGridLayout" name="gridLayout_4">
     <item row="0" column="0">
      <layout class="QHBoxLayout" name="horizontalLayout_2">
+      <item>
+       <widget class="QLabel" name="imageIMGLabel">
+        <property name="minimumSize">
+         <size>
+          <width>256</width>
+          <height>256</height>
+         </size>
+        </property>
+        <property name="text">
+         <string>TextLabel</string>
+        </property>
+       </widget>
+      </item>
       <item>
        <widget class="QCheckBox" name="checkBoxA">
         <property name="text">
@@ -53,8 +66,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>811</width>
-     <height>19</height>
+     <width>1342</width>
+     <height>25</height>
     </rect>
    </property>
   </widget>
@@ -221,6 +234,41 @@
          </property>
          <property name="text">
           <string>Compute A</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="distFakeLabel">
+         <property name="text">
+          <string>TextLabel</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="roiLabel">
+         <property name="text">
+          <string>TextLabel</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="imageFakeLabel">
+         <property name="text">
+          <string>TextLabel</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="roiButton">
+         <property name="text">
+          <string>Compute ROI</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="fakeButton">
+         <property name="text">
+          <string>Compute Fake</string>
          </property>
         </widget>
        </item>

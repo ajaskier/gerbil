@@ -7,10 +7,17 @@
 #include <model/model_a.h>
 #include <model/model_b.h>
 #include <model/model_d.h>
-#include <imagemodel.h>
+//#include <imagemodel.h>
+//#include <fakemodel.h>
+
 #include "model/representation.h"
+#include "multi_img.h"
 
 class NormDock;
+//class DistModel;
+class ImgModel;
+class FakeModel;
+
 
 namespace Ui {
 class MainWindow;
@@ -30,13 +37,15 @@ private:
     ModelA* modelA;
     ModelB* modelB;
     ModelD* modelD;
-    ImageModel* imageModel;
+    ImgModel* imageModel;
+    FakeModel* fakeModel;
+    //DistModel* distModel;
 
     SubscriptionManager sm;
     TaskScheduler* scheduler;
 
     std::unique_ptr<Subscription> imgSub;
-    std::unique_ptr<Subscription> imgIMG_Sub;
+    std::unique_ptr<Subscription> bandsSub;
     /*
     Subscription* imgSub;
     Subscription* imgIMG_Sub;
@@ -47,11 +56,21 @@ private:
     Subscription* dataCSub;
     Subscription* dataDSub;
 
+    std::unique_ptr<Subscription> imageIMGSub;
+   // Subscription* distFAKESub;
+    Subscription* roiSub;
+
+    Subscription* distIMGSub;
+
     QString representation = "IMG";
     int currentBand = 0;
     size_t maxBands = 0;
 
     NormDock* normDock;
+
+
+    multi_img::NormMode current_normMode;
+    multi_img_base::Range current_targetRange;
 
 signals:
     void normalizationParametersChanged(
@@ -75,6 +94,9 @@ private slots:
     void displayB();
     void displayC();
     void displayD();
+    void displayImageIMG();
+    void displayDist();
+    void displayROI();
     void imgUpdated();
     void imgIMG_updated();
 
@@ -102,6 +124,8 @@ private slots:
             multi_img::Range targetRange
             );
     void on_gradpcaButton_clicked();
+    void on_fakeButton_clicked();
+    void on_roiButton_clicked();
 };
 
 #endif // MAINWINDOW_H

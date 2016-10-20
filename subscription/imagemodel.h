@@ -1,5 +1,5 @@
-#ifndef IMAGE_MODEL_H
-#define IMAGE_MODEL_H
+#ifndef IMG_MODEL_H
+#define IMG_MODEL_H
 
 #include <model/representation.h>
 #include <QObject>
@@ -8,15 +8,15 @@
 
 #include "multi_img.h"
 
-class ImageModel : public Model
+class ImgModel : public Model
 {
     Q_OBJECT
 
 public:
-    explicit ImageModel(bool limitedMode, SubscriptionManager& sm,
+    explicit ImgModel(bool limitedMode, SubscriptionManager& sm,
                         TaskScheduler* scheduler, QObject *parent = nullptr);
 
-    virtual void delegateTask(QString id) override;
+    virtual void delegateTask(QString id, QString parentId = "") override;
     void spawn(representation::t type, const cv::Rect &newROI, int bands);
     //void computeBand(representation::t type, int dim);
     void setBandsCount(size_t bands);
@@ -25,14 +25,17 @@ public:
                                     multi_img_base::Range targetRange);
 
     void setFilename(QString filename);
-    void setROI(cv::Rect newROI);
+    void setROI(cv::Rect newROI_arg, bool sendTask = true);
+    void calculateROIdiff();
+
+    void runImg();
 
 private:
     bool limitedMode;
     QString filename;
 
+    cv::Rect newRoi;
     cv::Rect roi;
-    cv::Rect oldRoi;
 
     size_t nBands;
     size_t nBandsOld;
@@ -41,6 +44,8 @@ private:
     std::map<representation::t, multi_img::NormMode> normalizationModes;
     std::map<representation::t, multi_img_base::Range> normalizationRanges;
 
+    int imgFakeCounter = 0;
+
 };
 
-#endif // IMAGE_MODEL_H
+#endif // IMG_MODEL_H

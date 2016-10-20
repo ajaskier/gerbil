@@ -241,11 +241,11 @@ void DistViewController::processPreROISpawn(const cv::Rect &oldroi,
                                             const std::vector<cv::Rect> &add,
                                             bool profitable)
 {
-	if (profitable) {
-		GGDBGM("INCREMENTAL distview update" << endl);
-		for (auto r : payloadMap.keys()) {
-			auto &p = payloadMap[r];
-			if (!p->isSubscribed)
+    if (profitable) {
+        GGDBGM("INCREMENTAL distview update" << endl);
+        for (auto r : payloadMap.keys()) {
+            auto &p = payloadMap[r];
+            if (!p->isSubscribed)
 				continue;
 			GGDBGM("   BEGIN " << r <<" distview update" << endl);
 			p->tmp_binset = subImage(r, sub, newroi);

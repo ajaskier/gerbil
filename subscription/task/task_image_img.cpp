@@ -1,5 +1,6 @@
 #include "task_image_img.h"
 #include "subscription.h"
+#include "lock.h"
 
 #include "task_scope_image.h"
 #include "task_rescale_tbb.h"
@@ -14,6 +15,7 @@ TaskImageIMG::TaskImageIMG(cv::Rect roi, size_t bands, size_t roiBands,
       roiBands(roiBands), includecache(includecache), normMode(normMode),
       normRange(normRange), type(type), update(update)
 {
+
 }
 
 TaskImageIMG::~TaskImageIMG()
@@ -42,5 +44,13 @@ bool TaskImageIMG::run()
     TaskNormRangeTbb normRangeTbb("image.IMG", normMode, normRange.min,
                                   normRange.max, type, update);
     normRangeTbb.setSubscription(destId, sub("dest"));
-    return normRangeTbb.start();
+    success = normRangeTbb.start();
+
+    Subscription::Lock<multi_img> source_lock(*sub("source"));
+    Subscription::Lock<multi_img> dest_lock(*sub("dest"));
+   // dest_lock.setVersion(dest_lock.version()+1);
+
+    dest_lock.setVersion(source_lock.version());
+
+    return success;
 }

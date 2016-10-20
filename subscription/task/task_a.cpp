@@ -23,6 +23,9 @@ bool TaskA::run()
     data.num = a;
     Subscription::Lock<Data> lock(*sub("dest"));
     qDebug() << "got dataA";
+
+    int version = lock.version();
+    lock.setVersion(version+1);
     lock.swap(data);
 
     qDebug() << "swapped";

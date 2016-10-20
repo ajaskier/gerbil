@@ -24,15 +24,17 @@ public:
 
     explicit SubscriptionManager(QObject* parent = nullptr);
     void registerCreator(Model* creator, QString dataId, std::vector<QString> dependencies);
-    void subscribe(QString dataId, SubscriptionType sub, Subscription* subObj);
-    void unsubscribe(QString dataId, SubscriptionType sub, Subscription* subObj);
+    void subscribe(QString dataId, SubscriptionType sub, int version, Subscription* subObj);
+    void unsubscribe(QString dataId, SubscriptionType sub, int version, Subscription* subObj,
+                     bool consumed = true);
+    bool isDataInitialized(QString dataId);
 
 signals:
     void triggerTask(QString id);
 
 private:
 
-    void askModelForTask(QString id);
+    void askModelForTask(QString requestedId, QString beingComputedId = "");
     void updateState(QString id);
     bool processDependencies(std::vector<Dependency>& dependencies);
     void sendUpdate(QString id);
@@ -44,9 +46,9 @@ private:
     void subscribeRead(QString dataId, Subscription *subObj);
     void subscribeWrite(QString dataId);
 
-    handle_pair doSubscription(QString id, SubscriptionType sub);
-    handle_pair doReadSubscription(QString id);
-    handle_pair doWriteSubscription(QString id);
+    handle_tuple doSubscription(QString id, SubscriptionType sub);
+    handle_tuple doReadSubscription(QString id);
+    handle_tuple doWriteSubscription(QString id);
 
     void endDoSubscription(QString id, SubscriptionType sub);
     void endDoReadSubscription(QString id);

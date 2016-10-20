@@ -15,9 +15,10 @@ public:
     explicit Model(SubscriptionManager& sm, TaskScheduler* scheduler,
                    QObject *parent = 0)
         : QObject(parent), sm(sm), scheduler(scheduler) {}
+    virtual ~Model() {}
 
 public slots:
-    virtual void delegateTask(QString id) = 0;
+    virtual void delegateTask(QString requestedId, QString parentId = "") = 0;
 
 protected:
 

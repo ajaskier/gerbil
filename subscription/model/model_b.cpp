@@ -16,7 +16,7 @@ ModelB::ModelB(int b, int c, SubscriptionManager &sm, TaskScheduler* scheduler,
     registerData("DATA_C", {"DATA_A", "DATA_B"});
 }
 
-void ModelB::delegateTask(QString id)
+void ModelB::delegateTask(QString id, QString parentId)
 {
     Task* task;
     if (id == "DATA_B") {

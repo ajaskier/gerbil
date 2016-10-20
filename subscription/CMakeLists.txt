@@ -17,6 +17,7 @@ vole_compile_library(
 	subscription_type
 	task_scheduler
 	worker_thread
+        data_condition_informer
 
 	model/model
 	model/model_a
@@ -42,8 +43,19 @@ vole_compile_library(
         task/task_image_norm
         task/task_image_grad
         task/task_image_pca
+        task/task_image_fake
+        task/task_fake_sub
+        task/task_fake_add
+
+        task/task_distviewbins_tbb
+        task/task_dist_sub
+        task/task_dist_add
 
         imagemodel
+        distmodel
+        fakemodel
+
+        distviewcompute_utils
 )
 
 vole_moc_library(
@@ -58,6 +70,7 @@ vole_moc_library(
 	model/model_d.h
 
         imagemodel.h
+        fakemodel.h
 )
 
 vole_add_module()

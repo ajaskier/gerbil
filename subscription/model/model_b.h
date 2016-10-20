@@ -12,7 +12,7 @@ public:
     explicit ModelB(int b, int c, SubscriptionManager& sm, TaskScheduler *scheduler, QObject *parent = 0);
 
 public slots:
-    virtual void delegateTask(QString id) override;
+    virtual void delegateTask(QString id, QString parentId = "") override;
     void setB(int b) { this->b = b; }
     void setC(int c) { this->c = c; }
 

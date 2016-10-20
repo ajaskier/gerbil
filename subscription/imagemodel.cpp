@@ -12,9 +12,15 @@
 #include "task/task_pca_tbb.h"
 #include "task/task_band.h"
 
+
+#include "task/task_image_fake.h"
+
+#include "lock.h"
+#include "subscription_factory.h"
+#include <rectangles.h>
 #include <QVector>
 
-ImageModel::ImageModel(bool limitedMode, SubscriptionManager &sm,
+ImgModel::ImgModel(bool limitedMode, SubscriptionManager &sm,
                        TaskScheduler *scheduler, QObject *parent)
     : Model(sm, scheduler, parent), limitedMode(limitedMode)
 {
@@ -24,10 +30,12 @@ ImageModel::ImageModel(bool limitedMode, SubscriptionManager &sm,
     registerData("image.GRAD", {"image.IMG"});
     registerData("image.IMGPCA", {"image.IMG"});
     registerData("image.GRADPCA", {"image.GRAD"});
+    registerData("image.FAKE", {/*"ROI"*/});
+    registerData("ROI.diff", {});
 
 }
 
-void ImageModel::setBandsCount(size_t bands)
+void ImgModel::setBandsCount(size_t bands)
 {
     QVector<QString> vec = {"IMG", "NORM", "GRAD", "IMGPCA", "GRADPCA"};
     for (QString repr : vec) {
@@ -38,17 +46,21 @@ void ImageModel::setBandsCount(size_t bands)
     }
 }
 
-void ImageModel::delegateTask(QString id)
+void ImgModel::delegateTask(QString id, QString parentId)
 {
     Task* task = nullptr;
     if (id == "image") {
         task = new TaskImageLim(filename, limitedMode);
+
+    } else if (id == "image.FAKE") {
+        task = new TaskImageFAKE(imgFakeCounter++);
+
     } else if (id == "image.IMG") {
 
         auto range = normalizationRanges[representation::IMG];
         auto mode = normalizationModes[representation::IMG];
 
-        task = new TaskImageIMG(roi, rescaleBands, nBands, mode, range,
+        task = new TaskImageIMG(newRoi, rescaleBands, nBands, mode, range,
                                 representation::IMG, true);
     } else if (id == "image.NORM") {
 
@@ -78,7 +90,7 @@ void ImageModel::delegateTask(QString id)
         auto mode = normalizationModes[representation::GRADPCA];
 
         task = new TaskImagePCA("image.GRAD", "image.GRADPCA",
-                                mode, range, representation::GRADPCA, 0);
+                                mode, range, representation::GRADPCA, true, 0);
 
     } else if (id.startsWith("bands")) {
         auto args = id.split(".");
@@ -91,11 +103,19 @@ void ImageModel::delegateTask(QString id)
         else if (args[1] == "GRADPCA") repr = representation::GRADPCA;
 
         task = new TaskBand("image."+args[1], id, args[2].toInt(), repr);
+    } else if (id == "ROI.diff") {
+        calculateROIdiff();
+        return;
     }
     scheduler->pushTask(task);
 }
 
-void ImageModel::setNormalizationParameters(representation::t type,
+void ImgModel::runImg()
+{
+    delegateTask("image.IMG");
+}
+
+void ImgModel::setNormalizationParameters(representation::t type,
                                             multi_img::NormMode normMode,
                                             multi_img_base::Range targetRange)
 {
@@ -105,19 +125,21 @@ void ImageModel::setNormalizationParameters(representation::t type,
     delegateTask("image."+representation::str(type));
 }
 
-void ImageModel::setFilename(QString filename)
+void ImgModel::setFilename(QString filename)
 {
     this->filename = filename;
 }
 
-void ImageModel::spawn(representation::t type, const cv::Rect &newROI, int bands)
+void ImgModel::spawn(representation::t type, const cv::Rect &newROI, int bands)
 {
     if (type == representation::IMG) {
         nBandsOld = nBands;
-        oldRoi = roi;
+        roi = newRoi;
     }
-    roi = newROI;
+    newRoi = newROI;
     rescaleBands = bands;
+
+    calculateROIdiff();
 
     if (type == representation::IMG) {
         delegateTask("image.IMG");
@@ -128,8 +150,34 @@ void ImageModel::spawn(representation::t type, const cv::Rect &newROI, int bands
 
 //}
 
-void ImageModel::setROI(cv::Rect newROI) {
-    roi = newROI;
+void ImgModel::setROI(cv::Rect newROI_arg, bool sendTask)
+{
+    roi = newRoi;
+    newRoi = newROI_arg;
 
-    delegateTask("image.IMG");
+    //calculateROIdiff();
+
+    if(sendTask) delegateTask("image.IMG");
+}
+
+void ImgModel::calculateROIdiff()
+{
+
+    qDebug() << "calculating ROI";
+
+    std::shared_ptr<Subscription> roiSub(
+                SubscriptionFactory::create(Dependency("ROI.diff", SubscriptionType::WRITE),
+                                            SubscriberType::TASK));
+
+    Subscription::Lock<std::pair<std::vector<cv::Rect>, std::vector<cv::Rect>>> lock(*roiSub);
+    std::pair<std::vector<cv::Rect>, std::vector<cv::Rect>> roidiff;
+
+    rectTransform(roi, newRoi, roidiff.first, roidiff.second);
+
+
+    int version = lock.version();
+    lock.setVersion(version+1);
+    lock.swap(roidiff);
+
+    qDebug() << "ROI calculated";
 }

@@ -13,7 +13,7 @@ ModelD::ModelD(int d, SubscriptionManager &sm, TaskScheduler* scheduler,
     registerData("DATA_D", {"DATA_A"});
 }
 
-void ModelD::delegateTask(QString id)
+void ModelD::delegateTask(QString id, QString parentId)
 {
     if (id == "DATA_D") {
         Task* task = new TaskD(d);

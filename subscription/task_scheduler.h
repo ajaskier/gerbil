@@ -14,6 +14,9 @@ public:
     TaskScheduler(SubscriptionManager& sm);
     void pushTask(Task* task);
 
+    void stop();
+    void resume();
+
 protected:
     void checkTaskPool();
     void startTask(Task* task);
@@ -22,6 +25,8 @@ protected:
 
     std::list<Task*> taskPool;
     SubscriptionManager& sm;
+
+    int stopped = 0;
 };
 
 #endif // TASK_SCHEDULER_H

@@ -13,10 +13,12 @@ class Task
 
 public:
     explicit Task(QString target, std::map<QString, QString> sources);
+    explicit Task(QString id, QString target, std::map<QString, QString> sources);
 
     virtual ~Task();
     virtual bool start() final;
     virtual void setSubscription(QString id, std::shared_ptr<Subscription> sub) final;
+    virtual void invalidateSubscriptions() final;
 
     std::vector<Dependency>& getDependencies() { return dependencies; }
     QString getId() { return id; }
@@ -24,6 +26,7 @@ public:
 protected:
     virtual bool run() = 0;
     virtual std::shared_ptr<Subscription> sub(QString id) final;
+    virtual bool subExists(QString id) final;
     virtual bool isCancelled() { return false; }
 
 private:

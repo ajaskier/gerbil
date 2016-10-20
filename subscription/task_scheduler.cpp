@@ -13,10 +13,11 @@ void TaskScheduler::pushTask(Task *task)
 {
     qDebug() << "task" << task->getId() << "pushed to scheduler";
     removeRelated(task->getId());
+    //removeRelated(task->getDependencies());
     createSubscriptions(task);
 
     taskPool.push_front(task);
-    checkTaskPool();
+    if (!stopped) checkTaskPool();
 }
 
 void TaskScheduler::createSubscriptions(Task *task)
@@ -35,13 +36,16 @@ void TaskScheduler::removeRelated(QString id)
     auto it = taskPool.begin();
     while(it != taskPool.end()) {
 
-        auto dependencies = (*it)->getDependencies();
-        if (std::any_of(dependencies.begin(), dependencies.end(),
-                       [id](Dependency& dep){
-                            return dep.dataId == id;
-                        }))
+        auto comparedId = (*it)->getId();
+//        auto dependencies = (*it)->getDependencies();
+//        if (std::any_of(dependencies.begin(), dependencies.end(),
+//                       [id](Dependency& dep){
+//                            return dep.dataId == id;
+//                        }))
+        if(comparedId == id)
         {
             qDebug() << "need to remove " << (*it)->getId();
+            (*it)->invalidateSubscriptions();
             delete *it;
             it = taskPool.erase(it);
         } else {
@@ -52,6 +56,9 @@ void TaskScheduler::removeRelated(QString id)
 
 void TaskScheduler::checkTaskPool()
 {
+    if (stopped)
+        return;
+
     qDebug() << "checking taskPool";
     auto it = taskPool.begin();
     while(it != taskPool.end()) {
@@ -76,4 +83,17 @@ void TaskScheduler::startTask(Task *task)
             Qt::QueuedConnection);
 
     thread->start();
+}
+
+void TaskScheduler::stop()
+{
+    qDebug() << "scheduler stopped";
+    stopped++;
+}
+
+void TaskScheduler::resume()
+{
+    stopped--;
+    if(!stopped) qDebug() << "scheduler resumed";
+    if(!stopped) checkTaskPool();
 }

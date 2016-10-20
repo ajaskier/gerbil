@@ -23,6 +23,7 @@ public:
     virtual ~Subscription() override;
     void returnData();
     void forceUpdate();
+    void forceUnsubscribe();
     int getId() { return id; }
     SubscriberType getSubscriberType() { return subscriberType; }
     Dependency getDependency() { return dependency; }
@@ -40,16 +41,17 @@ private:
     explicit Subscription(Dependency dependency, SubscriberType subscriberType,
                           int id, SubscriptionManager& sm, QObject* requester,
                           std::function<void(void)> updateSlot);
-    handle_pair leaseData();
+    handle_tuple leaseData();
 
     Dependency dependency;
     SubscriberType subscriberType;
     SubscriptionManager& sm;
     const int id;
+
     static int spawnCounter;
     static int destroyCounter;
 
-    bool ended = false;
+    bool forcedDelete = false;
     friend class SubscriptionFactory;
 };
 

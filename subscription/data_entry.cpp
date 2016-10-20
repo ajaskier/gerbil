@@ -2,13 +2,13 @@
 
 #include "subscription.h"
 
-handle_pair DataEntry::read()
+handle_tuple DataEntry::read()
 {
     std::unique_lock<std::mutex> lock(mu);
     not_writing.wait(lock, [this]() {
         return !doWrite;
     });
-    return handle_pair(data_handle, meta_handle);
+    return handle_tuple(data_handle, meta_handle, externalVersion);
 }
 
 void DataEntry::endRead()
@@ -17,14 +17,14 @@ void DataEntry::endRead()
     if (doReads == 0) not_reading.notify_one();
 }
 
-handle_pair DataEntry::write()
+handle_tuple DataEntry::write()
 {
     std::unique_lock<std::mutex> lock(mu);
     not_reading.wait(lock, [this]() {
         return doReads == 0 && !doWrite;
     });
 
-    return handle_pair(data_handle, meta_handle);
+    return handle_tuple(data_handle, meta_handle, externalVersion);
 }
 
 void DataEntry::endWrite()

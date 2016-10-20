@@ -12,8 +12,11 @@ public:
     explicit ModelA(int a, SubscriptionManager& sm, TaskScheduler* scheduler,
                     QObject *parent = 0);
 
+
+    void calculateROI();
+
 public slots:
-    virtual void delegateTask(QString id) override;
+    virtual void delegateTask(QString id, QString parentId = "") override;
     void setA(int a) { this->a = a; }
 
 protected:

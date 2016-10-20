@@ -10,12 +10,13 @@
 #include <map>
 #include <boost/any.hpp>
 #include <boost/dynamic_any.hpp>
+#include <queue>
 
 class Model;
 class Subscription;
 
 using handle = std::shared_ptr<boost::dynamic_any>;
-using handle_pair = std::pair<handle, handle>;
+using handle_tuple = std::tuple<handle, handle, int&>;
 
 class DataEntry {
 
@@ -37,9 +38,13 @@ public:
     bool upToDate = false;
     bool initialized = false;
 
-    handle_pair read();
+    int internalVersion = 0;
+    int externalVersion = 0;
+    std::priority_queue<int, std::vector<int>, std::greater<int> > subscribedVersions;
+
+    handle_tuple read();
     void endRead();
-    handle_pair write();
+    handle_tuple write();
     void endWrite();
 
 private:

@@ -26,6 +26,7 @@ bool TaskImageLim::run()
 
         Subscription::Lock<multi_img_offloaded> lock(*sub("dest"));
         lock.swap(offloaded);
+        lock.setVersion(lock.version()+1);
     } else {
         imginput::ImgInputConfig inputConfig;
         inputConfig.file = fn;
@@ -33,6 +34,7 @@ bool TaskImageLim::run()
 
         Subscription::Lock<multi_img> lock(*sub("dest"));
         lock.swap(*img);
+        lock.setVersion(lock.version()+1);
     }
 
     return true;
