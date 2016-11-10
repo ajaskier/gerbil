@@ -84,7 +84,7 @@ multi_img & multi_img::operator=(const multi_img &a) {
 multi_img::multi_img(const multi_img &a, bool omitCache)
  : multi_img_base(a), roi(a.roi), bands(a.size())
 {
-	std::cerr << "multi_img: copy" << std::endl;
+    //std::cerr << "multi_img: copy" << std::endl;
 	for (size_t i = 0; i < bands.size(); ++i)
 		bands[i] = a.bands[i].clone();
 

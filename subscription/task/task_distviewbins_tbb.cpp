@@ -32,6 +32,9 @@ private:
     bool ignoreLabels;
     std::vector<multi_img::Value> &illuminant;
     std::vector<BinSet> &sets;
+
+protected:
+
 };
 
 void Accumulate2::operator()(const tbb::blocked_range2d<int> &r) const
@@ -78,13 +81,13 @@ void Accumulate2::operator()(const tbb::blocked_range2d<int> &r) const
 
 
 TaskDistviewBinsTbb::TaskDistviewBinsTbb(QString id, QString target, std::map<QString, QString> sources,
-                         const cv::Mat1s &labels,
-                         QVector<QColor> &colors,
+//                         const cv::Mat1s &labels,
+//                         QVector<QColor> &colors,
                          std::vector<multi_img::Value> &illuminant,
                          //ViewportCtx &args,
                          const cv::Mat1b &mask)//,
                          //bool inplace, bool apply)
-    : Task(id, target, sources), labels(labels), colors(colors), illuminant(illuminant),
+    : Task(id, target, sources), /*labels(labels), colors(colors),*/ illuminant(illuminant),
       mask(mask)//, inplace(inplace), apply(apply)
 {
 

@@ -16,7 +16,7 @@ class Model;
 class Subscription;
 
 using handle = std::shared_ptr<boost::dynamic_any>;
-using handle_tuple = std::tuple<handle, handle, int&>;
+using handle_pair = std::pair<handle, handle/*, int&*/>;
 
 class DataEntry {
 
@@ -42,10 +42,12 @@ public:
     int externalVersion = 0;
     std::priority_queue<int, std::vector<int>, std::greater<int> > subscribedVersions;
 
-    handle_tuple read();
+    handle_pair read();
     void endRead();
-    handle_tuple write();
+    handle_pair write();
     void endWrite();
+
+    int& version();
 
 private:
 

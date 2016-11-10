@@ -48,14 +48,16 @@ vole_compile_library(
         task/task_fake_add
 
         task/task_distviewbins_tbb
+        task/task_roi
         task/task_dist_sub
         task/task_dist_add
 
         imagemodel
-        distmodel
+       # distmodel
         fakemodel
 
         distviewcompute_utils
+
 )
 
 vole_moc_library(
@@ -64,6 +66,7 @@ vole_moc_library(
 	task_scheduler.h
 	worker_thread.h
 
+        task/task.h
 	model/model.h
 	model/model_a.h
 	model/model_b.h

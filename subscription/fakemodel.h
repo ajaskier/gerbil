@@ -21,7 +21,7 @@ public:
     explicit FakeModel(SubscriptionManager& sm,
                         TaskScheduler* scheduler, QObject *parent = nullptr);
 
-    virtual void delegateTask(QString id, QString parentId) override;
+    virtual void delegateTask(QString id, QString parentId = "") override;
 
     void addImage(int version, ViewportCtx *context, bool withTemp = false);
     void subImage(int version, ViewportCtx *context);

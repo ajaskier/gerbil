@@ -46,9 +46,11 @@ private:
     void subscribeRead(QString dataId, Subscription *subObj);
     void subscribeWrite(QString dataId);
 
-    handle_tuple doSubscription(QString id, SubscriptionType sub);
-    handle_tuple doReadSubscription(QString id);
-    handle_tuple doWriteSubscription(QString id);
+    handle_pair doSubscription(QString id, SubscriptionType sub);
+    handle_pair doReadSubscription(QString id);
+    handle_pair doWriteSubscription(QString id);
+
+    int &getVersion(QString id);
 
     void endDoSubscription(QString id, SubscriptionType sub);
     void endDoReadSubscription(QString id);
@@ -59,6 +61,7 @@ private:
 
     friend class TaskScheduler;
     friend class Subscription;
+    friend class DataConditionInformer;
 };
 
 

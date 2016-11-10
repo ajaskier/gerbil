@@ -25,8 +25,8 @@ public:
                                     multi_img_base::Range targetRange);
 
     void setFilename(QString filename);
-    void setROI(cv::Rect newROI_arg, bool sendTask = true);
-    void calculateROIdiff();
+    void setROI(cv::Rect newROI_arg);
+    //void calculateROIdiff();
 
     void runImg();
 

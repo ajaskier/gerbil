@@ -15,8 +15,8 @@ public:
     //the same with illuminant
     explicit TaskDistSub(QString sourceId, QString destId,
                          ViewportCtx &args,
-                         const cv::Mat1s &labels,
-                         QVector<QColor> &colors,
+//                         const cv::Mat1s &labels,
+//                         QVector<QColor> &colors,
                          std::vector<multi_img::Value> &illuminant,
                          const cv::Mat1b &mask = cv::Mat1b(), bool apply = true);
     virtual ~TaskDistSub();

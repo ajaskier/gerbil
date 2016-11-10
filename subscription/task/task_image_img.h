@@ -11,7 +11,7 @@ class TaskImageIMG : public Task
 {
 
 public:
-    explicit TaskImageIMG(cv::Rect roi, size_t bands, size_t roiBands,
+    explicit TaskImageIMG(size_t bands, size_t roiBands,
                           multi_img::NormMode normMode,
                           multi_img_base::Range normRange,
                           representation::t type, bool update,
@@ -20,9 +20,6 @@ public:
     virtual bool run() override;
 
 private:
-
-    //scope
-    cv::Rect roi;
 
     //rescale
     size_t bands;

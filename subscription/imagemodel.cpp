@@ -11,7 +11,7 @@
 #include "task/task_gradient_tbb.h"
 #include "task/task_pca_tbb.h"
 #include "task/task_band.h"
-
+#include "task/task_roi.h"
 
 #include "task/task_image_fake.h"
 
@@ -25,13 +25,14 @@ ImgModel::ImgModel(bool limitedMode, SubscriptionManager &sm,
     : Model(sm, scheduler, parent), limitedMode(limitedMode)
 {
     registerData("image", {});
-    registerData("image.IMG", {"image"});
+    registerData("ROI", {});
+    registerData("image.IMG", {"image", "ROI"});
     registerData("image.NORM", {"image.IMG"});
     registerData("image.GRAD", {"image.IMG"});
     registerData("image.IMGPCA", {"image.IMG"});
     registerData("image.GRADPCA", {"image.GRAD"});
     registerData("image.FAKE", {/*"ROI"*/});
-    registerData("ROI.diff", {});
+    //registerData("ROI.diff", {});
 
 }
 
@@ -48,49 +49,50 @@ void ImgModel::setBandsCount(size_t bands)
 
 void ImgModel::delegateTask(QString id, QString parentId)
 {
-    Task* task = nullptr;
+    //Task* task = nullptr;
+    std::shared_ptr<Task> task;
     if (id == "image") {
-        task = new TaskImageLim(filename, limitedMode);
+        task = std::shared_ptr<Task>(new TaskImageLim(filename, limitedMode));
 
     } else if (id == "image.FAKE") {
-        task = new TaskImageFAKE(imgFakeCounter++);
+        task = std::shared_ptr<Task>(new TaskImageFAKE(imgFakeCounter++));
 
     } else if (id == "image.IMG") {
 
         auto range = normalizationRanges[representation::IMG];
         auto mode = normalizationModes[representation::IMG];
 
-        task = new TaskImageIMG(newRoi, rescaleBands, nBands, mode, range,
-                                representation::IMG, true);
+        task = std::shared_ptr<Task>(new TaskImageIMG(rescaleBands, nBands, mode, range,
+                                representation::IMG, true));
     } else if (id == "image.NORM") {
 
         auto range = normalizationRanges[representation::NORM];
         auto mode = normalizationModes[representation::NORM];
 
-        task = new TaskImageNORM(mode, range, representation::NORM, true);
+        task = std::shared_ptr<Task>(new TaskImageNORM(mode, range, representation::NORM, true));
 
     } else if (id == "image.GRAD") {
 
         auto range = normalizationRanges[representation::GRAD];
         auto mode = normalizationModes[representation::GRAD];
 
-        task = new TaskImageGRAD(mode, range, representation::GRAD, true);
+        task = std::shared_ptr<Task>(new TaskImageGRAD(mode, range, representation::GRAD, true));
 
     } else if (id == "image.IMGPCA") {
 
         auto range = normalizationRanges[representation::IMGPCA];
         auto mode = normalizationModes[representation::IMGPCA];
 
-        task = new TaskImagePCA("image.IMG", "image.IMGPCA",
-                    mode, range, representation::IMGPCA, true, 10);
+        task = std::shared_ptr<Task>(new TaskImagePCA("image.IMG", "image.IMGPCA",
+                    mode, range, representation::IMGPCA, true, 10));
 
     } else if (id == "image.GRADPCA") {
 
         auto range = normalizationRanges[representation::GRADPCA];
         auto mode = normalizationModes[representation::GRADPCA];
 
-        task = new TaskImagePCA("image.GRAD", "image.GRADPCA",
-                                mode, range, representation::GRADPCA, true, 0);
+        task = std::shared_ptr<Task>(new TaskImagePCA("image.GRAD", "image.GRADPCA",
+                                mode, range, representation::GRADPCA, true, 0));
 
     } else if (id.startsWith("bands")) {
         auto args = id.split(".");
@@ -102,12 +104,16 @@ void ImgModel::delegateTask(QString id, QString parentId)
         else if (args[1] == "IMGPCA") repr = representation::IMGPCA;
         else if (args[1] == "GRADPCA") repr = representation::GRADPCA;
 
-        task = new TaskBand("image."+args[1], id, args[2].toInt(), repr);
-    } else if (id == "ROI.diff") {
-        calculateROIdiff();
+        task = std::shared_ptr<Task>(new TaskBand("image."+args[1], id, args[2].toInt(), repr));
+//    } else if (id == "ROI.diff") {
+//        calculateROIdiff();
+//        return;
+    } else if (id == "ROI") {
+
         return;
     }
-    scheduler->pushTask(task);
+    //scheduler->pushTask(task);
+    sendTask(task);
 }
 
 void ImgModel::runImg()
@@ -134,50 +140,70 @@ void ImgModel::spawn(representation::t type, const cv::Rect &newROI, int bands)
 {
     if (type == representation::IMG) {
         nBandsOld = nBands;
-        roi = newRoi;
+        //roi = newRoi;
     }
-    newRoi = newROI;
     rescaleBands = bands;
-
-    calculateROIdiff();
+    //newRoi = newROI;
 
     if (type == representation::IMG) {
-        delegateTask("image.IMG");
+        setROI(newROI);
     }
+
+//    calculateROIdiff();
+
+//    if (type == representation::IMG) {
+//        delegateTask("image.IMG");
+//    }
 }
 
 //void ImageModel::computeBand(representation::t type, int dim) {
 
 //}
 
-void ImgModel::setROI(cv::Rect newROI_arg, bool sendTask)
+void ImgModel::setROI(cv::Rect newROI_arg)
 {
     roi = newRoi;
     newRoi = newROI_arg;
 
-    //calculateROIdiff();
+    //Task* t = new TaskRoi(roi, newRoi);
+    std::shared_ptr<Task> t(new TaskRoi(roi, newRoi));
+    sendTask(t);
+    //scheduler->pushTask(t);
+//    std::shared_ptr<Subscription> roiSub(
+//                SubscriptionFactory::create(Dependency("ROI", SubscriptionType::WRITE),
+//                                            SubscriberType::TASK));
 
-    if(sendTask) delegateTask("image.IMG");
+//    Subscription::Lock<cv::Rect, std::pair<std::vector<cv::Rect>, std::vector<cv::Rect>>> lock(*roiSub);
+//    std::pair<std::vector<cv::Rect>, std::vector<cv::Rect>> roidiff;
+
+//    rectTransform(roi, newRoi, roidiff.first, roidiff.second);
+
+//    lock.swap(newROI_arg);
+//    lock.swapMeta(roidiff);
+//    lock.setVersion(lock.version()+1);
+
+//    qDebug() << "roi computed!";
+
 }
 
-void ImgModel::calculateROIdiff()
-{
+//void ImgModel::calculateROIdiff()
+//{
 
-    qDebug() << "calculating ROI";
+//    qDebug() << "calculating ROI";
 
-    std::shared_ptr<Subscription> roiSub(
-                SubscriptionFactory::create(Dependency("ROI.diff", SubscriptionType::WRITE),
-                                            SubscriberType::TASK));
+//    std::shared_ptr<Subscription> roiSub(
+//                SubscriptionFactory::create(Dependency("ROI.diff", SubscriptionType::WRITE),
+//                                            SubscriberType::TASK));
 
-    Subscription::Lock<std::pair<std::vector<cv::Rect>, std::vector<cv::Rect>>> lock(*roiSub);
-    std::pair<std::vector<cv::Rect>, std::vector<cv::Rect>> roidiff;
+//    Subscription::Lock<std::pair<std::vector<cv::Rect>, std::vector<cv::Rect>>> lock(*roiSub);
+//    std::pair<std::vector<cv::Rect>, std::vector<cv::Rect>> roidiff;
 
-    rectTransform(roi, newRoi, roidiff.first, roidiff.second);
+//    rectTransform(roi, newRoi, roidiff.first, roidiff.second);
 
 
-    int version = lock.version();
-    lock.setVersion(version+1);
-    lock.swap(roidiff);
+//    int version = lock.version();
+//    lock.setVersion(version+1);
+//    lock.swap(roidiff);
 
-    qDebug() << "ROI calculated";
-}
+//    qDebug() << "ROI calculated";
+//}

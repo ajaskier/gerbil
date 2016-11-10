@@ -9,7 +9,7 @@ template <class T1, class T2>
 class Subscription::Lock
 {
 public:
-    Lock(Subscription& sub) : sub(sub), handles(sub.leaseData()) {}
+    Lock(Subscription& sub) : sub(sub)/*, handles(sub.leaseData())*/ {}
     Lock(const Lock&) = delete;
     Lock(Lock&&) = delete;
     Lock& operator=(const Lock &) = delete;
@@ -19,6 +19,9 @@ public:
     }
 
     T1* operator()() {
+
+        if (!initialized) initialize();
+
         try {
             T1& data = boost::dynamic_any_cast<T1&>(*get_data());
             return &data;
@@ -29,12 +32,18 @@ public:
     }
 
     void swap(T1& target) {
+
+        if (!initialized) initialize();
+
         boost::dynamic_any newany(target);
         //*data_ptr = boost::dynamic_any(target);
         std::swap(*get_data(), newany);
     }
 
     T2* meta() {
+
+        if (!initialized) initialize();
+
         try {
             T2& meta = boost::dynamic_any_cast<T2&>(*get_meta());
             return &meta;
@@ -42,6 +51,14 @@ public:
         catch (...) {
             return nullptr;
         }
+    }
+
+    void swapMeta(T2& target) {
+
+        if (!initialized) initialize();
+
+        boost::dynamic_any newany(target);
+        std::swap(*get_meta(), newany);
     }
 
     int version() {
@@ -52,24 +69,26 @@ public:
         get_version() = newVersion;
     }
 
-    void swapMeta(T2& target) {
-        boost::dynamic_any newany(target);
-        std::swap(*get_meta(), newany);
+    void release() {
+        if (initialized) sub.returnData();
+        released = true;
     }
 
-    void release() {
-        sub.returnData();
-        released = true;
+    void initialize() {
+        handles = sub.leaseData();
+        initialized = true;
     }
 
 private:
 
     handle get_data() { return std::get<0>(handles); }
     handle get_meta() { return std::get<1>(handles); }
-    int& get_version() { return std::get<2>(handles); }
+    int& get_version() { return sub.version(); }
 
     Subscription& sub;
-    handle_tuple handles;
+    handle_pair handles;
+
+    bool initialized = false;
     bool released = false;
 };
 

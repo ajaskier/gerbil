@@ -69,7 +69,7 @@ void SubscriptionManager::subscribeWrite(QString dataId)
     updateState(dataId);
 
     propagateChange(dataId);
-    invalidDependants(dataId);
+    //invalidDependants(dataId);
 }
 
 void SubscriptionManager::unsubscribe(QString dataId, SubscriptionType sub,
@@ -86,6 +86,10 @@ void SubscriptionManager::unsubscribe(QString dataId, SubscriptionType sub,
     if (sub == SubscriptionType::READ) dataPool[dataId].willReads--;
     else {
         dataPool[dataId].willWrite = false;
+
+        qDebug() << "WRITE OF DATA" << dataId << "ENDED. CURRENT VERSION: "
+                 << dataPool[dataId].externalVersion;
+
         updateState(dataId);
         if (consumed) sendUpdate(dataId);
         //propagateChange(dataId);
@@ -104,12 +108,12 @@ void SubscriptionManager::unsubscribe(QString dataId, SubscriptionType sub,
 
 }
 
-handle_tuple SubscriptionManager::doSubscription(QString id, SubscriptionType sub) {
+handle_pair SubscriptionManager::doSubscription(QString id, SubscriptionType sub) {
     if (sub == SubscriptionType::READ) return doReadSubscription(id);
     else return doWriteSubscription(id);
 }
 
-handle_tuple SubscriptionManager::doReadSubscription(QString id)
+handle_pair SubscriptionManager::doReadSubscription(QString id)
 {
     auto data = dataPool[id].read();
 
@@ -120,7 +124,7 @@ handle_tuple SubscriptionManager::doReadSubscription(QString id)
     return data;
 }
 
-handle_tuple SubscriptionManager::doWriteSubscription(QString id)
+handle_pair SubscriptionManager::doWriteSubscription(QString id)
 {
     auto data = dataPool[id].write();
 
@@ -130,6 +134,12 @@ handle_tuple SubscriptionManager::doWriteSubscription(QString id)
 
     updateState(id);
     return data;
+}
+
+int& SubscriptionManager::getVersion(QString id)
+{
+    std::unique_lock<std::recursive_mutex> lock(mu);
+    return dataPool[id].version();
 }
 
 void SubscriptionManager::endDoSubscription(QString id, SubscriptionType sub)
@@ -171,7 +181,7 @@ void SubscriptionManager::propagateChange(QString id) {
             //dataToAsk.push_back(data);
             //emit triggerTask(data);
         }
-        propagateChange(data);
+        //propagateChange(data);
     }
 
 }
@@ -209,7 +219,8 @@ void SubscriptionManager::updateState(QString id)
 
 bool SubscriptionManager::isDataInitialized(QString dataId)
 {
-    return dataPool[dataId].initialized && dataPool[dataId].upToDate;
+    std::unique_lock<std::recursive_mutex> lock(mu);
+    return dataPool[dataId].initialized;// && dataPool[dataId].upToDate;
 }
 
 void SubscriptionManager::sendUpdate(QString id)
@@ -234,7 +245,7 @@ bool SubscriptionManager::hasWillReads(QString parentId) {
 
 void SubscriptionManager::askModelForTask(QString requestedId, QString beingComputedId)
 {
-    qDebug() << "asking for" << requestedId;
+    qDebug() << "asking for" << requestedId << "from" << beingComputedId;
     dataPool[requestedId].creator->delegateTask(requestedId, beingComputedId);
 }
 
@@ -247,10 +258,23 @@ bool SubscriptionManager::processDependencies(std::vector<Dependency> &dependenc
         QString dataId = dep.dataId;
 
         if(!dataPool[dataId].subscribedVersions.empty()) {
+
             int smallestSubscribedVersion = dataPool[dataId].subscribedVersions.top();
             int currentVersion = dataPool[dataId].externalVersion;
-            if ( ( dep.version == -1 && smallestSubscribedVersion == currentVersion )
-                    || dep.version > smallestSubscribedVersion) return false;
+
+//            if (currentVersion < smallestSubscribedVersion
+//                    && dep.subscription == SubscriptionType::READ) {
+//                askModelForTask(dataId);
+//                return false;
+//            }
+
+            if (( dep.version == -1 && smallestSubscribedVersion == currentVersion )
+                    || dep.version > smallestSubscribedVersion/*
+                    || dep.version != currentVersion*/) return false;
+            else if (dep.version == -1 || dep.version == currentVersion)
+                return true;
+            else
+                return false;
         }
 
 //        if (dep.subscription == SubscriptionType::READ

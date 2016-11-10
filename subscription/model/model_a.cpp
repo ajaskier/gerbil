@@ -20,8 +20,10 @@ ModelA::ModelA(int a, SubscriptionManager& sm, TaskScheduler *scheduler, QObject
 void ModelA::delegateTask(QString id, QString parentId)
 {
     if (id == "DATA_A") {
-        TaskA *task= new TaskA(a);
-        scheduler->pushTask(task);
+        //TaskA *task= new TaskA(a);
+        std::shared_ptr<Task> task(new TaskA(a));
+        sendTask(task);
+        //scheduler->pushTask(task);
     } /*else if (id == "ROI") {
 
         calculateROI();

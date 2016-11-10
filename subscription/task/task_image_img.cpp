@@ -7,11 +7,11 @@
 #include "task_normrange_tbb.h"
 #include <QDebug>
 
-TaskImageIMG::TaskImageIMG(cv::Rect roi, size_t bands, size_t roiBands,
+TaskImageIMG::TaskImageIMG(size_t bands, size_t roiBands,
                            multi_img::NormMode normMode,
                            multi_img_base::Range normRange,
                            representation::t type, bool update, bool includecache)
-    : Task("image.IMG", {{"image", "source"}}), roi(roi), bands(bands),
+    : Task("image.IMG", {{"image", "source"}, {"ROI", "ROI"}}), bands(bands),
       roiBands(roiBands), includecache(includecache), normMode(normMode),
       normRange(normRange), type(type), update(update)
 {
@@ -25,10 +25,13 @@ bool TaskImageIMG::run()
 {
     auto sourceId = sub("source")->getDependency().dataId;
     auto destId = sub("dest")->getDependency().dataId;
+    auto roiId = sub("ROI")->getDependency().dataId;
 
-    TaskScopeImage scopeImage(roi);
+
+    TaskScopeImage scopeImage;
     scopeImage.setSubscription(sourceId, sub("source"));
     scopeImage.setSubscription(destId, sub("dest"));
+    scopeImage.setSubscription(roiId, sub("ROI"));
     auto success = scopeImage.start();
     if(!success) return success;
 
@@ -48,9 +51,10 @@ bool TaskImageIMG::run()
 
     Subscription::Lock<multi_img> source_lock(*sub("source"));
     Subscription::Lock<multi_img> dest_lock(*sub("dest"));
+    Subscription::Lock<cv::Rect> roi_lock(*sub("ROI"));
    // dest_lock.setVersion(dest_lock.version()+1);
 
-    dest_lock.setVersion(source_lock.version());
+    dest_lock.setVersion(roi_lock.version());
 
     return success;
 }

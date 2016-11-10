@@ -11,7 +11,7 @@
 #include "task/task_dist_add.h"
 #include "task/task_dist_sub.h"
 
-#include "labeling.h"
+//#include "labeling.h"
 #include "qtopencv.h"
 
 
@@ -21,107 +21,45 @@ FakeModel::FakeModel(SubscriptionManager &sm,
                        TaskScheduler *scheduler, QObject *parent)
     : Model(sm, scheduler, parent)
 {
-  //  registerData("dist.tmp.FAKE", {"image.FAKE"});
-  //  registerData("dist.FAKE", {"image.FAKE"}); // it needs dist.tmp.FAKE too!
-
-    registerData("dist.tmp.IMG", {"image.IMG"});
-    registerData("dist.IMG", {"image.IMG"}); // it needs dist.tmp.FAKE too!
+    registerData("dist.tmp.IMG", {"image.IMG", "ROI"});
+    registerData("dist.IMG", {"image.IMG", "ROI"}); // it needs dist.tmp.FAKE too!
 }
 
 
 void FakeModel::delegateTask(QString id, QString parentId)
 {
-//    Task* task = nullptr;
-//    scheduler->pushTask(task);
 
-    //if(id == "dist.FAKE") return;
-//    if(id == "dist.tmp.FAKE") return;
-
-//    std::shared_ptr<Subscription> roiSub(
-//                SubscriptionFactory::create(Dependency("ROI", SubscriptionType::READ),
-//                                            SubscriberType::READER));
-
-//    std::shared_ptr<Subscription> imageFakeSub(
-//                SubscriptionFactory::create(Dependency("image.FAKE", SubscriptionType::READ),
-//                                            SubscriberType::READER));
-
-
-//    Subscription::Lock<Data> roi_lock(*roiSub);
-//    int roiVersion = roi_lock.version();
-
-//    Subscription::Lock<Data> imageFake_lock(*imageFakeSub);
-//    int fakeVersion = imageFake_lock.version();
-
-//    if (roiVersion == fakeVersion+1 && fakeVersion > 0) {
-//        qDebug() << "versions match";
-
-//        QString imageVersioned = "image.FAKE-" + QString::number(fakeVersion);
-//        Task* taskSub = new TaskFakeSub(imageVersioned);
-//        scheduler->pushTask(taskSub);
-
-
-//        QString imageVersionedHigher = "image.FAKE-" + QString::number(fakeVersion+1);
-//        Task* taskAdd = new TaskFakeAdd("dist.FAKE", imageVersionedHigher, "dist.tmp.FAKE");
-//        scheduler->pushTask(taskAdd);
-
-//    } else {
-//        qDebug() << "versions don't match";
-
-//        QString imageVersioned = "image.FAKE-" + QString::number(fakeVersion+1);
-//        Task* taskAdd = new TaskFakeAdd("dist.FAKE", imageVersioned);
-//        scheduler->pushTask(taskAdd);
-
-//    }
-
+    if (parentId == "ROI") {
+        qDebug() << "ROI WANTS MEEE \n\n";
+    } else if (parentId == "image.IMG") {
+        qDebug() << "image IMG wants me\n\n";
+    }
     if (id == "dist.tmp.IMG") return;
 
-    int roiVersion;
-    int imageVersion;
-    {
 
-        std::shared_ptr<Subscription> roiSub(
-                    SubscriptionFactory::create(Dependency("ROI.diff", SubscriptionType::READ),
-                                                SubscriberType::READER));
-
-        std::shared_ptr<Subscription> imageSub(
-                    SubscriptionFactory::create(Dependency("image.IMG", SubscriptionType::READ),
-                                                SubscriberType::READER));
-
-        Subscription::Lock<
-                std::pair<std::vector<cv::Rect>, std::vector<cv::Rect>>
-                > roi_lock(*roiSub);
-       roiVersion = roi_lock.version();
-
-        Subscription::Lock<multi_img> image_lock(*imageSub);
-
-        multi_img* img = image_lock();
-        labels = cv::Mat1s(img->height, img->width, (short)0);
-
-        QVector<QColor> col = Vec2QColor(Labeling::colors(2, true));
-        col[0] = Qt::white;
-        labelColors.swap(col);
-
-        imageVersion = image_lock.version();
-
-    }
+    int roiVersion = DataConditionInformer::version("ROI");
+    int imageVersion = DataConditionInformer::version("image.IMG");
+    int distVersion = DataConditionInformer::version("dist.IMG");
 
     ViewportCtx* context = nullptr;
     if (DataConditionInformer::isInitialized("dist.IMG")) {
         std::shared_ptr<Subscription> distSub(
                     SubscriptionFactory::create(Dependency("dist.IMG", SubscriptionType::READ),
-                                                SubscriberType::READER));
+                                                SubscriberType::TASK));
 
         Subscription::Lock<std::vector<BinSet>, ViewportCtx> dist_lock(*distSub);
         context = dist_lock.meta();
     }
 
-    if (roiVersion == imageVersion + 1 && imageVersion > 0) {
+    if (!imageVersion || !DataConditionInformer::isInitialized("image.IMG")) {
+        qDebug() << "ONLY ADD WITH" << imageVersion+1;
+        addImage(imageVersion+1, context, false);
+    } else if(imageVersion == roiVersion && distVersion != imageVersion) {
+        addImage(imageVersion, context, false);
+    } else {
+        qDebug() << "SUB WITH IMG VERSION" << imageVersion << "AND ADD WITH" << imageVersion+1;
         subImage(imageVersion, context);
         addImage(imageVersion+1, context, true);
-    } else if (roiVersion == 1 && imageVersion == 1) {
-        addImage(imageVersion, context);
-    } else {
-        addImage(imageVersion+1, context);
     }
 
 }
@@ -141,18 +79,20 @@ void FakeModel::addImage(int version, ViewportCtx* context, bool withTemp)
 
     QString id = "image.IMG-" + QString::number(version);
 
-    Task* taskAdd;
+    //Task* taskAdd;
+    std::shared_ptr<Task> taskAdd;
     if (withTemp) {
-        taskAdd = new TaskDistAdd("dist.tmp.IMG", id, "dist.IMG", ctx,
-                                        labels, labelColors, illuminant,
-                                        cv::Mat1b(), true);
+        taskAdd = std::shared_ptr<Task>(new TaskDistAdd("dist.tmp.IMG", id, "dist.IMG", ctx,
+                                        /*labels, labelColors,*/ illuminant,
+                                        cv::Mat1b(), true));
     } else {
-        taskAdd = new TaskDistAdd("dist.IMG", id, ctx, labels,
-                                        labelColors, illuminant, cv::Mat1b(),
-                                        true);
+        taskAdd = std::shared_ptr<Task>(new TaskDistAdd("dist.IMG", id, ctx, /*labels,
+                                        labelColors,*/ illuminant, cv::Mat1b(),
+                                        true));
     }
 
-    scheduler->pushTask(taskAdd);
+    //scheduler->pushTask(taskAdd);
+    sendTask(taskAdd);
 
 }
 
@@ -169,8 +109,12 @@ void FakeModel::subImage(int version, ViewportCtx* context)
     ctx.wait.fetch_and_store(1);
 
     QString id = "image.IMG-" + QString::number(version);
-    Task* taskSub = new TaskDistSub(id, "dist.tmp.IMG", ctx, labels,
-                                    labelColors, illuminant, cv::Mat1b(), false);
+//    Task* taskSub = new TaskDistSub(id, "dist.tmp.IMG", ctx, /*labels,
+//                                    labelColors,*/ illuminant, cv::Mat1b(), false);
+    std::shared_ptr<Task> taskSub(new TaskDistSub(id, "dist.tmp.IMG", ctx, /*labels,
+                                              labelColors,*/ illuminant, cv::Mat1b(), false));
 
-    scheduler->pushTask(taskSub);
+
+    //scheduler->pushTask(taskSub);
+    sendTask(taskSub);
 }

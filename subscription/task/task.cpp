@@ -102,7 +102,9 @@ void Task::setSubscription(QString id, std::shared_ptr<Subscription> sub)
 }
 
 bool Task::start() {
-    return run();
+    bool success = run();
+    emit finished(this->id, success);
+    return success;
 }
 
 void Task::invalidateSubscriptions()

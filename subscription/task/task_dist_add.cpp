@@ -8,27 +8,29 @@
 #include <algorithm>
 
 #include "distviewcompute_utils.h"
+#include "labeling.h"
+#include "qtopencv.h"
 
 #define REUSE_THRESHOLD 0.1
 
 TaskDistAdd::TaskDistAdd(QString destId, QString sourceImgId, ViewportCtx &args,
-                         const cv::Mat1s &labels,
-                         QVector<QColor> &colors,
+//                         const cv::Mat1s &labels,
+//                         QVector<QColor> &colors,
                          std::vector<multi_img::Value> &illuminant, const cv::Mat1b &mask, bool apply)
-    : TaskDistviewBinsTbb("taskAdd", destId, {{sourceImgId, "source"}, {"ROI.diff", "ROI.diff"}},
-                      labels, colors, illuminant,
+    : TaskDistviewBinsTbb("taskAdd", destId, {{sourceImgId, "source"}, {"ROI", "ROI"}},
+                      /*labels, colors,*/ illuminant,
                       mask),//, inplace, apply)
       args(args), /*inplace(inplace),*/ apply(apply)
 {
 }
 
 TaskDistAdd::TaskDistAdd(QString sourceTempId, QString sourceImgId, QString destId, ViewportCtx &args,
-                         const cv::Mat1s &labels,
-                         QVector<QColor> &colors,
+//                         const cv::Mat1s &labels,
+//                         QVector<QColor> &colors,
                          std::vector<multi_img::Value> &illuminant, const cv::Mat1b &mask, bool apply)
     : TaskDistviewBinsTbb("taskAdd", destId,
-                    {{sourceImgId, "source"}, {sourceTempId, "temp"}, {"ROI.diff", "ROI.diff"}},
-                      labels, colors, illuminant,
+                    {{sourceImgId, "source"}, {sourceTempId, "temp"}, {"ROI", "ROI"}},
+                      /*labels, colors,*/ illuminant,
                       mask),//, inplace, apply)
       args(args), /*inplace(inplace),*/ apply(apply)
 {
@@ -47,13 +49,21 @@ bool TaskDistAdd::run()
     Subscription::Lock<multi_img> source_lock(*sub("source"));
     multi_img* source = source_lock();
 
+    /* ------ TEMP */
+    labels = cv::Mat1s(source->height, source->width, (short)0);
+    QVector<QColor> col = Vec2QColor(Labeling::colors(2, true));
+    col[0] = Qt::white;
+    colors.swap(col);
+    /* TEMP ------ */
+
     qDebug() << "image width:" << source->width << "image height: "  << source->height;
 
     Subscription::Lock<
+            cv::Rect,
             std::pair<std::vector<cv::Rect>, std::vector<cv::Rect>>
-            > roi_lock(*sub("ROI.diff"));
+            > roi_lock(*sub("ROI"));
 
-    std::pair<std::vector<cv::Rect>, std::vector<cv::Rect>>* roidiff = roi_lock();
+    std::pair<std::vector<cv::Rect>, std::vector<cv::Rect>>* roidiff = roi_lock.meta();
 
     bool reuse = !roidiff->second.empty();
     bool keepOldContext;

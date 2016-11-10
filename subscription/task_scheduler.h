@@ -2,6 +2,7 @@
 #define TASK_SCHEDULER_H
 
 #include <QObject>
+#include <memory>
 
 class Task;
 class Dependency;
@@ -12,18 +13,22 @@ class TaskScheduler : public QObject
     Q_OBJECT
 public:
     TaskScheduler(SubscriptionManager& sm);
-    void pushTask(Task* task);
+    void pushTask(std::shared_ptr<Task> task);
 
     void stop();
     void resume();
 
 protected:
     void checkTaskPool();
-    void startTask(Task* task);
+    void startTask(std::shared_ptr<Task> task);
     void removeRelated(QString id);
-    void createSubscriptions(Task* task);
+    void createSubscriptions(std::shared_ptr<Task> task);
+    void taskEnded(QString id, bool success);
 
-    std::list<Task*> taskPool;
+    void printPool();
+
+    std::list<std::shared_ptr<Task>> taskPool;
+    std::map<QString, bool> runningTasks;
     SubscriptionManager& sm;
 
     int stopped = 0;

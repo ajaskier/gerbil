@@ -2,29 +2,33 @@
 
 #include "subscription.h"
 
-handle_tuple DataEntry::read()
+handle_pair DataEntry::read()
 {
     std::unique_lock<std::mutex> lock(mu);
     not_writing.wait(lock, [this]() {
-        return !doWrite;
+        return !doWrite && initialized;
     });
-    return handle_tuple(data_handle, meta_handle, externalVersion);
+    return handle_pair(data_handle, meta_handle/*, externalVersion*/);
 }
 
 void DataEntry::endRead()
 {
-    //std::unique_lock<std::mutex> lock(mu);
     if (doReads == 0) not_reading.notify_one();
 }
 
-handle_tuple DataEntry::write()
+int& DataEntry::version()
+{
+    return externalVersion;
+}
+
+handle_pair DataEntry::write()
 {
     std::unique_lock<std::mutex> lock(mu);
     not_reading.wait(lock, [this]() {
         return doReads == 0 && !doWrite;
     });
 
-    return handle_tuple(data_handle, meta_handle, externalVersion);
+    return handle_pair(data_handle, meta_handle/*, externalVersion*/);
 }
 
 void DataEntry::endWrite()

@@ -3,7 +3,9 @@
 
 #include <QObject>
 #include <utility>
+#include <memory>
 #include "subscription_manager.h"
+#include "task/task.h"
 
 class TaskScheduler;
 enum class SubscriptionType;
@@ -13,21 +15,25 @@ class Model : public QObject
     Q_OBJECT
 public:
     explicit Model(SubscriptionManager& sm, TaskScheduler* scheduler,
-                   QObject *parent = 0)
-        : QObject(parent), sm(sm), scheduler(scheduler) {}
-    virtual ~Model() {}
+                   QObject *parent = 0);
+    virtual ~Model();
 
 public slots:
     virtual void delegateTask(QString requestedId, QString parentId = "") = 0;
+    void taskFinished(QString id, bool success);
 
 protected:
 
-    void registerData(QString dataId, std::vector<QString> dependencies) {
-        sm.registerCreator(this, dataId, dependencies);
-    }
+    void registerData(QString dataId, std::vector<QString> dependencies);
+
+    void sendTask(std::shared_ptr<Task> t);
+
+private:
 
     SubscriptionManager& sm;
     TaskScheduler* scheduler;
+
+    std::map<QString, std::shared_ptr<Task>> tasks;
 
 };
 

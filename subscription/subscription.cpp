@@ -63,6 +63,10 @@ void Subscription::forceUpdate()
     emit update();
 }
 
-handle_tuple Subscription::leaseData() {
+handle_pair Subscription::leaseData() {
     return sm.doSubscription(dependency.dataId, dependency.subscription);
+}
+
+int& Subscription::version() {
+    return sm.getVersion(dependency.dataId);
 }

@@ -1,6 +1,7 @@
 #ifndef TASK_H
 #define TASK_H
 
+#include <QObject>
 #include <memory>
 #include <QString>
 #include "dependency.h"
@@ -8,9 +9,9 @@
 
 class Subscription;
 
-class Task
+class Task : public QObject
 {
-
+    Q_OBJECT
 public:
     explicit Task(QString target, std::map<QString, QString> sources);
     explicit Task(QString id, QString target, std::map<QString, QString> sources);
@@ -22,6 +23,9 @@ public:
 
     std::vector<Dependency>& getDependencies() { return dependencies; }
     QString getId() { return id; }
+
+signals:
+    void finished(QString id, bool success);
 
 protected:
     virtual bool run() = 0;

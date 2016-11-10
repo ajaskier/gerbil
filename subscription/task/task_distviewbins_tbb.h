@@ -21,8 +21,8 @@ class TaskDistviewBinsTbb : public Task
 
 public:
     explicit TaskDistviewBinsTbb(QString id, QString target, std::map<QString, QString> sources,
-                             const cv::Mat1s &labels,
-                             QVector<QColor> &colors,
+//                             const cv::Mat1s &labels,
+//                             QVector<QColor> &colors,
                              std::vector<multi_img::Value> &illuminant,
                              //ViewportCtx &args,
                              const cv::Mat1b &mask = cv::Mat1b());//,
@@ -44,10 +44,13 @@ private:
 
     tbb::task_group_context stopper;
 
-    const cv::Mat1s labels;
     const cv::Mat1b mask;
-    QVector<QColor> colors;
     std::vector<multi_img::Value> illuminant;
+
+protected:
+    cv::Mat1s labels;
+    QVector<QColor> colors;
+
 };
 
 

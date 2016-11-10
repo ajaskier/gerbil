@@ -9,20 +9,21 @@ class WorkerThread : public QThread
     Q_OBJECT
 
     void run() override {
+        QString id = t->getId();
         auto success = t->start();
-        delete t;
+        //delete t;
 
-        emit finished(success);
+        emit finished(id, success);
     }
 
 public:
-    WorkerThread(Task* t, QObject* parent = 0) : QThread(parent), t(t) {}
+    WorkerThread(std::shared_ptr<Task> t, QObject* parent = 0) : QThread(parent), t(t) {}
 
 signals:
-    void finished(bool success);
+    void finished(QString id, bool success);
 
 private:
-   Task* t;
+   std::shared_ptr<Task> t;
 };
 
 #endif // WORKER_THREAD_H

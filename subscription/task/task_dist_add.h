@@ -12,8 +12,8 @@ class TaskDistAdd : public TaskDistviewBinsTbb
 public:
     explicit TaskDistAdd(QString destId, QString sourceImgId,
                          ViewportCtx &args,
-                         const cv::Mat1s &labels,
-                         QVector<QColor> &colors,
+//                         const cv::Mat1s &labels,
+//                         QVector<QColor> &colors,
                          std::vector<multi_img::Value> &illuminant,
                          const cv::Mat1b &mask = cv::Mat1b(), bool apply = true);
 
@@ -21,8 +21,8 @@ public:
                          QString sourceImgId,
                          QString sourceTempId,
                          ViewportCtx &args,
-                         const cv::Mat1s &labels,
-                         QVector<QColor> &colors,
+//                         const cv::Mat1s &labels,
+//                         QVector<QColor> &colors,
                          std::vector<multi_img_base::Value> &illuminant,
                          const cv::Mat1b &mask, bool apply = true);
 

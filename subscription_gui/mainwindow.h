@@ -13,6 +13,13 @@
 #include "model/representation.h"
 #include "multi_img.h"
 
+#include "awindow.h"
+#include "bwindow.h"
+#include "cwindow.h"
+#include "imgwindow.h"
+#include "bandswindow.h"
+#include "distwindow.h"
+
 class NormDock;
 //class DistModel;
 class ImgModel;
@@ -34,6 +41,13 @@ public:
 private:
     Ui::MainWindow *ui;
 
+    AWindow* aWindow;
+    BWindow* bWindow;
+    CWindow* cWindow;
+    ImgWindow* imgWindow;
+    BandsWindow* bandsWindow;
+    DistWindow* distWindow;
+
     ModelA* modelA;
     ModelB* modelB;
     ModelD* modelD;
@@ -45,22 +59,7 @@ private:
     TaskScheduler* scheduler;
 
     std::unique_ptr<Subscription> imgSub;
-    std::unique_ptr<Subscription> bandsSub;
-    /*
-    Subscription* imgSub;
-    Subscription* imgIMG_Sub;
-    */
-
-    Subscription* dataASub;
-    Subscription* dataBSub;
-    Subscription* dataCSub;
-    Subscription* dataDSub;
-
-    std::unique_ptr<Subscription> imageIMGSub;
-   // Subscription* distFAKESub;
-    Subscription* roiSub;
-
-    Subscription* distIMGSub;
+    std::unique_ptr<Subscription> roiSub;
 
     QString representation = "IMG";
     int currentBand = 0;
@@ -68,9 +67,6 @@ private:
 
     NormDock* normDock;
 
-
-    multi_img::NormMode current_normMode;
-    multi_img_base::Range current_targetRange;
 
 signals:
     void normalizationParametersChanged(
@@ -86,46 +82,29 @@ private slots:
 
     cv::Rect getDimensions();
 
-    void dockAVisibilityChanged(bool visible);
-    void dockBVisibilityChanged(bool visible);
-    void dockCVisibilityChanged(bool visible);
-
-    void displayA();
-    void displayB();
-    void displayC();
-    void displayD();
-    void displayImageIMG();
-    void displayDist();
     void displayROI();
     void imgUpdated();
-    void imgIMG_updated();
 
-    void on_inputA_textChanged(const QString &arg1);
-    void on_inputB_textChanged(const QString &arg1);
-    void on_inputC_textChanged(const QString &arg1);
-    void on_checkBoxA_toggled(bool checked);
-    void on_checkBoxB_toggled(bool checked);
-    void on_checkBoxC_toggled(bool checked);
+    void on_checkBoxA_toggled(bool visible);
+    void on_checkBoxB_toggled(bool visible);
+    void on_checkBoxC_toggled(bool visible);
     void on_computeAButton_clicked();
     void on_computeBButton_clicked();
     void on_computeCButton_clicked();
     void on_computeDButton_clicked();
-    void on_inputD_textChanged(const QString &arg1);
-    void on_imageModelButton_clicked();
-    void on_imgButton_clicked();
-    void on_normButton_clicked();
-    void on_gradButton_clicked();
-    void on_pcaButton_clicked();
-    void on_bandSlider_sliderMoved(int position);
+    void onDistIMGRequest();
+    void onImageIMGRequest();
 
     void onNormalizationParametersChanged(
             representation::t type,
             multi_img::NormMode normMode,
             multi_img::Range targetRange
             );
-    void on_gradpcaButton_clicked();
-    void on_fakeButton_clicked();
+
     void on_roiButton_clicked();
+    void on_bands_checkbox_toggled(bool visible);
+    void on_img_checkbox_toggled(bool visible);
+    void on_dist_checkbox_toggled(bool visible);
 };
 
 #endif // MAINWINDOW_H

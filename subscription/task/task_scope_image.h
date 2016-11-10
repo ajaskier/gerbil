@@ -10,14 +10,11 @@ class TaskScopeImage : public Task
 {
 
 public:
-    explicit TaskScopeImage(cv::Rect roi);
+    explicit TaskScopeImage();
     virtual ~TaskScopeImage();
 
     virtual bool run() override;
 
-private:
-
-    cv::Rect roi;
 };
 
 

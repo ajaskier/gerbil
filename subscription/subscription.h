@@ -41,7 +41,8 @@ private:
     explicit Subscription(Dependency dependency, SubscriberType subscriberType,
                           int id, SubscriptionManager& sm, QObject* requester,
                           std::function<void(void)> updateSlot);
-    handle_tuple leaseData();
+    handle_pair leaseData();
+    int &version();
 
     Dependency dependency;
     SubscriberType subscriberType;

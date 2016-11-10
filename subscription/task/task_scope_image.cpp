@@ -5,8 +5,8 @@
 #include "multi_img.h"
 #include <QDebug>
 
-TaskScopeImage::TaskScopeImage(cv::Rect roi)
-    : Task("image.IMG", {{"image", "source"}}), roi(roi)
+TaskScopeImage::TaskScopeImage()
+    : Task("image.IMG", {{"image", "source"}, {"ROI", "ROI"}})
 {
 }
 
@@ -16,8 +16,9 @@ TaskScopeImage::~TaskScopeImage()
 bool TaskScopeImage::run()
 {
     Subscription::Lock<multi_img> source_lock(*sub("source"));
+    Subscription::Lock<cv::Rect> roi_lock(*sub("ROI"));
 
-    multi_img tmp(*source_lock(), roi);
+    multi_img tmp(*source_lock(), *roi_lock());
 
     Subscription::Lock<multi_img> dest_lock(*sub("dest"));
     dest_lock.swap(tmp);
