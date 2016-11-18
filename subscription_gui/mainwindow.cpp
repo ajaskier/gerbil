@@ -15,7 +15,7 @@
 
 #include <imagemodel.h>
 #include <fakemodel.h>
-#include <distmodel.h>
+//#include <distmodel.h>
 
 #include "normdock.h"
 

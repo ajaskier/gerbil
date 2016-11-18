@@ -14,7 +14,12 @@ bool DataConditionInformer::isInitialized(QString dataId)
     return sm->isDataInitialized(dataId);
 }
 
-int DataConditionInformer::version(QString dataId)
+int DataConditionInformer::majorVersion(QString dataId)
 {
-    return sm->getVersion(dataId);
+    return sm->getMajorVersion(dataId);
+}
+
+int DataConditionInformer::minorVersion(QString dataId)
+{
+    return sm->getMinorVersion(dataId);
 }

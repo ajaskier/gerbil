@@ -105,12 +105,12 @@ bool TaskDistviewBinsTbb::run()
 
 void TaskDistviewBinsTbb::expression(bool subtract, std::vector<cv::Rect> &collection,
                                  multi_img &multi, std::vector<BinSet> &sets,
-                                 const ViewportCtx &args)
+                                 const ViewportCtx *args)
 {
 
     for (auto it = collection.begin(); it != collection.end(); ++it) {
-        Accumulate2 expr(subtract, multi, labels, mask, args.nbins, args.binsize,
-                            args.minval, args.ignoreLabels, illuminant, sets);
+        Accumulate2 expr(subtract, multi, labels, mask, args->nbins, args->binsize,
+                            args->minval, args->ignoreLabels, illuminant, sets);
 
         tbb::parallel_for(
                     tbb::blocked_range2d<int>(it->y, it->x + it->height,
@@ -127,22 +127,22 @@ void TaskDistviewBinsTbb::createBinSets(multi_img &multi, std::vector<BinSet> &s
     }
 }
 
-void TaskDistviewBinsTbb::updateContext(multi_img &multi, ViewportCtx &args)
+void TaskDistviewBinsTbb::updateContext(multi_img &multi, ViewportCtx *args)
 {
-    args.dimensionality = multi.size();
-    args.meta = multi.meta;
-    args.xlabels.resize(multi.size());
+    args->dimensionality = multi.size();
+    args->meta = multi.meta;
+    args->xlabels.resize(multi.size());
     for (unsigned int i = 0; i < multi.size(); ++i) {
         if (!multi.meta[i].empty) {
-            args.xlabels[i].setNum(multi.meta[i].center, 'g', 4);
+            args->xlabels[i].setNum(multi.meta[i].center, 'g', 4);
         } else {
             //GGDBGM(i << " meta is empty. "<< args.type << endl);
         }
     }
-    args.binsize = (multi.maxval - multi.minval)
-                    / (multi_img::Value)(args.nbins - 1);
-    args.minval = multi.minval;
-    args.maxval = multi.maxval;
+    args->binsize = (multi.maxval - multi.minval)
+                    / (multi_img::Value)(args->nbins - 1);
+    args->minval = multi.minval;
+    args->maxval = multi.maxval;
 
-    args.valid = true;
+    args->valid = true;
 }

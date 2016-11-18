@@ -20,12 +20,11 @@ public:
 
 public slots:
     virtual void delegateTask(QString requestedId, QString parentId = "") = 0;
-    void taskFinished(QString id, bool success);
+    virtual void taskFinished(QString id, bool success);
 
 protected:
-
     void registerData(QString dataId, std::vector<QString> dependencies);
-
+    bool isTaskCurrent(QString id);
     void sendTask(std::shared_ptr<Task> t);
 
 private:

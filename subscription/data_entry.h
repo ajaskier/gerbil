@@ -38,8 +38,8 @@ public:
     bool upToDate = false;
     bool initialized = false;
 
-    int internalVersion = 0;
-    int externalVersion = 0;
+    int minorVersion = 0;
+    int majorVersion = 0;
     std::priority_queue<int, std::vector<int>, std::greater<int> > subscribedVersions;
 
     handle_pair read();
@@ -47,7 +47,8 @@ public:
     handle_pair write();
     void endWrite();
 
-    int& version();
+    int& getMajorVersion();
+    int getMinorVersion();
 
 private:
 

@@ -1,25 +1,23 @@
-#ifndef TASK_DIST_SUB_H
-#define TASK_DIST_SUB_H
+#ifndef TASK_DIST_SUB_ARG_H
+#define TASK_DIST_SUB_ARG_H
 
 #include <QObject>
 #include <task/task.h>
 
-#include <task/task_distviewbins_tbb.h>
+#include <task/dist/task_distviewbins_tbb.h>
 
-class TaskDistSub : public TaskDistviewBinsTbb
+class TaskDistSubArg : public TaskDistviewBinsTbb
 {
 
 public:
     //labels seems to be redundant!!!
     //the same with colors
     //the same with illuminant
-    explicit TaskDistSub(QString sourceId, QString destId,
-                         ViewportCtx &args,
-//                         const cv::Mat1s &labels,
-//                         QVector<QColor> &colors,
+    explicit TaskDistSubArg(QString sourceId, QString destId,
+                         ViewportCtx *args,
                          std::vector<multi_img::Value> &illuminant,
                          const cv::Mat1b &mask = cv::Mat1b(), bool apply = true);
-    virtual ~TaskDistSub();
+    virtual ~TaskDistSubArg();
 
     virtual bool run() override;
 
@@ -28,9 +26,9 @@ private:
     //virtual bool isCancelled() { return stopper.is_group_execution_cancelled(); }
 
     bool apply;
-    ViewportCtx &args;
+    ViewportCtx *args;
 
 };
 
 
-#endif // TASK_DIST_SUB_H
+#endif // TASK_DIST_SUB_ARG_H

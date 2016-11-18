@@ -12,7 +12,8 @@ public:
     static void init(SubscriptionManager *subscriptionManager);
     static bool isInitialized(QString dataId);
 
-    static int version(QString dataId);
+    static int majorVersion(QString dataId);
+    static int minorVersion(QString dataId);
 private:
 
     static SubscriptionManager* sm;

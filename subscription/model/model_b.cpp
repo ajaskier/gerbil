@@ -13,7 +13,7 @@ ModelB::ModelB(int b, int c, SubscriptionManager &sm, TaskScheduler* scheduler,
     : Model(sm, scheduler, parent), b(b), c(c)
 {
     registerData("DATA_B", {"DATA_A"});
-    registerData("DATA_C", {"DATA_A", "DATA_B"});
+    registerData("DATA_C", {"DATA_B", "DATA_A"});
 }
 
 void ModelB::delegateTask(QString id, QString parentId)

@@ -15,10 +15,10 @@ public:
     TaskScheduler(SubscriptionManager& sm);
     void pushTask(std::shared_ptr<Task> task);
 
-    void stop();
-    void resume();
+//    void stop();
+//    void resume();
 
-protected:
+private:
     void checkTaskPool();
     void startTask(std::shared_ptr<Task> task);
     void removeRelated(QString id);
@@ -28,10 +28,10 @@ protected:
     void printPool();
 
     std::list<std::shared_ptr<Task>> taskPool;
-    std::map<QString, bool> runningTasks;
+    //std::map<QString, bool> runningTasks;
     SubscriptionManager& sm;
 
-    int stopped = 0;
+    //int stopped = 0;
 };
 
 #endif // TASK_SCHEDULER_H

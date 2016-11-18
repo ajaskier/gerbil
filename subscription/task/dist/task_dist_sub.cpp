@@ -13,14 +13,10 @@
 
 #define REUSE_THRESHOLD 0.1
 
-TaskDistSub::TaskDistSub(QString sourceId, QString destId, ViewportCtx &args,
-//                         const cv::Mat1s &labels,
-//                         QVector<QColor> &colors,
+TaskDistSub::TaskDistSub(QString sourceId, QString destId,
                          std::vector<multi_img::Value> &illuminant, const cv::Mat1b &mask, bool apply)
     : TaskDistviewBinsTbb("taskSub", destId, {{sourceId, "source"}, {"ROI", "ROI"}},
-                      /*labels, colors,*/ illuminant,
-                      mask),//, inplace, apply)
-      args(args), /*inplace(inplace),*/ apply(apply)
+                      illuminant, mask), apply(apply)
 {
 }
 
@@ -57,17 +53,17 @@ bool TaskDistSub::run()
     /* TEMP ------ */
 
     Subscription::Lock<std::vector<BinSet>, ViewportCtx> dest_lock(*sub("dest"));
-
+    ViewportCtx* args = dest_lock.meta();
 
 
     bool reuse = !roidiff->first.empty();
     bool keepOldContext = false;
 
     if (reuse) {
-        keepOldContext = ((fabs(args.minval) * REUSE_THRESHOLD) >=
-                          (fabs(args.minval - source->minval))) &&
-            ((fabs(args.maxval) * REUSE_THRESHOLD) >=
-             (fabs(args.maxval - source->maxval)));
+        keepOldContext = ((fabs(args->minval) * REUSE_THRESHOLD) >=
+                          (fabs(args->minval - source->minval))) &&
+            ((fabs(args->maxval) * REUSE_THRESHOLD) >=
+             (fabs(args->maxval - source->maxval)));
 
         if (!keepOldContext) {
             reuse = false;
@@ -89,7 +85,7 @@ bool TaskDistSub::run()
     }
 
     dest_lock.swap(result);
-    dest_lock.swapMeta(args);
+    dest_lock.swapMeta(*args);
 
     return true;
 

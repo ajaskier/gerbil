@@ -30,7 +30,7 @@ public:
     bool isDataInitialized(QString dataId);
 
 signals:
-    void triggerTask(QString id);
+    //void triggerTask(QString id, QString id2);
 
 private:
 
@@ -38,8 +38,11 @@ private:
     void updateState(QString id);
     bool processDependencies(std::vector<Dependency>& dependencies);
     void sendUpdate(QString id);
+    void sendUpdate(QString id, int subscriberId);
     bool hasWillReads(QString parentId);
     void invalidDependants(QString id);
+
+    void removeData(QString dataId);
 
     void propagateChange(QString id);
 
@@ -50,7 +53,9 @@ private:
     handle_pair doReadSubscription(QString id);
     handle_pair doWriteSubscription(QString id);
 
-    int &getVersion(QString id);
+    int getMinorVersion(QString id);
+    int getMajorVersion(QString id);
+    void setMajorVersion(QString id, int version);
 
     void endDoSubscription(QString id, SubscriptionType sub);
     void endDoReadSubscription(QString id);

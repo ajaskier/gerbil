@@ -19,8 +19,6 @@ DistWindow::DistWindow(QWidget *parent) :
 {
     ui->setupUi(this);
 
-
-    qDebug() << "displayA";
     distSub = SubscriptionFactory::create(Dependency("dist.IMG", SubscriptionType::READ),
                                            SubscriberType::READER, this,
                                            std::bind(&DistWindow::displayDist, this));

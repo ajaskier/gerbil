@@ -66,7 +66,8 @@ public:
     }
 
     void setVersion(int newVersion) {
-        get_version() = newVersion;
+        //get_version() = newVersion;
+        sub.setVersion(newVersion);
     }
 
     void release() {
@@ -83,7 +84,7 @@ private:
 
     handle get_data() { return std::get<0>(handles); }
     handle get_meta() { return std::get<1>(handles); }
-    int& get_version() { return sub.version(); }
+    int get_version() { return sub.version(); }
 
     Subscription& sub;
     handle_pair handles;

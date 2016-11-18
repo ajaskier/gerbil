@@ -58,15 +58,15 @@ void Subscription::returnData()
     sm.endDoSubscription(dependency.dataId, dependency.subscription);
 }
 
-void Subscription::forceUpdate()
-{
-    emit update();
-}
-
 handle_pair Subscription::leaseData() {
     return sm.doSubscription(dependency.dataId, dependency.subscription);
 }
 
-int& Subscription::version() {
-    return sm.getVersion(dependency.dataId);
+int Subscription::version() {
+    return sm.getMajorVersion(dependency.dataId);
+}
+
+void Subscription::setVersion(int version)
+{
+    sm.setMajorVersion(dependency.dataId, version);
 }

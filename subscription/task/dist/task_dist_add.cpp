@@ -13,26 +13,18 @@
 
 #define REUSE_THRESHOLD 0.1
 
-TaskDistAdd::TaskDistAdd(QString destId, QString sourceImgId, ViewportCtx &args,
-//                         const cv::Mat1s &labels,
-//                         QVector<QColor> &colors,
+TaskDistAdd::TaskDistAdd(QString destId, QString sourceImgId,
                          std::vector<multi_img::Value> &illuminant, const cv::Mat1b &mask, bool apply)
     : TaskDistviewBinsTbb("taskAdd", destId, {{sourceImgId, "source"}, {"ROI", "ROI"}},
-                      /*labels, colors,*/ illuminant,
-                      mask),//, inplace, apply)
-      args(args), /*inplace(inplace),*/ apply(apply)
+                      illuminant, mask), apply(apply)
 {
 }
 
-TaskDistAdd::TaskDistAdd(QString sourceTempId, QString sourceImgId, QString destId, ViewportCtx &args,
-//                         const cv::Mat1s &labels,
-//                         QVector<QColor> &colors,
+TaskDistAdd::TaskDistAdd(QString destId, QString sourceImgId, QString sourceTempId,
                          std::vector<multi_img::Value> &illuminant, const cv::Mat1b &mask, bool apply)
     : TaskDistviewBinsTbb("taskAdd", destId,
                     {{sourceImgId, "source"}, {sourceTempId, "temp"}, {"ROI", "ROI"}},
-                      /*labels, colors,*/ illuminant,
-                      mask),//, inplace, apply)
-      args(args), /*inplace(inplace),*/ apply(apply)
+                      illuminant, mask), apply(apply)
 {
 }
 
@@ -68,11 +60,14 @@ bool TaskDistAdd::run()
     bool reuse = !roidiff->second.empty();
     bool keepOldContext;
 
+    Subscription::Lock<std::vector<BinSet>, ViewportCtx> dest_lock(*sub("dest"));
+    ViewportCtx* args = dest_lock.meta();
+
     if (reuse) {
-        keepOldContext = ((fabs(args.minval) * REUSE_THRESHOLD) >=
-                          (fabs(args.minval - source->minval))) &&
-            ((fabs(args.maxval) * REUSE_THRESHOLD) >=
-             (fabs(args.maxval - source->maxval)));
+        keepOldContext = ((fabs(args->minval) * REUSE_THRESHOLD) >=
+                          (fabs(args->minval - source->minval))) &&
+            ((fabs(args->maxval) * REUSE_THRESHOLD) >=
+             (fabs(args->maxval - source->maxval)));
 
         if (!keepOldContext) {
             reuse = false;
@@ -101,9 +96,9 @@ bool TaskDistAdd::run()
         return false;
     }
 
-    Subscription::Lock<std::vector<BinSet>, ViewportCtx> dest_lock(*sub("dest"));
+
     dest_lock.swap(result);
-    dest_lock.swapMeta(args);
+    dest_lock.swapMeta(*args);
     dest_lock.setVersion(source_lock.version());
 
 

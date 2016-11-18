@@ -22,7 +22,6 @@ public:
 
     virtual ~Subscription() override;
     void returnData();
-    void forceUpdate();
     void forceUnsubscribe();
     int getId() { return id; }
     SubscriberType getSubscriberType() { return subscriberType; }
@@ -42,7 +41,8 @@ private:
                           int id, SubscriptionManager& sm, QObject* requester,
                           std::function<void(void)> updateSlot);
     handle_pair leaseData();
-    int &version();
+    int version();
+    void setVersion(int version);
 
     Dependency dependency;
     SubscriberType subscriberType;

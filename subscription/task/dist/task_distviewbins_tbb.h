@@ -35,9 +35,9 @@ protected:
 
     void expression(bool subtract, std::vector<cv::Rect> &collection,
                     multi_img &multi, std::vector<BinSet> &sets,
-                    const ViewportCtx &args);
+                    const ViewportCtx *args);
     void createBinSets(multi_img &multi, std::vector<BinSet> &sets);
-    void updateContext(multi_img &multi, ViewportCtx &args);
+    void updateContext(multi_img &multi, ViewportCtx *args);
     virtual bool isCancelled() { return stopper.is_group_execution_cancelled(); }
 
 private:

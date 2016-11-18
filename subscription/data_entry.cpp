@@ -16,9 +16,14 @@ void DataEntry::endRead()
     if (doReads == 0) not_reading.notify_one();
 }
 
-int& DataEntry::version()
+int& DataEntry::getMajorVersion()
 {
-    return externalVersion;
+    return majorVersion;
+}
+
+int DataEntry::getMinorVersion()
+{
+    return minorVersion;
 }
 
 handle_pair DataEntry::write()

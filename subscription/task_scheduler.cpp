@@ -12,11 +12,12 @@ TaskScheduler::TaskScheduler(SubscriptionManager &sm) : QObject(), sm(sm) {}
 void TaskScheduler::pushTask(std::shared_ptr<Task> task)
 {
     //qDebug() << "task" << task->getId() << "landed in scheduler";
-    if (runningTasks[task->getId()]) {
-        qDebug() << "there's already task running";
-        //delete task;
-        return;
-    }
+//    if (runningTasks[task->getId()]) {
+//        qDebug() << "there's already task running";
+//        //delete task;
+//        return;
+//    }
+
     //removeRelated(task->getId());
     //removeRelated(task->getDependencies());
     createSubscriptions(task);
@@ -25,7 +26,8 @@ void TaskScheduler::pushTask(std::shared_ptr<Task> task)
     //removeRelated(task->getId()); //DIRTY HACK
     //qDebug() << "task" << task->getId() << "going to the pool";
     taskPool.push_front(task);
-    if (!stopped) checkTaskPool();
+    checkTaskPool();
+    //if (!stopped) checkTaskPool();
 }
 
 void TaskScheduler::printPool()
@@ -71,8 +73,8 @@ void TaskScheduler::removeRelated(QString id)
 
 void TaskScheduler::checkTaskPool()
 {
-    if (stopped)
-        return;
+//    if (stopped)
+//        return;
 
     qDebug() << "checking taskPool";
     printPool();
@@ -109,22 +111,22 @@ void TaskScheduler::startTask(std::shared_ptr<Task> task)
     thread->start();
 }
 
-void TaskScheduler::taskEnded(QString id, bool success)
-{
-    runningTasks[id] = false;
-    qDebug() << id << "task finished";
-    qDebug() << taskPool.size() << "tasks in queue";
-}
+//void TaskScheduler::taskEnded(QString id, bool success)
+//{
+//    runningTasks[id] = false;
+//    qDebug() << id << "task finished";
+//    qDebug() << taskPool.size() << "tasks in queue";
+//}
 
-void TaskScheduler::stop()
-{
-    qDebug() << "scheduler stopped";
-    stopped++;
-}
+//void TaskScheduler::stop()
+//{
+//    qDebug() << "scheduler stopped";
+//    stopped++;
+//}
 
-void TaskScheduler::resume()
-{
-    stopped--;
-    if(!stopped) qDebug() << "scheduler resumed";
-    if(!stopped) checkTaskPool();
-}
+//void TaskScheduler::resume()
+//{
+//    stopped--;
+//    if(!stopped) qDebug() << "scheduler resumed";
+//    if(!stopped) checkTaskPool();
+//}

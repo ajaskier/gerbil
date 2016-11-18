@@ -8,6 +8,7 @@
 #include <QObject>
 #include <opencv2/core/core.hpp>
 #include <model/model.h>
+#include "subscription.h"
 
 #include "multi_img.h"
 #include "distviewcompute_utils.h"
@@ -23,11 +24,20 @@ public:
 
     virtual void delegateTask(QString id, QString parentId = "") override;
 
-    void addImage(int version, ViewportCtx *context, bool withTemp = false);
-    void subImage(int version, ViewportCtx *context);
+    void addImage(bool withTemp = false);
+    void subImage(int version);
 
+public slots:
+    void taskFinished(QString id, bool success);
 
 private:
+
+    void imageIMGUpdated();
+
+    ViewportCtx* createInitialContext();
+
+    std::unique_ptr<Subscription> imgSub;
+    std::unique_ptr<Subscription> distTmpSub;
 
     representation::t type;
     cv::Mat1s labels;
@@ -40,6 +50,8 @@ private:
     cv::Mat1b highlightMask;
     bool inbetween;
 
+
+    bool directRequest = false;
 };
 
 #endif // FAKE_MODEL_H

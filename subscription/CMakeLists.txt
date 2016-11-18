@@ -47,10 +47,12 @@ vole_compile_library(
         task/task_fake_sub
         task/task_fake_add
 
-        task/task_distviewbins_tbb
         task/task_roi
-        task/task_dist_sub
-        task/task_dist_add
+        task/dist/task_distviewbins_tbb
+        task/dist/task_dist_sub
+        task/dist/task_dist_add
+        task/dist/task_dist_sub_arg
+        task/dist/task_dist_add_arg
 
         imagemodel
        # distmodel

@@ -2,14 +2,16 @@
 
 #include "task_scheduler.h"
 #include "task/task.h"
-#include "subscription.h"
+
 #include "subscription_factory.h"
 #include "data.h"
 #include "lock.h"
 #include "data_condition_informer.h"
 
-#include "task/task_dist_add.h"
-#include "task/task_dist_sub.h"
+#include "task/dist/task_dist_add.h"
+#include "task/dist/task_dist_sub.h"
+#include "task/dist/task_dist_add_arg.h"
+#include "task/dist/task_dist_sub_arg.h"
 
 //#include "labeling.h"
 #include "qtopencv.h"
@@ -23,98 +25,134 @@ FakeModel::FakeModel(SubscriptionManager &sm,
 {
     registerData("dist.tmp.IMG", {"image.IMG", "ROI"});
     registerData("dist.IMG", {"image.IMG", "ROI"}); // it needs dist.tmp.FAKE too!
+
+}
+
+void FakeModel::imageIMGUpdated()
+{
+    qDebug() << "inside distModel on image.IMG updated";
+
+    int imageMinorVersion = DataConditionInformer::minorVersion("image.IMG");
+    qDebug() << "image minor version" << imageMinorVersion;
+    if (imageMinorVersion > 0 || directRequest) {
+        qDebug() << "non-ROI update";
+        addImage(/*context, */false);
+    } else {
+        qDebug() << "ROI update";
+        addImage(/*context, */true);
+    }
 }
 
 
 void FakeModel::delegateTask(QString id, QString parentId)
 {
-
-    if (parentId == "ROI") {
-        qDebug() << "ROI WANTS MEEE \n\n";
-    } else if (parentId == "image.IMG") {
-        qDebug() << "image IMG wants me\n\n";
-    }
     if (id == "dist.tmp.IMG") return;
 
+    if (parentId == "ROI") {
 
-    int roiVersion = DataConditionInformer::version("ROI");
-    int imageVersion = DataConditionInformer::version("image.IMG");
-    int distVersion = DataConditionInformer::version("dist.IMG");
+        int imageVersion = DataConditionInformer::majorVersion("image.IMG");
+        qDebug() << "roi wants me, scheduling subImage";
+        subImage(imageVersion);
 
-    ViewportCtx* context = nullptr;
-    if (DataConditionInformer::isInitialized("dist.IMG")) {
-        std::shared_ptr<Subscription> distSub(
-                    SubscriptionFactory::create(Dependency("dist.IMG", SubscriptionType::READ),
-                                                SubscriberType::TASK));
 
-        Subscription::Lock<std::vector<BinSet>, ViewportCtx> dist_lock(*distSub);
-        context = dist_lock.meta();
+    } else if (parentId.isEmpty()) {
+
+        directRequest = true;
+
+        if (DataConditionInformer::isInitialized("image.IMG")) {
+            imageIMGUpdated();
+        }
     }
 
-    if (!imageVersion || !DataConditionInformer::isInitialized("image.IMG")) {
-        qDebug() << "ONLY ADD WITH" << imageVersion+1;
-        addImage(imageVersion+1, context, false);
-    } else if(imageVersion == roiVersion && distVersion != imageVersion) {
-        addImage(imageVersion, context, false);
-    } else {
-        qDebug() << "SUB WITH IMG VERSION" << imageVersion << "AND ADD WITH" << imageVersion+1;
-        subImage(imageVersion, context);
-        addImage(imageVersion+1, context, true);
+    if (!imgSub) {
+        imgSub = std::unique_ptr<Subscription>(SubscriptionFactory::create(Dependency("image.IMG", SubscriptionType::READ),
+                                                SubscriberType::READER, this,
+                                                std::bind(&FakeModel::imageIMGUpdated, this)));
+    }
+
+    if (!distTmpSub) {
+        distTmpSub = std::unique_ptr<Subscription>(SubscriptionFactory::create(Dependency("dist.tmp.IMG", SubscriptionType::READ),
+                                                                               SubscriberType::TASK));
     }
 
 }
 
-
-void FakeModel::addImage(int version, ViewportCtx* context, bool withTemp)
+void FakeModel::taskFinished(QString id, bool success)
 {
-    if (context) ctx = *context;
+    Model::taskFinished(id, success);
 
-    ctx.ignoreLabels = true;
-
-    ctx.nbins = 64;
-
-    ctx.valid = false;
-    ctx.reset.fetch_and_store(1);
-    ctx.wait.fetch_and_store(1);
-
-    QString id = "image.IMG-" + QString::number(version);
-
-    //Task* taskAdd;
-    std::shared_ptr<Task> taskAdd;
-    if (withTemp) {
-        taskAdd = std::shared_ptr<Task>(new TaskDistAdd("dist.tmp.IMG", id, "dist.IMG", ctx,
-                                        /*labels, labelColors,*/ illuminant,
-                                        cv::Mat1b(), true));
-    } else {
-        taskAdd = std::shared_ptr<Task>(new TaskDistAdd("dist.IMG", id, ctx, /*labels,
-                                        labelColors,*/ illuminant, cv::Mat1b(),
-                                        true));
+    if (id == "taskAdd" || id == "taskAddArg") {
+        distTmpSub.reset(nullptr);
+        imgSub.reset(nullptr);
     }
+    directRequest = false;
 
-    //scheduler->pushTask(taskAdd);
+}
+
+
+void FakeModel::addImage(bool withTemp)
+{
+    QString id = "image.IMG";
+    std::shared_ptr<Task> taskAdd;
+    if (DataConditionInformer::isInitialized("dist.IMG")) {
+
+        if (withTemp) {
+            taskAdd = std::shared_ptr<Task>(new TaskDistAdd("dist.IMG", id,
+                                            "dist.tmp.IMG",
+                                            illuminant,
+                                            cv::Mat1b(), true));
+        } else {
+            taskAdd = std::shared_ptr<Task>(new TaskDistAdd("dist.IMG", id,
+                                            illuminant,
+                                            cv::Mat1b(), true));
+        }
+
+    } else {
+        ViewportCtx* ctx = createInitialContext();
+
+        if (withTemp) {
+            taskAdd = std::shared_ptr<Task>(new TaskDistAddArg("dist.IMG", id,
+                                            "dist.tmp.IMG", ctx,
+                                            illuminant,
+                                            cv::Mat1b(), true));
+        } else {
+            taskAdd = std::shared_ptr<Task>(new TaskDistAddArg("dist.IMG", id,
+                                            ctx, illuminant,
+                                            cv::Mat1b(), true));
+        }
+
+    }
     sendTask(taskAdd);
 
 }
 
-void FakeModel::subImage(int version, ViewportCtx* context)
+ViewportCtx* FakeModel::createInitialContext()
 {
-    //ViewportCtx ctx;
-    if (context) ctx = *context;
+    ViewportCtx *ctx = new ViewportCtx();
+    ctx->ignoreLabels = true;
+    ctx->nbins = 64;
 
-    ctx.ignoreLabels = true;
-    ctx.nbins = 64;
+    ctx->valid = false;
+    ctx->reset.fetch_and_store(1);
+    ctx->wait.fetch_and_store(1);
 
-    ctx.valid = false;
-    ctx.reset.fetch_and_store(1);
-    ctx.wait.fetch_and_store(1);
+    return ctx;
+}
 
+void FakeModel::subImage(int version)
+{
     QString id = "image.IMG-" + QString::number(version);
-//    Task* taskSub = new TaskDistSub(id, "dist.tmp.IMG", ctx, /*labels,
-//                                    labelColors,*/ illuminant, cv::Mat1b(), false);
-    std::shared_ptr<Task> taskSub(new TaskDistSub(id, "dist.tmp.IMG", ctx, /*labels,
-                                              labelColors,*/ illuminant, cv::Mat1b(), false));
 
+    std::shared_ptr<Task> taskSub;
+    if (DataConditionInformer::isInitialized("dist.IMG")) {
+        taskSub = std::shared_ptr<Task>(new TaskDistSub(id, "dist.tmp.IMG",
+                                        illuminant, cv::Mat1b(), false));
+    } else {
+        ViewportCtx* ctx = createInitialContext();
+        taskSub = std::shared_ptr<Task>(new TaskDistSubArg(id, "dist.tmp.IMG",
+                                        ctx, illuminant, cv::Mat1b(), false));
 
-    //scheduler->pushTask(taskSub);
+    }
+
     sendTask(taskSub);
 }
