@@ -10,9 +10,9 @@
 #include <subscription_manager.h>
 #include "dependency.h"
 
-enum class SubscriberType {
-    TASK,
-    READER
+enum class AccessType {
+    DIRECT,
+    DEFERRED
 };
 
 class Subscription : public QObject
@@ -24,7 +24,7 @@ public:
     void returnData();
     void forceUnsubscribe();
     int getId() { return id; }
-    SubscriberType getSubscriberType() { return subscriberType; }
+    AccessType getAccessType() { return accessType; }
     Dependency getDependency() { return dependency; }
 
     template <class T1, class T2 = int>
@@ -34,10 +34,10 @@ signals:
     void update();
 
 private:
-    explicit Subscription(Dependency dependency, SubscriberType subscriberType,
+    explicit Subscription(Dependency dependency, AccessType accessType,
                           int id, SubscriptionManager& sm);
 
-    explicit Subscription(Dependency dependency, SubscriberType subscriberType,
+    explicit Subscription(Dependency dependency, AccessType accessType,
                           int id, SubscriptionManager& sm, QObject* requester,
                           std::function<void(void)> updateSlot);
     handle_pair leaseData();
@@ -45,7 +45,7 @@ private:
     void setVersion(int version);
 
     Dependency dependency;
-    SubscriberType subscriberType;
+    AccessType accessType;
     SubscriptionManager& sm;
     const int id;
 

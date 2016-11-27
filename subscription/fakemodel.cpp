@@ -66,13 +66,13 @@ void FakeModel::delegateTask(QString id, QString parentId)
 
     if (!imgSub) {
         imgSub = std::unique_ptr<Subscription>(SubscriptionFactory::create(Dependency("image.IMG", SubscriptionType::READ),
-                                                SubscriberType::READER, this,
+                                                AccessType::DEFERRED, this,
                                                 std::bind(&FakeModel::imageIMGUpdated, this)));
     }
 
     if (!distTmpSub) {
         distTmpSub = std::unique_ptr<Subscription>(SubscriptionFactory::create(Dependency("dist.tmp.IMG", SubscriptionType::READ),
-                                                                               SubscriberType::TASK));
+                                                                               AccessType::DIRECT));
     }
 
 }

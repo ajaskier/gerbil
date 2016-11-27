@@ -72,6 +72,7 @@ public:
 
     void release() {
         if (initialized) sub.returnData();
+       // sub.returnData();
         released = true;
     }
 

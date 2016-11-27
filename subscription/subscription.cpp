@@ -4,8 +4,8 @@
 int Subscription::spawnCounter = 0;
 int Subscription::destroyCounter = 0;
 
-Subscription::Subscription(Dependency dependency,  SubscriberType subscriberType, int id, SubscriptionManager& sm) :
-    QObject(), dependency(dependency), subscriberType(subscriberType),
+Subscription::Subscription(Dependency dependency,  AccessType accessType, int id, SubscriptionManager& sm) :
+    QObject(), dependency(dependency), accessType(accessType),
     sm(sm), id(id)
 {
     {
@@ -17,10 +17,10 @@ Subscription::Subscription(Dependency dependency,  SubscriberType subscriberType
     sm.subscribe(dependency.dataId, dependency.subscription, dependency.version, this);
 }
 
-Subscription::Subscription(Dependency dependency, SubscriberType subscriberType,
+Subscription::Subscription(Dependency dependency, AccessType accessType,
                            int id, SubscriptionManager &sm, QObject *requester,
                            std::function<void ()> updateSlot)
-    : QObject(), dependency(dependency), subscriberType(subscriberType),
+    : QObject(), dependency(dependency), accessType(accessType),
       sm(sm), id(id)
 {
     {

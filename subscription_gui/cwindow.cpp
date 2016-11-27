@@ -22,7 +22,7 @@ CWindow::CWindow(QWidget *parent) :
 
     qDebug() << "displayC";
     dataCSub = SubscriptionFactory::create(Dependency("DATA_C", SubscriptionType::READ),
-                                           SubscriberType::READER, this,
+                                           AccessType::DEFERRED, this,
                                            std::bind(&CWindow::displayC, this));
 
 }

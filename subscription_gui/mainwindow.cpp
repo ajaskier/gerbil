@@ -39,7 +39,7 @@ void MainWindow::initCrucials()
    // distModel = new DistModel(sm, scheduler, this);
     imageModel->setFilename("/home/olek/gerbil_data/peppers_descriptor.txt");
     imgSub = std::unique_ptr<Subscription>(SubscriptionFactory::create(Dependency("image", SubscriptionType::READ),
-                                         SubscriberType::READER, this,
+                                         AccessType::DEFERRED, this,
                                          std::bind(&MainWindow::imgUpdated, this)));
 
 
@@ -100,7 +100,7 @@ void MainWindow::displayROI()
 void MainWindow::imgUpdated()
 {
     roiSub = std::unique_ptr<Subscription>(SubscriptionFactory::create(Dependency("ROI", SubscriptionType::READ),
-                                               SubscriberType::READER, this,
+                                               AccessType::DEFERRED, this,
                                                std::bind(&MainWindow::displayROI, this)));
 
     {

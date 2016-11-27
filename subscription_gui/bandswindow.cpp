@@ -48,7 +48,7 @@ void BandsWindow::on_imageModelButton_clicked()
 
     bandsSub = SubscriptionFactory::create(Dependency(image,
                                                         SubscriptionType::READ),
-                                             SubscriberType::READER, this,
+                                             AccessType::DEFERRED, this,
                                              std::bind(&BandsWindow::display, this));
 }
 

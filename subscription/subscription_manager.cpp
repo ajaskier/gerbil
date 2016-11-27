@@ -49,7 +49,7 @@ void SubscriptionManager::subscribeRead(QString dataId, Subscription* subObj)
 {
     std::unique_lock<std::recursive_mutex> lock(mu);
 
-    bool instantRequest = subObj->getSubscriberType() == SubscriberType::READER;
+    bool instantRequest = subObj->getAccessType() == AccessType::DEFERRED;
     dataPool[dataId].willReads++;
     if (dataPool[dataId].validity == ValidityState::INVALID
             && !dataPool[dataId].willWrite) {
@@ -107,7 +107,6 @@ void SubscriptionManager::unsubscribe(QString dataId, SubscriptionType sub,
             removeData(dataId);
         }
     }
-
 }
 
 handle_pair SubscriptionManager::doSubscription(QString id, SubscriptionType sub) {
@@ -190,15 +189,12 @@ void SubscriptionManager::endDoWriteSubscription(QString id)
 
 void SubscriptionManager::propagateChange(QString id) {
 
-    for(QString data: dataPool[id].dependants) {
+    for (QString data: dataPool[id].dependants) {
         if (hasWillReads(data) && !dataPool[data].willWrite) {
-        //if (dataPool[data].willReads > 0 && !dataPool[data].willWrite) {
             askModelForTask(data, id);
-            //emit triggerTask(data, id);
         } else if(dataPool[data].initialized) {
             removeData(data);
         }
-        //propagateChange(data);
     }
 }
 

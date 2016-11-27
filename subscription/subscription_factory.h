@@ -4,7 +4,7 @@
 #include <QObject>
 #include <functional>
 
-enum class SubscriberType;
+enum class AccessType;
 class SubscriptionManager;
 class Dependency;
 class Subscription;
@@ -14,8 +14,8 @@ class SubscriptionFactory
 
 public:
     static void init(SubscriptionManager *subscriptionManager);
-    static Subscription* create(Dependency dependency, SubscriberType subscriberType);
-    static Subscription* create(Dependency dependency, SubscriberType subscriberType,
+    static Subscription* create(Dependency dependency, AccessType accessType);
+    static Subscription* create(Dependency dependency, AccessType accessType,
                                 QObject *requester, std::function<void(void)> updateSlot);
 
 private:

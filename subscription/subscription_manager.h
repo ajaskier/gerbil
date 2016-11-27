@@ -29,22 +29,7 @@ public:
                      bool consumed = true);
     bool isDataInitialized(QString dataId);
 
-signals:
-    //void triggerTask(QString id, QString id2);
-
 private:
-
-    void askModelForTask(QString requestedId, QString beingComputedId = "");
-    void updateState(QString id);
-    bool processDependencies(std::vector<Dependency>& dependencies);
-    void sendUpdate(QString id);
-    void sendUpdate(QString id, int subscriberId);
-    bool hasWillReads(QString parentId);
-    void invalidDependants(QString id);
-
-    void removeData(QString dataId);
-
-    void propagateChange(QString id);
 
     void subscribeRead(QString dataId, Subscription *subObj);
     void subscribeWrite(QString dataId);
@@ -53,13 +38,25 @@ private:
     handle_pair doReadSubscription(QString id);
     handle_pair doWriteSubscription(QString id);
 
+    void endDoSubscription(QString id, SubscriptionType sub);
+    void endDoReadSubscription(QString id);
+    void endDoWriteSubscription(QString id);
+
     int getMinorVersion(QString id);
     int getMajorVersion(QString id);
     void setMajorVersion(QString id, int version);
 
-    void endDoSubscription(QString id, SubscriptionType sub);
-    void endDoReadSubscription(QString id);
-    void endDoWriteSubscription(QString id);
+    bool processDependencies(std::vector<Dependency>& dependencies);
+
+    void askModelForTask(QString requestedId, QString beingComputedId = "");
+    void updateState(QString id);
+    void sendUpdate(QString id);
+    void sendUpdate(QString id, int subscriberId);
+    bool hasWillReads(QString parentId);
+    void invalidDependants(QString id);
+
+    void removeData(QString dataId);
+    void propagateChange(QString id);
 
     std::map<QString, DataEntry> dataPool;
     std::recursive_mutex mu;

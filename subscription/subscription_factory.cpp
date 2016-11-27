@@ -13,18 +13,18 @@ void SubscriptionFactory::init(SubscriptionManager* subscriptionManager) {
 }
 
 Subscription* SubscriptionFactory::create(Dependency dependency,
-                                          SubscriberType subscriberType)
+                                          AccessType accessType)
 {
     assert(sm);
-    return new Subscription(dependency, subscriberType, idCounter++, *sm);
+    return new Subscription(dependency, accessType, idCounter++, *sm);
 }
 
 Subscription* SubscriptionFactory::create(Dependency dependency,
-                                          SubscriberType subscriberType,
+                                          AccessType accessType,
                                           QObject *requester,
                                           std::function<void ()> updateSlot)
 {
     assert(sm);
-    return new Subscription(dependency, subscriberType, idCounter++, *sm,
+    return new Subscription(dependency, accessType, idCounter++, *sm,
                             requester, updateSlot);
 }
