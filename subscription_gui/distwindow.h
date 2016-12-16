@@ -4,6 +4,8 @@
 #include <QWidget>
 #include <subscription_manager.h>
 
+#include "dist/distviewgui2.h"
+
 namespace Ui {
 class DistWindow;
 }
@@ -19,6 +21,10 @@ public:
 private:
     Ui::DistWindow *ui;
     Subscription* distSub;
+
+    DistViewGUI2 *gui;
+
+    bool guiCreated = false;
 
 signals:
     void calculateRequest();

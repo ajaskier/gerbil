@@ -17,7 +17,12 @@ class WorkerThread : public QThread
     }
 
 public:
-    WorkerThread(std::shared_ptr<Task> t, QObject* parent = 0) : QThread(parent), t(t) {}
+    WorkerThread(std::shared_ptr<Task> t, QObject* parent = 0) : QThread(parent), t(t) {
+
+        connect(this, &WorkerThread::finished, this, &WorkerThread::deleteLater,
+                Qt::QueuedConnection);
+
+    }
 
 signals:
     void finished(QString id, bool success);

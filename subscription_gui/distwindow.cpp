@@ -32,11 +32,22 @@ void DistWindow::displayDist()
     std::vector<BinSet>* sets = lock();
 
     qDebug() << "sets size:" << sets->size();
+
+    if (!guiCreated) {
+        gui = new DistViewGUI2(representation::t::IMG);
+        QWidget *frame = gui->getFrame();
+        ui->gridLayout->addWidget(frame, 1, 1);
+
+        gui->setActive();
+
+        guiCreated = true;
+    }
 }
 
 DistWindow::~DistWindow()
 {
     delete distSub;
+    delete gui;
 }
 
 void DistWindow::on_pushButton_clicked()

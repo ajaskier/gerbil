@@ -19,6 +19,7 @@
 #include "imgwindow.h"
 #include "bandswindow.h"
 #include "distwindow.h"
+#include "dist/distviewgui2.h"
 
 class NormDock;
 //class DistModel;
