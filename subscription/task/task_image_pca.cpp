@@ -11,7 +11,7 @@ TaskImagePCA::TaskImagePCA(QString sourceId, QString destId,
                            multi_img_base::Range normRange,
                            representation::t type, bool update,
                            unsigned int components, bool includecache)
-    : Task(destId, {{sourceId, "source"}}), normMode(normMode),
+    : Task(destId, {{"source", sourceId}}), normMode(normMode),
       normRange(normRange), type(type), update(update),
       components(components), includecache(includecache)
 {

@@ -13,10 +13,10 @@
 
 #define REUSE_THRESHOLD 0.1
 
-TaskDistSub::TaskDistSub(QString sourceId, QString sourceDistId, QString destId,
+TaskDistSub::TaskDistSub(QString destId, SourceDeclaration sourceId, SourceDeclaration sourceDistId,
                          std::vector<multi_img::Value> &illuminant, const cv::Mat1b &mask, bool apply)
     : TaskDistviewBinsTbb("taskSubDest", destId,
-                        {{sourceId, "source"}, {sourceDistId, "sourceDist"},{"ROI", "ROI"}},
+                        {{"source", sourceId}, {"sourceDist", sourceDistId},{"ROI", {"ROI"}}},
                         illuminant, mask), apply(apply)
 {
 }

@@ -10,14 +10,14 @@ class TaskDistAddArg : public TaskDistviewBinsTbb
 {
 
 public:
-    explicit TaskDistAddArg(QString destId, QString sourceImgId,
+    explicit TaskDistAddArg(QString destId, SourceDeclaration sourceImgId,
                          ViewportCtx *args,
                          std::vector<multi_img::Value> &illuminant,
                          const cv::Mat1b &mask = cv::Mat1b(), bool apply = true);
 
     explicit TaskDistAddArg(QString destId,
-                         QString sourceImgId,
-                         QString sourceTempId,
+                         SourceDeclaration sourceImgId,
+                         SourceDeclaration sourceTempId,
                          ViewportCtx *args,
                          std::vector<multi_img_base::Value> &illuminant,
                          const cv::Mat1b &mask, bool apply = true);

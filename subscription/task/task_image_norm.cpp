@@ -9,7 +9,7 @@
 TaskImageNORM::TaskImageNORM(multi_img::NormMode normMode,
                              multi_img_base::Range normRange,
                              representation::t type, bool update)
-    : Task("image.NORM", {{"image.IMG", "source"}}), normMode(normMode),
+    : Task("image.NORM", {{"source", {"image.IMG"}}}), normMode(normMode),
       normRange(normRange), type(type), update(update)
 {
 }

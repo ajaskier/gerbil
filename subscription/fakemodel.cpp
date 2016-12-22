@@ -92,17 +92,16 @@ void FakeModel::taskFinished(QString id, bool success)
 
 void FakeModel::addImage(bool withTemp)
 {
-    QString id = "image.IMG";
     std::shared_ptr<Task> taskAdd;
     if (DataConditionInformer::isInitialized("dist.IMG")) {
 
         if (withTemp) {
-            taskAdd = std::shared_ptr<Task>(new TaskDistAdd("dist.IMG", id,
-                                            "dist.tmp.IMG",
+            taskAdd = std::shared_ptr<Task>(new TaskDistAdd("dist.IMG", {"image.IMG"},
+                                            {"dist.tmp.IMG"},
                                             illuminant,
                                             cv::Mat1b(), true));
         } else {
-            taskAdd = std::shared_ptr<Task>(new TaskDistAdd("dist.IMG", id,
+            taskAdd = std::shared_ptr<Task>(new TaskDistAdd("dist.IMG", {"image.IMG"},
                                             illuminant,
                                             cv::Mat1b(), true));
         }
@@ -111,19 +110,18 @@ void FakeModel::addImage(bool withTemp)
         ViewportCtx* ctx = createInitialContext();
 
         if (withTemp) {
-            taskAdd = std::shared_ptr<Task>(new TaskDistAddArg("dist.IMG", id,
-                                            "dist.tmp.IMG", ctx,
+            taskAdd = std::shared_ptr<Task>(new TaskDistAddArg("dist.IMG", {"image.IMG"},
+                                            {"dist.tmp.IMG"}, ctx,
                                             illuminant,
                                             cv::Mat1b(), true));
         } else {
-            taskAdd = std::shared_ptr<Task>(new TaskDistAddArg("dist.IMG", id,
+            taskAdd = std::shared_ptr<Task>(new TaskDistAddArg("dist.IMG", {"image.IMG"},
                                             ctx, illuminant,
                                             cv::Mat1b(), true));
         }
 
     }
     sendTask(taskAdd);
-
 }
 
 ViewportCtx* FakeModel::createInitialContext()
@@ -141,15 +139,15 @@ ViewportCtx* FakeModel::createInitialContext()
 
 void FakeModel::subImage(int version)
 {
-    QString id = "image.IMG+" + QString::number(version);
 
     std::shared_ptr<Task> taskSub;
     if (DataConditionInformer::isInitialized("dist.IMG")) {
-        taskSub = std::shared_ptr<Task>(new TaskDistSub(id, "dist.IMG+-1+FORCED", "dist.tmp.IMG",
+        taskSub = std::shared_ptr<Task>(new TaskDistSub("dist.tmp.IMG", {"image.IMG", version},
+                                        {"dist.IMG", AccessType::FORCED},
                                         illuminant, cv::Mat1b(), false));
     } else {
         ViewportCtx* ctx = createInitialContext();
-        taskSub = std::shared_ptr<Task>(new TaskDistSubArg(id, "dist.tmp.IMG",
+        taskSub = std::shared_ptr<Task>(new TaskDistSubArg("dist.tmp.IMG", {"image.IMG", version},
                                         ctx, illuminant, cv::Mat1b(), false));
 
     }

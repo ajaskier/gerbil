@@ -13,9 +13,9 @@
 
 #define REUSE_THRESHOLD 0.1
 
-TaskDistSubArg::TaskDistSubArg(QString sourceId, QString destId, ViewportCtx *args,
+TaskDistSubArg::TaskDistSubArg(QString destId, SourceDeclaration sourceId, ViewportCtx *args,
                          std::vector<multi_img::Value> &illuminant, const cv::Mat1b &mask, bool apply)
-    : TaskDistviewBinsTbb("taskSubArg", destId, {{sourceId, "source"}, {"ROI", "ROI"}},
+    : TaskDistviewBinsTbb("taskSubArg", destId, {{"source", sourceId}, {"ROI", {"ROI"}}},
                       illuminant, mask), args(args), apply(apply)
 {
 }

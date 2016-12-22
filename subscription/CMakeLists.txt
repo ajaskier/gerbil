@@ -18,6 +18,7 @@ vole_compile_library(
 	task_scheduler
 	worker_thread
         data_condition_informer
+        source_declaration
 
 	model/model
 	model/model_a

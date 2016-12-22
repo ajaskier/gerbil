@@ -6,6 +6,7 @@
 #include <QString>
 #include "dependency.h"
 #include <map>
+#include "source_declaration.h"
 
 class Subscription;
 
@@ -13,8 +14,8 @@ class Task : public QObject
 {
     Q_OBJECT
 public:
-    explicit Task(QString target, std::map<QString, QString> sources);
-    explicit Task(QString id, QString target, std::map<QString, QString> sources);
+    explicit Task(QString target, std::map<QString, SourceDeclaration> sources);
+    explicit Task(QString id, QString target, std::map<QString, SourceDeclaration> sources);
 
     virtual ~Task();
     virtual bool start() final;
@@ -35,9 +36,11 @@ protected:
 
 private:
 
+    void setDependencies(QString target);
+
     QString id;
     std::vector<Dependency> dependencies;
-    std::map<QString, QString> sources;
+    std::map<QString, SourceDeclaration> sources;
     std::map<QString, std::shared_ptr<Subscription>> subscriptions;
 
 };

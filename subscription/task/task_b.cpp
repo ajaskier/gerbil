@@ -5,7 +5,7 @@
 #include "data.h"
 
 TaskB::TaskB(int b)
-    : Task("DATA_B", {{"DATA_A", "source"}}), b(b)
+    : Task("DATA_B", {{"source", {"DATA_A"}}}), b(b)
 {
 }
 

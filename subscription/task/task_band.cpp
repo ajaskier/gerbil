@@ -9,7 +9,7 @@
 
 TaskBand::TaskBand(QString sourceId, QString destId, size_t dim,
                    representation::t repr)
-    : Task(destId, {{sourceId, "source"}}), dim(dim), repr(repr)
+    : Task(destId, {{"source", sourceId}}), dim(dim), repr(repr)
 {
 }
 

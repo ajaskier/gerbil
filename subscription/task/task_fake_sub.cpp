@@ -6,7 +6,7 @@
 #include "QDebug"
 
 TaskFakeSub::TaskFakeSub(QString sourceId)
-    : Task("taskSub", "dist.tmp.FAKE", {{sourceId, "source"}})
+    : Task("taskSub", "dist.tmp.FAKE", {{"source", sourceId}})
 {
 }
 

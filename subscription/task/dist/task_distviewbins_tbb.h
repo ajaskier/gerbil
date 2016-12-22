@@ -20,7 +20,7 @@ class TaskDistviewBinsTbb : public Task
 {
 
 public:
-    explicit TaskDistviewBinsTbb(QString id, QString target, std::map<QString, QString> sources,
+    explicit TaskDistviewBinsTbb(QString id, QString target, std::map<QString, SourceDeclaration> sources,
 //                             const cv::Mat1s &labels,
 //                             QVector<QColor> &colors,
                              std::vector<multi_img::Value> &illuminant,

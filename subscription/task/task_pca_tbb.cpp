@@ -11,7 +11,7 @@
 #include <tbb/parallel_for.h>
 
 TaskPcaTbb::TaskPcaTbb(QString sourceId, QString destId, unsigned int components, bool includecache)
-    : Task(destId, {{sourceId, "source"}}), components(components),
+    : Task(destId, {{"source", sourceId}}), components(components),
       includecache(includecache)
 {
 }

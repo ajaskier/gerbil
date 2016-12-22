@@ -13,7 +13,7 @@
 
 TaskBand2QImageTbb::TaskBand2QImageTbb(QString sourceId, QString destId,
                                        size_t dim)
-    : Task(destId, {{sourceId, "source"}}), dim(dim)
+    : Task(destId, {{"source", sourceId}}), dim(dim)
 {
 }
 

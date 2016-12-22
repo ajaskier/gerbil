@@ -15,9 +15,6 @@ public:
     TaskScheduler(SubscriptionManager& sm);
     void pushTask(std::shared_ptr<Task> task);
 
-//    void stop();
-//    void resume();
-
 private:
     void checkTaskPool();
     void startTask(std::shared_ptr<Task> task);
@@ -28,10 +25,7 @@ private:
     void printPool();
 
     std::list<std::shared_ptr<Task>> taskPool;
-    //std::map<QString, bool> runningTasks;
     SubscriptionManager& sm;
-
-    //int stopped = 0;
 };
 
 #endif // TASK_SCHEDULER_H

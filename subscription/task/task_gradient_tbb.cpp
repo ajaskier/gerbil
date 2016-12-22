@@ -11,7 +11,7 @@
 #include <tbb/parallel_for.h>
 
 TaskGradientTbb::TaskGradientTbb(bool includecache)
-    : Task("image.GRAD", {{"image.IMG", "source"}}), includecache(includecache)
+    : Task("image.GRAD", {{"source", {"image.IMG"}}}), includecache(includecache)
 {
 }
 

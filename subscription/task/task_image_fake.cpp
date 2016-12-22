@@ -8,7 +8,7 @@
 #include <QDebug>
 
 TaskImageFAKE::TaskImageFAKE(int a)
-    : Task("image.FAKE", {{"ROI", "source"}}), a(a)
+    : Task("image.FAKE", {{"source", {"ROI"}}}), a(a)
 {
 }
 

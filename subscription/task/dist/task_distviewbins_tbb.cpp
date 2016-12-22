@@ -80,7 +80,7 @@ void Accumulate2::operator()(const tbb::blocked_range2d<int> &r) const
 }
 
 
-TaskDistviewBinsTbb::TaskDistviewBinsTbb(QString id, QString target, std::map<QString, QString> sources,
+TaskDistviewBinsTbb::TaskDistviewBinsTbb(QString id, QString target, std::map<QString, SourceDeclaration> sources,
 //                         const cv::Mat1s &labels,
 //                         QVector<QColor> &colors,
                          std::vector<multi_img::Value> &illuminant,

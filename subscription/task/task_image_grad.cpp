@@ -10,7 +10,7 @@ TaskImageGRAD::TaskImageGRAD(multi_img::NormMode normMode,
                              multi_img_base::Range normRange,
                              representation::t type, bool update,
                              bool includecache)
-    : Task("image.GRAD", {{"image.IMG", "source"}}), normMode(normMode),
+    : Task("image.GRAD", {{"source", {"image.IMG"}}}), normMode(normMode),
       normRange(normRange), type(type), update(update), includecache(includecache)
 {
 }

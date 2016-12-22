@@ -6,13 +6,13 @@
 #include "QDebug"
 
 TaskFakeAdd::TaskFakeAdd(QString destId, QString imageId)
-    : Task(destId, {{imageId, "sourceImage"}})
+    : Task(destId, {{"sourceImage", imageId}})
 {
 
 }
 
 TaskFakeAdd::TaskFakeAdd(QString destId, QString imageId, QString tempId)
-    : Task(destId, {{imageId, "sourceImage"}, {tempId, "sourceTemp"}})
+    : Task(destId, {{"sourceImage", imageId}, {"sourceTemp", tempId}})
 {
 
 }

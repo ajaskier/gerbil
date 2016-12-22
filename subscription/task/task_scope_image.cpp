@@ -6,7 +6,7 @@
 #include <QDebug>
 
 TaskScopeImage::TaskScopeImage()
-    : Task("image.IMG", {{"image", "source"}, {"ROI", "ROI"}})
+    : Task("image.IMG", {{"source", {"image"}}, {"ROI", {"ROI"}}})
 {
 }
 

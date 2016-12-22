@@ -11,7 +11,7 @@ TaskImageIMG::TaskImageIMG(size_t bands, size_t roiBands,
                            multi_img::NormMode normMode,
                            multi_img_base::Range normRange,
                            representation::t type, bool update, bool includecache)
-    : Task("image.IMG", {{"image", "source"}, {"ROI", "ROI"}}), bands(bands),
+    : Task("image.IMG", {{"source", {"image"}}, {"ROI", {"ROI"}}}), bands(bands),
       roiBands(roiBands), includecache(includecache), normMode(normMode),
       normRange(normRange), type(type), update(update)
 {

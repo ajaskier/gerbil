@@ -13,7 +13,7 @@ public:
     //labels seems to be redundant!!!
     //the same with colors
     //the same with illuminant
-    explicit TaskDistSub(QString sourceId, QString sourceDistId, QString destId,
+    explicit TaskDistSub(QString destId, SourceDeclaration sourceId, SourceDeclaration sourceDistId,
                          std::vector<multi_img::Value> &illuminant,
                          const cv::Mat1b &mask = cv::Mat1b(), bool apply = true);
     virtual ~TaskDistSub();

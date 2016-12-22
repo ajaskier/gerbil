@@ -283,12 +283,6 @@ bool SubscriptionManager::processDependencies(std::vector<Dependency> &dependenc
             int smallestSubscribedVersion = dataPool[dataId].subscribedVersions.top();
             int currentVersion = dataPool[dataId].majorVersion;
 
-//            if (currentVersion < smallestSubscribedVersion
-//                    && dep.subscription == SubscriptionType::READ) {
-//                askModelForTask(dataId);
-//                return false;
-//            }
-
             if (( dep.version == -1 && smallestSubscribedVersion == currentVersion )
                     || dep.version > smallestSubscribedVersion/*
                     || dep.version != currentVersion*/) return false;
@@ -297,11 +291,6 @@ bool SubscriptionManager::processDependencies(std::vector<Dependency> &dependenc
             else
                 return false;
         }
-
-//        if (dep.subscription == SubscriptionType::READ
-//                && (dataPool[dataId].access == AccessState::WRITE
-//                    || dataPool[dataId].validity != ValidityState::VALID))
-//            return false;
 
         if (dep.subscription == SubscriptionType::READ)
         {
