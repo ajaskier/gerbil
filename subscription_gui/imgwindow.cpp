@@ -21,8 +21,8 @@ ImgWindow::ImgWindow(QWidget *parent) :
     ui(new Ui::ImgWindow)
 {
     ui->setupUi(this);
-    sub = SubscriptionFactory::create(Dependency("image.IMG", SubscriptionType::READ),
-                                           AccessType::DEFERRED, this,
+    sub = SubscriptionFactory::create(Dependency("image.IMG", SubscriptionType::READ,
+                                           AccessType::DEFERRED), this,
                                            std::bind(&ImgWindow::display, this));
 }
 

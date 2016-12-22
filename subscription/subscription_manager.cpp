@@ -192,15 +192,16 @@ void SubscriptionManager::propagateChange(QString id) {
     for (QString data: dataPool[id].dependants) {
         if (hasWillReads(data) && !dataPool[data].willWrite) {
             askModelForTask(data, id);
-        } else if(dataPool[data].initialized) {
+        }/* else if(dataPool[data].initialized) {
             removeData(data);
-        }
+        }*/
     }
 }
 
 void SubscriptionManager::invalidDependants(QString id)
 {
     for(QString& data: dataPool[id].dependants) {
+        //qDebug() << "invalidating" << data;
         dataPool[data].upToDate = false;
         updateState(data);
         invalidDependants(data);
@@ -305,6 +306,12 @@ bool SubscriptionManager::processDependencies(std::vector<Dependency> &dependenc
         if (dep.subscription == SubscriptionType::READ)
         {
             if (dataPool[dataId].access == AccessState::WRITE) return false;
+            if (dep.accessType == AccessType::FORCED) {
+                //EXPERIMENTAL!!! AND HACK!!!
+                qDebug() << "Granting immediate access for" << dep.dataId;
+                //return true;
+                continue;
+            }
             if (dataPool[dataId].validity != ValidityState::VALID
                     && dep.version != dataPool[dataId].majorVersion)
                 return false;

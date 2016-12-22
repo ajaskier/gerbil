@@ -27,14 +27,12 @@ bool TaskImageIMG::run()
     auto destId = sub("dest")->getDependency().dataId;
     auto roiId = sub("ROI")->getDependency().dataId;
 
-
     TaskScopeImage scopeImage;
     scopeImage.setSubscription(sourceId, sub("source"));
     scopeImage.setSubscription(destId, sub("dest"));
     scopeImage.setSubscription(roiId, sub("ROI"));
     auto success = scopeImage.start();
     if(!success) return success;
-
 
     qDebug() << "halfway there";
 

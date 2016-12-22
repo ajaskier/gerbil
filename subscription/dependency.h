@@ -4,14 +4,19 @@
 #include <QString>
 #include "subscription_type.h"
 
+enum class AccessType;
+
 class Dependency {
 
 public:
-    Dependency(QString dataId, SubscriptionType subscription, int version = -1)
-        : dataId(dataId), subscription(subscription), version(version) {}
+    Dependency(QString dataId, SubscriptionType subscription, AccessType accessType,
+               int version = -1)
+        : dataId(dataId), subscription(subscription),
+          accessType(accessType), version(version) {}
 
     QString dataId;
     int version;
+    AccessType accessType;
     SubscriptionType subscription;
 
 };

@@ -113,7 +113,7 @@ void TaskDistviewBinsTbb::expression(bool subtract, std::vector<cv::Rect> &colle
                             args->minval, args->ignoreLabels, illuminant, sets);
 
         tbb::parallel_for(
-                    tbb::blocked_range2d<int>(it->y, it->x + it->height,
+                    tbb::blocked_range2d<int>(it->y, it->y + it->height,
                                               it->x, it->x + it->width),
                     expr, tbb::auto_partitioner(), stopper);
     }

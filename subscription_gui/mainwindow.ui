@@ -143,7 +143,7 @@
            </widget>
           </item>
           <item>
-           <widget class="QLineEdit" name="height_input"/>
+           <widget class="QLineEdit" name="width_input"/>
           </item>
          </layout>
         </item>
@@ -157,7 +157,7 @@
            </widget>
           </item>
           <item>
-           <widget class="QLineEdit" name="width_input"/>
+           <widget class="QLineEdit" name="height_input"/>
           </item>
          </layout>
         </item>

@@ -38,13 +38,13 @@ ImgModel::ImgModel(bool limitedMode, SubscriptionManager &sm,
 
 void ImgModel::setBandsCount(size_t bands)
 {
-    QVector<QString> vec = {"IMG", "NORM", "GRAD", "IMGPCA", "GRADPCA"};
-    for (QString repr : vec) {
-        for(int i = 0; i < bands; i++) {
-            registerData("bands."+repr+"."+QString::number(i),
-            {"image."+repr});
-        }
-    }
+//    QVector<QString> vec = {"IMG", "NORM", "GRAD", "IMGPCA", "GRADPCA"};
+//    for (QString repr : vec) {
+//        for(int i = 0; i < bands; i++) {
+//            registerData("bands."+repr+"."+QString::number(i),
+//            {"image."+repr});
+//        }
+//    }
 }
 
 void ImgModel::delegateTask(QString id, QString parentId)

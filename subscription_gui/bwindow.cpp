@@ -21,11 +21,11 @@ BWindow::BWindow(QWidget *parent) :
 
 
     qDebug() << "displayB";
-    dataBSub = SubscriptionFactory::create(Dependency("DATA_B", SubscriptionType::READ),
-                                           AccessType::DEFERRED, this,
+    dataBSub = SubscriptionFactory::create(Dependency("DATA_B", SubscriptionType::READ,
+                                           AccessType::DEFERRED), this,
                                            std::bind(&BWindow::displayB, this));
-    dataDSub = SubscriptionFactory::create(Dependency("DATA_D", SubscriptionType::READ),
-                                           AccessType::DEFERRED, this,
+    dataDSub = SubscriptionFactory::create(Dependency("DATA_D", SubscriptionType::READ,
+                                           AccessType::DEFERRED), this,
                                            std::bind(&BWindow::displayD, this));
 
 }

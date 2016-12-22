@@ -19,6 +19,7 @@ bool TaskScopeImage::run()
     Subscription::Lock<cv::Rect> roi_lock(*sub("ROI"));
 
     multi_img tmp(*source_lock(), *roi_lock());
+    qDebug() << "image width:" << tmp.width << "image height:" << tmp.height;
 
     Subscription::Lock<multi_img> dest_lock(*sub("dest"));
     dest_lock.swap(tmp);

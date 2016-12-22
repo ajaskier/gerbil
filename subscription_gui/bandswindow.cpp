@@ -47,8 +47,8 @@ void BandsWindow::on_imageModelButton_clicked()
     QString image = "bands." + representation + "." + QString::number(currentBand);
 
     bandsSub = SubscriptionFactory::create(Dependency(image,
-                                                        SubscriptionType::READ),
-                                             AccessType::DEFERRED, this,
+                                                        SubscriptionType::READ,
+                                             AccessType::DEFERRED), this,
                                              std::bind(&BandsWindow::display, this));
 }
 

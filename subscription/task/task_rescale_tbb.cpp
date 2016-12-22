@@ -40,6 +40,7 @@ bool TaskRescaleTbb::run()
     }
 
     Subscription::Lock<multi_img> dest(*sub("dest"));
+    multi_img* destptr = dest();
 
     multi_img* temp = new multi_img(*dest(), cv::Rect(0,0, dest()->width,
                                                       dest()->height));

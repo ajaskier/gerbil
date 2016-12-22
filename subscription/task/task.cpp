@@ -12,15 +12,23 @@ Task::Task(QString target, std::map<QString, QString> sources)
     for (auto& source : this->sources) {
 
         QString dataString = source.first;
-        QStringList list = dataString.split("-");
+        //qDebug() << dataString;
+        QStringList list = dataString.split("+");
 
-        if(list.size() > 1) {
+        if(list.size() == 2) {
             badKeys.push_back(source.first);
             int version = list[1].toInt();
-            dependencies.push_back(Dependency(list[0], SubscriptionType::READ, version));
+            dependencies.push_back(Dependency(list[0], SubscriptionType::READ, AccessType::DIRECT, version));
 
+        } else if (list.size() == 3) {
+
+            //DIRTY && UGLY
+
+            badKeys.push_back(source.first);
+            int version = list[1].toInt();
+            dependencies.push_back(Dependency(list[0], SubscriptionType::READ, AccessType::FORCED, version));
         } else {
-            dependencies.push_back(Dependency(list[0], SubscriptionType::READ));
+            dependencies.push_back(Dependency(list[0], SubscriptionType::READ, AccessType::DIRECT));
 
         }
 
@@ -30,7 +38,7 @@ Task::Task(QString target, std::map<QString, QString> sources)
 
     for(QString key : badKeys) {
 
-        QString newKey = key.split("-").at(0);
+        QString newKey = key.split("+").at(0);
 
         auto it = this->sources.find(key);
         if (it != this->sources.end() ) {
@@ -40,7 +48,7 @@ Task::Task(QString target, std::map<QString, QString> sources)
         }
     }
 
-    dependencies.push_back(Dependency(target, SubscriptionType::WRITE));
+    dependencies.push_back(Dependency(target, SubscriptionType::WRITE, AccessType::DIRECT));
     subscriptions["dest"] = std::shared_ptr<Subscription>();
     this->sources[target] = "dest";
 }
@@ -53,14 +61,22 @@ Task::Task(QString id, QString target, std::map<QString, QString> sources)
     for (auto source : sources) {
 
         QString dataString = source.first;
-        QStringList list = dataString.split("-");
+        QStringList list = dataString.split("+");
+        //qDebug() << dataString << "split size" << list.size();
 
-        if(list.size() > 1) {
+        if(list.size() == 2) {
             badKeys.push_back(source.first);
             int version = list[1].toInt();
-            dependencies.push_back(Dependency(list[0], SubscriptionType::READ, version));
+            dependencies.push_back(Dependency(list[0], SubscriptionType::READ, AccessType::DIRECT, version));
+        } else if (list.size() == 3) {
+
+        //DIRTY && UGLY
+            qDebug() << "creating forced dependency";
+            badKeys.push_back(source.first);
+            //int version = list[1].toInt();
+            dependencies.push_back(Dependency(list[0], SubscriptionType::READ, AccessType::FORCED));
         } else {
-            dependencies.push_back(Dependency(list[0], SubscriptionType::READ));
+            dependencies.push_back(Dependency(list[0], SubscriptionType::READ, AccessType::DIRECT));
         }
 
         //dependencies.push_back(Dependency(source.first, SubscriptionType::READ));
@@ -69,7 +85,7 @@ Task::Task(QString id, QString target, std::map<QString, QString> sources)
 
     for(QString key : badKeys) {
 
-        QString newKey = key.split("-").at(0);
+        QString newKey = key.split("+").at(0);
 
         auto it = this->sources.find(key);
         if (it != this->sources.end() ) {
@@ -79,7 +95,7 @@ Task::Task(QString id, QString target, std::map<QString, QString> sources)
         }
     }
 
-    dependencies.push_back(Dependency(target, SubscriptionType::WRITE));
+    dependencies.push_back(Dependency(target, SubscriptionType::WRITE, AccessType::DIRECT));
     subscriptions["dest"] = std::shared_ptr<Subscription>();
     this->sources[target] = "dest";
 }
@@ -92,7 +108,7 @@ Task::~Task()
 
 void Task::setSubscription(QString id, std::shared_ptr<Subscription> sub)
 {
-    auto list = id.split("-");
+    auto list = id.split("+");
     if(list.size() > 1) {
         id = list[0];
     }

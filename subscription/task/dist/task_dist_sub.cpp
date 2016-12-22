@@ -13,10 +13,11 @@
 
 #define REUSE_THRESHOLD 0.1
 
-TaskDistSub::TaskDistSub(QString sourceId, QString destId,
+TaskDistSub::TaskDistSub(QString sourceId, QString sourceDistId, QString destId,
                          std::vector<multi_img::Value> &illuminant, const cv::Mat1b &mask, bool apply)
-    : TaskDistviewBinsTbb("taskSub", destId, {{sourceId, "source"}, {"ROI", "ROI"}},
-                      illuminant, mask), apply(apply)
+    : TaskDistviewBinsTbb("taskSubDest", destId,
+                        {{sourceId, "source"}, {sourceDistId, "sourceDist"},{"ROI", "ROI"}},
+                        illuminant, mask), apply(apply)
 {
 }
 
@@ -53,8 +54,8 @@ bool TaskDistSub::run()
     /* TEMP ------ */
 
     Subscription::Lock<std::vector<BinSet>, ViewportCtx> dest_lock(*sub("dest"));
-    ViewportCtx* args = dest_lock.meta();
-
+    Subscription::Lock<std::vector<BinSet>, ViewportCtx> sourceDist_lock(*sub("sourceDist"));
+    ViewportCtx* args = sourceDist_lock.meta();
 
     bool reuse = !roidiff->first.empty();
     bool keepOldContext = false;

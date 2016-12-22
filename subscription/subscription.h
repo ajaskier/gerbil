@@ -12,7 +12,8 @@
 
 enum class AccessType {
     DIRECT,
-    DEFERRED
+    DEFERRED,
+    FORCED
 };
 
 class Subscription : public QObject
@@ -24,7 +25,7 @@ public:
     void returnData();
     void forceUnsubscribe();
     int getId() { return id; }
-    AccessType getAccessType() { return accessType; }
+    AccessType getAccessType() { return dependency.accessType; }
     Dependency getDependency() { return dependency; }
 
     template <class T1, class T2 = int>
@@ -34,10 +35,10 @@ signals:
     void update();
 
 private:
-    explicit Subscription(Dependency dependency, AccessType accessType,
+    explicit Subscription(Dependency dependency, /*AccessType accessType,*/
                           int id, SubscriptionManager& sm);
 
-    explicit Subscription(Dependency dependency, AccessType accessType,
+    explicit Subscription(Dependency dependency, /*AccessType accessType,*/
                           int id, SubscriptionManager& sm, QObject* requester,
                           std::function<void(void)> updateSlot);
     handle_pair leaseData();
@@ -45,7 +46,7 @@ private:
     void setVersion(int version);
 
     Dependency dependency;
-    AccessType accessType;
+    //AccessType accessType;
     SubscriptionManager& sm;
     const int id;
 

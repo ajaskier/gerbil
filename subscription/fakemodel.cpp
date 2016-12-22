@@ -65,14 +65,14 @@ void FakeModel::delegateTask(QString id, QString parentId)
     }
 
     if (!imgSub) {
-        imgSub = std::unique_ptr<Subscription>(SubscriptionFactory::create(Dependency("image.IMG", SubscriptionType::READ),
-                                                AccessType::DEFERRED, this,
+        imgSub = std::unique_ptr<Subscription>(SubscriptionFactory::create(Dependency("image.IMG", SubscriptionType::READ,
+                                                                                      AccessType::DEFERRED), this,
                                                 std::bind(&FakeModel::imageIMGUpdated, this)));
     }
 
     if (!distTmpSub) {
-        distTmpSub = std::unique_ptr<Subscription>(SubscriptionFactory::create(Dependency("dist.tmp.IMG", SubscriptionType::READ),
-                                                                               AccessType::DIRECT));
+        distTmpSub = std::unique_ptr<Subscription>(SubscriptionFactory::create(Dependency("dist.tmp.IMG", SubscriptionType::READ,
+                                                                               AccessType::DIRECT)));
     }
 
 }
@@ -141,11 +141,11 @@ ViewportCtx* FakeModel::createInitialContext()
 
 void FakeModel::subImage(int version)
 {
-    QString id = "image.IMG-" + QString::number(version);
+    QString id = "image.IMG+" + QString::number(version);
 
     std::shared_ptr<Task> taskSub;
     if (DataConditionInformer::isInitialized("dist.IMG")) {
-        taskSub = std::shared_ptr<Task>(new TaskDistSub(id, "dist.tmp.IMG",
+        taskSub = std::shared_ptr<Task>(new TaskDistSub(id, "dist.IMG+-1+FORCED", "dist.tmp.IMG",
                                         illuminant, cv::Mat1b(), false));
     } else {
         ViewportCtx* ctx = createInitialContext();
