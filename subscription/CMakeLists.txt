@@ -10,7 +10,6 @@ vole_compile_library(
 	data_entry
 	dependency
 	lock
-	state
 	subscription
 	subscription_factory
 	subscription_manager

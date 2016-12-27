@@ -1,8 +1,6 @@
 #ifndef DATA_ENTRY_H
 #define DATA_ENTRY_H
 
-#include "state.h"
-
 #include <vector>
 #include <QString>
 #include <mutex>
@@ -25,8 +23,8 @@ public:
     handle data_handle = nullptr;
     handle meta_handle = nullptr;
 
-    AccessState access = AccessState::NONE;
-    ValidityState validity = ValidityState::INVALID;
+    //AccessState access = AccessState::NONE;
+    //ValidityState validity = ValidityState::INVALID;
     Model* creator = nullptr;
     std::vector<QString> dependants;
     std::map<int, Subscription*> currentSubs;

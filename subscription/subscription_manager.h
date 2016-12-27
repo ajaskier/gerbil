@@ -10,7 +10,6 @@
 
 #include "data_entry.h"
 #include "subscription_type.h"
-#include "state.h"
 
 class Model;
 class Dependency;
@@ -30,6 +29,12 @@ public:
     bool isDataInitialized(QString dataId);
 
 private:
+
+    bool isReadState(QString id);
+    bool isWriteState(QString id);
+    bool isNoneState(QString id);
+    bool isValid(QString id);
+
 
     void subscribeRead(QString dataId, Subscription *subObj);
     void subscribeWrite(QString dataId);

@@ -42,7 +42,6 @@ void SubscriptionManager::subscribe(QString dataId, SubscriptionType sub,
     if (sub == SubscriptionType::READ) subscribeRead(dataId, subObj);
     else subscribeWrite(dataId);
 
-    updateState(dataId);
 }
 
 void SubscriptionManager::subscribeRead(QString dataId, Subscription* subObj)
@@ -51,11 +50,10 @@ void SubscriptionManager::subscribeRead(QString dataId, Subscription* subObj)
 
     bool instantRequest = subObj->getAccessType() == AccessType::DEFERRED;
     dataPool[dataId].willReads++;
-    if (dataPool[dataId].validity == ValidityState::INVALID
-            && !dataPool[dataId].willWrite) {
+    if (!isValid(dataId) && !dataPool[dataId].willWrite) {
         askModelForTask(dataId);
         //emit triggerTask(dataId, "");
-    } else if (dataPool[dataId].access != AccessState::WRITE && instantRequest
+    } else if (!isWriteState(dataId) && instantRequest
               && dataPool[dataId].upToDate) {
         sendUpdate(dataId, subObj->getId());
     }
@@ -66,7 +64,6 @@ void SubscriptionManager::subscribeWrite(QString dataId)
     std::unique_lock<std::recursive_mutex> lock(mu);
     dataPool[dataId].willWrite = true;
     dataPool[dataId].upToDate = false;
-    updateState(dataId);
 
     propagateChange(dataId);
     invalidDependants(dataId);
@@ -90,7 +87,6 @@ void SubscriptionManager::unsubscribe(QString dataId, SubscriptionType sub,
         qDebug() << "WRITE OF DATA" << dataId << "ENDED. CURRENT VERSION: "
                  << dataPool[dataId].majorVersion;
 
-        updateState(dataId);
         if (consumed && !dataPool[dataId].data_handle->empty()) {
             sendUpdate(dataId);
         } else {
@@ -120,7 +116,6 @@ handle_pair SubscriptionManager::doReadSubscription(QString id)
 
     std::unique_lock<std::recursive_mutex> lock(mu);
     dataPool[id].doReads++;
-    updateState(id);
 
     return data;
 }
@@ -133,7 +128,6 @@ handle_pair SubscriptionManager::doWriteSubscription(QString id)
     //dataPool[id].upToDate = false;
     dataPool[id].doWrite = true;
 
-    updateState(id);
     return data;
 }
 
@@ -168,7 +162,6 @@ void SubscriptionManager::endDoReadSubscription(QString id)
     std::unique_lock<std::recursive_mutex> lock(mu);
     dataPool[id].doReads--;
     dataPool[id].endRead();
-    updateState(id);
 }
 
 void SubscriptionManager::endDoWriteSubscription(QString id)
@@ -182,7 +175,6 @@ void SubscriptionManager::endDoWriteSubscription(QString id)
     dataPool[id].minorVersion++;
     dataPool[id].endWrite();
 
-    updateState(id);
 //    sendUpdate(id);
 //    propagateChange(id);
 }
@@ -203,30 +195,7 @@ void SubscriptionManager::invalidDependants(QString id)
     for(QString& data: dataPool[id].dependants) {
         //qDebug() << "invalidating" << data;
         dataPool[data].upToDate = false;
-        updateState(data);
         invalidDependants(data);
-    }
-}
-
-void SubscriptionManager::updateState(QString id)
-{
-    std::unique_lock<std::recursive_mutex> lock(mu);
-
-    if (dataPool[id].upToDate && dataPool[id].initialized) dataPool[id].validity = ValidityState::VALID;
-    else dataPool[id].validity = ValidityState::INVALID;
-
-    if (!dataPool[id].doWrite && dataPool[id].doReads == 0)
-    {
-        dataPool[id].access = AccessState::NONE;
-    }
-    else if (dataPool[id].doWrite && dataPool[id].doReads == 0)
-    {
-        dataPool[id].access = AccessState::WRITE;
-    } else if (!dataPool[id].doWrite && dataPool[id].doReads > 0)
-    {
-        dataPool[id].access = AccessState::READ;
-    } else {
-        assert(false);
     }
 }
 
@@ -287,28 +256,28 @@ bool SubscriptionManager::processDependencies(std::vector<Dependency> &dependenc
                     || dep.version > smallestSubscribedVersion/*
                     || dep.version != currentVersion*/) return false;
             else if (dep.version == -1 || dep.version == currentVersion)
-                return true;
+                continue;
             else
                 return false;
         }
 
         if (dep.subscription == SubscriptionType::READ)
         {
-            if (dataPool[dataId].access == AccessState::WRITE) return false;
+            if (isWriteState(dataId)) return false;
             if (dep.accessType == AccessType::FORCED) {
                 //EXPERIMENTAL!!! AND HACK!!!
                 qDebug() << "Granting immediate access for" << dep.dataId;
                 //return true;
                 continue;
             }
-            if (dataPool[dataId].validity != ValidityState::VALID
-                    && dep.version != dataPool[dataId].majorVersion)
+            if (!isValid(dataId) && dep.version != dataPool[dataId].majorVersion)
                 return false;
         }
 
         if (dep.subscription == SubscriptionType::WRITE
-                && dataPool[dataId].access != AccessState::NONE)
+                && !isNoneState(dataId))
             return false;
+
     }
     return true;
 }
@@ -320,7 +289,26 @@ void SubscriptionManager::removeData(QString dataId)
 
     dataPool[dataId].initialized = false;
     dataPool[dataId].upToDate = false;
-    dataPool[dataId].validity = ValidityState::INVALID;
 
     qDebug() << "data" << dataId << "was released due to no subscribers!";
+}
+
+bool SubscriptionManager::isReadState(QString id)
+{
+    return !dataPool[id].doWrite && dataPool[id].doReads > 0;
+}
+
+bool SubscriptionManager::isWriteState(QString id)
+{
+    return dataPool[id].doWrite && dataPool[id].doReads == 0;
+}
+
+bool SubscriptionManager::isNoneState(QString id)
+{
+    return !dataPool[id].doWrite && dataPool[id].doReads == 0;
+}
+
+bool SubscriptionManager::isValid(QString id)
+{
+    return dataPool[id].upToDate && dataPool[id].initialized;
 }
