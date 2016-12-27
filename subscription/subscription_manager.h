@@ -30,11 +30,14 @@ public:
 
 private:
 
-    bool isReadState(QString id);
-    bool isWriteState(QString id);
-    bool isNoneState(QString id);
-    bool isValid(QString id);
+    inline bool isReadState(QString id);
+    inline bool isWriteState(QString id);
+    inline bool isNoneState(QString id);
+    inline bool isValid(QString id);
 
+    inline bool hasWillWrite(QString id);
+    inline bool hasWillReads(QString id);
+    bool hasWillReadsRecursive(QString id);
 
     void subscribeRead(QString dataId, Subscription *subObj);
     void subscribeWrite(QString dataId);
@@ -57,7 +60,6 @@ private:
     void updateState(QString id);
     void sendUpdate(QString id);
     void sendUpdate(QString id, int subscriberId);
-    bool hasWillReads(QString parentId);
     void invalidDependants(QString id);
 
     void removeData(QString dataId);

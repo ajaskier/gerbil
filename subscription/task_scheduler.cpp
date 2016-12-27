@@ -30,7 +30,7 @@ void TaskScheduler::createSubscriptions(std::shared_ptr<Task> task)
     for(auto& dependency : dependencies) {
 
         std::shared_ptr<Subscription> s(
-                    SubscriptionFactory::create(dependency/*,AccessType::DIRECT*/));
+                    SubscriptionFactory::create(dependency));
         task->setSubscription(dependency.dataId, std::move(s));
     }
 }
