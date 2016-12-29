@@ -23,8 +23,6 @@ public:
     handle data_handle = nullptr;
     handle meta_handle = nullptr;
 
-    //AccessState access = AccessState::NONE;
-    //ValidityState validity = ValidityState::INVALID;
     Model* creator = nullptr;
     std::vector<QString> dependants;
     std::map<int, Subscription*> currentSubs;

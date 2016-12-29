@@ -14,7 +14,7 @@
 #include "multi_img.h"
 
 #include <imagemodel.h>
-#include <fakemodel.h>
+#include "distmodel.h"
 //#include <distmodel.h>
 
 #include "normdock.h"
@@ -35,7 +35,7 @@ void MainWindow::initCrucials()
     DataConditionInformer::init(&sm);
 
     imageModel = new ImgModel(false, sm, scheduler, this);
-    fakeModel = new FakeModel(sm, scheduler, this);
+    distModel = new DistModel(sm, scheduler, this);
    // distModel = new DistModel(sm, scheduler, this);
     imageModel->setFilename("/home/olek/gerbil_data/peppers_descriptor.txt");
     imgSub = std::unique_ptr<Subscription>(SubscriptionFactory::create(Dependency("image", SubscriptionType::READ,
@@ -143,7 +143,7 @@ void MainWindow::on_checkBoxA_toggled(bool visible)
 
 void MainWindow::onDistIMGRequest()
 {
-    fakeModel->delegateTask("dist.IMG");
+    distModel->delegateTask("dist.IMG");
 }
 
 void MainWindow::onImageIMGRequest()

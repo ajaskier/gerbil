@@ -55,8 +55,7 @@ vole_compile_library(
         task/dist/task_dist_add_arg
 
         imagemodel
-       # distmodel
-        fakemodel
+        distmodel
 
         distviewcompute_utils
 
@@ -75,7 +74,7 @@ vole_moc_library(
 	model/model_d.h
 
         imagemodel.h
-        fakemodel.h
+        distmodel.h
 )
 
 vole_add_module()

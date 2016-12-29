@@ -7,8 +7,6 @@
 #include <model/model_a.h>
 #include <model/model_b.h>
 #include <model/model_d.h>
-//#include <imagemodel.h>
-//#include <fakemodel.h>
 
 #include "model/representation.h"
 #include "multi_img.h"
@@ -22,9 +20,8 @@
 #include "dist/distviewgui2.h"
 
 class NormDock;
-//class DistModel;
+class DistModel;
 class ImgModel;
-class FakeModel;
 
 
 namespace Ui {
@@ -53,8 +50,7 @@ private:
     ModelB* modelB;
     ModelD* modelD;
     ImgModel* imageModel;
-    FakeModel* fakeModel;
-    //DistModel* distModel;
+    DistModel* distModel;
 
     SubscriptionManager sm;
     TaskScheduler* scheduler;
