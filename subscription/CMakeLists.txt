@@ -51,8 +51,8 @@ vole_compile_library(
         task/dist/task_dist_sub_arg
         task/dist/task_dist_add_arg
 
-        imagemodel
-        distmodel
+        model/imagemodel
+        model/distmodel
 
         distviewcompute_utils
 
@@ -70,8 +70,8 @@ vole_moc_library(
 	model/model_b.h
 	model/model_d.h
 
-        imagemodel.h
-        distmodel.h
+        model/imagemodel.h
+        model/distmodel.h
 )
 
 vole_add_module()
