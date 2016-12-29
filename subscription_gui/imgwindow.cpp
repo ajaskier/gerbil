@@ -7,7 +7,6 @@
 #include "subscription.h"
 #include "task_scheduler.h"
 #include "dependency.h"
-#include "data.h"
 #include "lock.h"
 #include "subscription_factory.h"
 #include "data_condition_informer.h"

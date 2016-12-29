@@ -1,7 +1,6 @@
 #include "task_roi.h"
 #include "subscription.h"
 #include "lock.h"
-#include "data.h"
 #include "QDebug"
 
 #include <rectangles.h>

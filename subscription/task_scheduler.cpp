@@ -58,9 +58,6 @@ void TaskScheduler::startTask(std::shared_ptr<Task> task)
     qDebug() << "starting task" << task->getId();
 
     WorkerThread *thread = new WorkerThread(task);
-    //connect(thread, &WorkerThread::finished, thread, &WorkerThread::deleteLater);
-//    connect(thread, &WorkerThread::destroyed, this, &TaskScheduler::taskEnded,
-//            Qt::QueuedConnection);
 
     connect(thread, &WorkerThread::destroyed, this, &TaskScheduler::checkTaskPool,
             Qt::QueuedConnection);
@@ -69,9 +66,3 @@ void TaskScheduler::startTask(std::shared_ptr<Task> task)
     thread->start();
 }
 
-//void TaskScheduler::taskEnded(QString id, bool success)
-//{
-//    runningTasks[id] = false;
-//    qDebug() << id << "task finished";
-//    qDebug() << taskPool.size() << "tasks in queue";
-//}

@@ -9,24 +9,19 @@ struct SourceDeclaration {
     SourceDeclaration() {}
     SourceDeclaration(QString dataId)
         : dataId(dataId)
-    {
+    {}
 
-    }
     SourceDeclaration(QString dataId, int version)
         : dataId(dataId), version(version)
-    {
+    {}
 
-    }
     SourceDeclaration(QString dataId, AccessType accessType)
         : dataId(dataId), accessType(accessType)
-    {
+    {}
 
-    }
     SourceDeclaration(QString dataId, int version, AccessType accessType)
         : dataId(dataId), version(version), accessType(accessType)
-    {
-
-    }
+    {}
 
     operator QString&() { return dataId; }
 

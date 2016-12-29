@@ -1,8 +1,8 @@
 #ifndef LOCK_H
 #define LOCK_H
 
-#include "subscription.h"
 #include <functional>
+#include "subscription.h"
 #include "subscription_manager.h"
 
 template <class T1, class T2>

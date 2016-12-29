@@ -30,7 +30,6 @@
 
 #include "subscription.h"
 #include "dependency.h"
-#include "data.h"
 #include "lock.h"
 #include "subscription_factory.h"
 

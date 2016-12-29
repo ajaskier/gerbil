@@ -14,7 +14,7 @@ class Model;
 class Subscription;
 
 using handle = std::shared_ptr<boost::dynamic_any>;
-using handle_pair = std::pair<handle, handle/*, int&*/>;
+using handle_pair = std::pair<handle, handle>;
 
 class DataEntry {
 
