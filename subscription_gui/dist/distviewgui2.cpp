@@ -11,7 +11,7 @@ DistViewGUI2::DistViewGUI2(representation::t type)
 	: type(type)
 {	
 	// setup frame and its UI
-	frame = new QWidget();
+    frame = new QWidget(this);
 	frame->setSizePolicy(QSizePolicy::Preferred, // hor
 						 QSizePolicy::Expanding); // ver
     ui = new Ui::DistViewGUI2();
@@ -32,6 +32,11 @@ DistViewGUI2::DistViewGUI2(representation::t type)
 	initTop();
 
 	restoreState();
+}
+
+DistViewGUI2::~DistViewGUI2()
+{
+    vp->deleteLater();
 }
 
 void DistViewGUI2::initVP()

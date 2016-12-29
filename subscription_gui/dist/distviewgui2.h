@@ -7,11 +7,12 @@
 #include "viewport2.h"
 #include <QMenu>
 
-class DistViewGUI2 : public QObject
+class DistViewGUI2 : public QWidget
 {
 	Q_OBJECT
 public:
     explicit DistViewGUI2(representation::t type);
+    virtual ~DistViewGUI2();
 	void initSignals(QObject *dvctrl);
 	void initSubscriptions();
 

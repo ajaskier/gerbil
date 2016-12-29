@@ -27,12 +27,6 @@ DistWindow::DistWindow(QWidget *parent) :
 
 void DistWindow::displayDist()
 {
-    qDebug() << "dist calculated";
-    Subscription::Lock<std::vector<BinSet>, ViewportCtx> lock(*distSub);
-    std::vector<BinSet>* sets = lock();
-
-    qDebug() << "sets size:" << sets->size();
-
     if (!guiCreated) {
         gui = new DistViewGUI2(representation::t::IMG);
         QWidget *frame = gui->getFrame();
@@ -47,7 +41,7 @@ void DistWindow::displayDist()
 DistWindow::~DistWindow()
 {
     delete distSub;
-    delete gui;
+    gui->deleteLater();
 }
 
 void DistWindow::on_pushButton_clicked()

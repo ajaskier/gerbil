@@ -164,8 +164,6 @@ void SubscriptionManager::endDoReadSubscription(QString id)
 
 void SubscriptionManager::endDoWriteSubscription(QString id)
 {
-    //invalidDependants(id);
-
     std::unique_lock<std::recursive_mutex> lock(mu);
     dataPool[id].doWrite = false;
     dataPool[id].upToDate = true;
@@ -180,6 +178,8 @@ void SubscriptionManager::propagateChange(QString id) {
     for (QString data: dataPool[id].dependants) {
         if (hasWillReadsRecursive(data) && !dataPool[data].willWrite) {
             askModelForTask(data, id);
+        } else if(!hasWillReadsRecursive(data) && !dataPool[data].willWrite) {
+            removeData(data);
         }
     }
 }

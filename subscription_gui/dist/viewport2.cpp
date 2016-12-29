@@ -66,7 +66,6 @@ Viewport2::Viewport2(representation::t type, QGLWidget *target)
 
 Viewport2::~Viewport2()
 {
-	target->makeCurrent();
 	for (int i = 0; i < 2; ++i) {
 		delete buffers[i].fbo;
 		delete buffers[i].blit;
