@@ -13,8 +13,6 @@
 #include "task/task_band.h"
 #include "task/task_roi.h"
 
-#include "task/task_image_fake.h"
-
 #include "lock.h"
 #include "subscription_factory.h"
 #include <rectangles.h>
@@ -31,31 +29,26 @@ ImgModel::ImgModel(bool limitedMode, SubscriptionManager &sm,
     registerData("image.GRAD", {"image.IMG"});
     registerData("image.IMGPCA", {"image.IMG"});
     registerData("image.GRADPCA", {"image.GRAD"});
-    registerData("image.FAKE", {/*"ROI"*/});
-    //registerData("ROI.diff", {});
 
 }
 
 void ImgModel::setBandsCount(size_t bands)
 {
-//    QVector<QString> vec = {"IMG", "NORM", "GRAD", "IMGPCA", "GRADPCA"};
-//    for (QString repr : vec) {
-//        for(int i = 0; i < bands; i++) {
-//            registerData("bands."+repr+"."+QString::number(i),
-//            {"image."+repr});
-//        }
-//    }
+    QVector<QString> vec = {"IMG", "NORM", "GRAD", "IMGPCA", "GRADPCA"};
+    for (QString repr : vec) {
+        for(size_t i = 0; i < bands; i++) {
+            registerData("bands."+repr+"."+QString::number(i),
+            {"image."+repr});
+        }
+    }
 }
 
 void ImgModel::delegateTask(QString id, QString parentId)
 {
-    //Task* task = nullptr;
+
     std::shared_ptr<Task> task;
     if (id == "image") {
         task = std::shared_ptr<Task>(new TaskImageLim(filename, limitedMode));
-
-    } else if (id == "image.FAKE") {
-        task = std::shared_ptr<Task>(new TaskImageFAKE(imgFakeCounter++));
 
     } else if (id == "image.IMG") {
 
@@ -105,14 +98,11 @@ void ImgModel::delegateTask(QString id, QString parentId)
         else if (args[1] == "GRADPCA") repr = representation::GRADPCA;
 
         task = std::shared_ptr<Task>(new TaskBand("image."+args[1], id, args[2].toInt(), repr));
-//    } else if (id == "ROI.diff") {
-//        calculateROIdiff();
-//        return;
-    } else if (id == "ROI") {
 
+    } else if (id == "ROI") {
         return;
     }
-    //scheduler->pushTask(task);
+
     sendTask(task);
 }
 
@@ -140,70 +130,22 @@ void ImgModel::spawn(representation::t type, const cv::Rect &newROI, int bands)
 {
     if (type == representation::IMG) {
         nBandsOld = nBands;
-        //roi = newRoi;
     }
     rescaleBands = bands;
-    //newRoi = newROI;
 
     if (type == representation::IMG) {
         setROI(newROI);
     }
 
-//    calculateROIdiff();
-
-//    if (type == representation::IMG) {
-//        delegateTask("image.IMG");
-//    }
 }
-
-//void ImageModel::computeBand(representation::t type, int dim) {
-
-//}
 
 void ImgModel::setROI(cv::Rect newROI_arg)
 {
+    //these probably shouldn't be members anymore
     roi = newRoi;
     newRoi = newROI_arg;
 
-    //Task* t = new TaskRoi(roi, newRoi);
     std::shared_ptr<Task> t(new TaskRoi(roi, newRoi));
     sendTask(t);
-    //scheduler->pushTask(t);
-//    std::shared_ptr<Subscription> roiSub(
-//                SubscriptionFactory::create(Dependency("ROI", SubscriptionType::WRITE),
-//                                            SubscriberType::TASK));
-
-//    Subscription::Lock<cv::Rect, std::pair<std::vector<cv::Rect>, std::vector<cv::Rect>>> lock(*roiSub);
-//    std::pair<std::vector<cv::Rect>, std::vector<cv::Rect>> roidiff;
-
-//    rectTransform(roi, newRoi, roidiff.first, roidiff.second);
-
-//    lock.swap(newROI_arg);
-//    lock.swapMeta(roidiff);
-//    lock.setVersion(lock.version()+1);
-
-//    qDebug() << "roi computed!";
 
 }
-
-//void ImgModel::calculateROIdiff()
-//{
-
-//    qDebug() << "calculating ROI";
-
-//    std::shared_ptr<Subscription> roiSub(
-//                SubscriptionFactory::create(Dependency("ROI.diff", SubscriptionType::WRITE),
-//                                            SubscriberType::TASK));
-
-//    Subscription::Lock<std::pair<std::vector<cv::Rect>, std::vector<cv::Rect>>> lock(*roiSub);
-//    std::pair<std::vector<cv::Rect>, std::vector<cv::Rect>> roidiff;
-
-//    rectTransform(roi, newRoi, roidiff.first, roidiff.second);
-
-
-//    int version = lock.version();
-//    lock.setVersion(version+1);
-//    lock.swap(roidiff);
-
-//    qDebug() << "ROI calculated";
-//}

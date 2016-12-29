@@ -43,9 +43,6 @@ vole_compile_library(
         task/task_image_norm
         task/task_image_grad
         task/task_image_pca
-        task/task_image_fake
-        task/task_fake_sub
-        task/task_fake_add
 
         task/task_roi
         task/dist/task_distviewbins_tbb
