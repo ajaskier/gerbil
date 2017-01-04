@@ -26,10 +26,8 @@ TaskDistSub::~TaskDistSub()
 
 }
 
-bool TaskDistSub::run()
+std::vector<BinSet> TaskDistSub::coreExecution(ViewportCtx* args)
 {
-    qDebug() << "task dist sub running";
-
     Subscription::Lock<
             cv::Rect,
             std::pair<std::vector<cv::Rect>, std::vector<cv::Rect>>
@@ -40,7 +38,7 @@ bool TaskDistSub::run()
         std::vector<BinSet> fakeResult;
         dest_lock.swap(fakeResult);
 
-        return false;
+        return std::vector<BinSet>();
     }
 
     Subscription::Lock<multi_img> source_lock(*sub("source"));
@@ -52,10 +50,6 @@ bool TaskDistSub::run()
     col[0] = Qt::white;
     colors.swap(col);
     /* TEMP ------ */
-
-    Subscription::Lock<std::vector<BinSet>, ViewportCtx> dest_lock(*sub("dest"));
-    Subscription::Lock<std::vector<BinSet>, ViewportCtx> sourceDist_lock(*sub("sourceDist"));
-    ViewportCtx* args = sourceDist_lock.meta();
 
     bool reuse = !roidiff->first.empty();
     bool keepOldContext = false;
@@ -81,7 +75,22 @@ bool TaskDistSub::run()
 
     expression(true, roidiff->first, *source, result, args);
 
-    if (isCancelled()) {
+    return result;
+}
+
+bool TaskDistSub::run()
+{
+    qDebug() << "task dist sub running";
+
+    Subscription::Lock<std::vector<BinSet>, ViewportCtx> sourceDist_lock(*sub("sourceDist"));
+    ViewportCtx* args = sourceDist_lock.meta();
+
+    Subscription::Lock<std::vector<BinSet>, ViewportCtx> dest_lock(*sub("dest"));
+
+    std::vector<BinSet> result = coreExecution(args);
+
+
+    if (isCancelled() || result.empty()) {
         return false;
     }
 

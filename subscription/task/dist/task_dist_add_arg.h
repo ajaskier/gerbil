@@ -5,8 +5,9 @@
 #include <task/task.h>
 
 #include <task/dist/task_distviewbins_tbb.h>
+#include <task/dist/task_dist_add.h>
 
-class TaskDistAddArg : public TaskDistviewBinsTbb
+class TaskDistAddArg : public TaskDistAdd
 {
 
 public:

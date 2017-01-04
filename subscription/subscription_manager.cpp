@@ -283,7 +283,7 @@ void SubscriptionManager::removeData(QString dataId)
     dataPool[dataId].initialized = false;
     dataPool[dataId].upToDate = false;
 
-    qDebug() << "data" << dataId << "was released due to no subscribers!";
+   // qDebug() << "data" << dataId << "was released due to no subscribers!";
 }
 
 bool SubscriptionManager::isReadState(QString id)

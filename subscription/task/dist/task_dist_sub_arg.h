@@ -4,9 +4,9 @@
 #include <QObject>
 #include <task/task.h>
 
-#include <task/dist/task_distviewbins_tbb.h>
+#include "task/dist/task_dist_sub.h"
 
-class TaskDistSubArg : public TaskDistviewBinsTbb
+class TaskDistSubArg : public TaskDistSub
 {
 
 public:

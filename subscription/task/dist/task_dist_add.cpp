@@ -33,11 +33,8 @@ TaskDistAdd::~TaskDistAdd()
 
 }
 
-bool TaskDistAdd::run()
+std::vector<BinSet> TaskDistAdd::coreExecution(ViewportCtx *args)
 {
-
-    qDebug() << "task dist add running";
-
     Subscription::Lock<multi_img> source_lock(*sub("source"));
     multi_img* source = source_lock();
 
@@ -47,8 +44,6 @@ bool TaskDistAdd::run()
     col[0] = Qt::white;
     colors.swap(col);
     /* TEMP ------ */
-
-    qDebug() << "image width:" << source->width << "image height: "  << source->height;
 
     Subscription::Lock<
             cv::Rect,
@@ -60,8 +55,6 @@ bool TaskDistAdd::run()
     bool reuse = !roidiff->second.empty();
     bool keepOldContext;
 
-    Subscription::Lock<std::vector<BinSet>, ViewportCtx> dest_lock(*sub("dest"));
-    ViewportCtx* args = dest_lock.meta();
 
     if (reuse) {
         keepOldContext = ((fabs(args->minval) * REUSE_THRESHOLD) >=
@@ -91,16 +84,29 @@ bool TaskDistAdd::run()
 
     expression(false, roidiff->second, *source, result, args);
 
+    return result;
+}
+
+bool TaskDistAdd::run()
+{
+
+    qDebug() << "task dist add running";
+
+    Subscription::Lock<std::vector<BinSet>, ViewportCtx> dest_lock(*sub("dest"));
+    ViewportCtx* args = dest_lock.meta();
+
+    std::vector<BinSet> result = coreExecution(args);
+
 
     if (isCancelled()) {
         return false;
     }
 
+    Subscription::Lock<multi_img> source_lock(*sub("source"));
 
     dest_lock.swap(result);
     dest_lock.swapMeta(*args);
     dest_lock.setVersion(source_lock.version());
-
 
     return true;
 

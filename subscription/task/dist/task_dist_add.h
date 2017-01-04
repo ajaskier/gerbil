@@ -23,8 +23,9 @@ public:
 
     virtual bool run() override;
 
-private:
+protected:
 
+    std::vector<BinSet> coreExecution(ViewportCtx* args);
     //virtual bool isCancelled() { return stopper.is_group_execution_cancelled(); }
 
     bool apply;
