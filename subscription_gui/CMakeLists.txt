@@ -2,8 +2,8 @@ vole_module_name("subscriptiongui")
 vole_module_description("Subscription Manager && Task Scheduler GUI")
 vole_module_variable("Gerbil_Subscription_GUI")
 
-vole_add_required_modules("subscription" "gerbil_gui")
-vole_add_required_dependencies("QT" "BOOST" "OPENCV")
+vole_add_required_dependencies("BOOST" "OPENCV" "QT")
+vole_add_required_modules("gerbil_gui" "subscription")
 
 
 vole_compile_library(

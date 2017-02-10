@@ -2,8 +2,8 @@ vole_module_name("subscription")
 vole_module_description("Subscription Manager && Task Scheduler functionality")
 vole_module_variable("Gerbil_Subscription")
 
+vole_add_required_dependencies("BOOST" "TBB" "OPENCV" "QT" "Threads")
 vole_add_required_modules("gerbil_gui" "dynamic_any")
-vole_add_required_dependencies("QT" "BOOST" "TBB" "OPENCV")
 
 vole_compile_library(
 	data
@@ -51,8 +51,8 @@ vole_compile_library(
         task/dist/task_dist_sub_arg
         task/dist/task_dist_add_arg
 
-        model/imagemodel
-        model/distmodel
+        model/img_model
+        model/dist_model
 
         distviewcompute_utils
 
@@ -70,8 +70,8 @@ vole_moc_library(
 	model/model_b.h
 	model/model_d.h
 
-        model/imagemodel.h
-        model/distmodel.h
+        model/img_model.h
+        model/dist_model.h
 )
 
 vole_add_module()

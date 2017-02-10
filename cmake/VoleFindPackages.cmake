@@ -255,4 +255,13 @@ endif (OpenCL_FOUND)
 
 # Find threading library.
 # On Linux/UNIX this pthreads.
-find_package(Threads)
+find_package(Threads REQUIRED)
+vole_check_package(Threads
+        "Threads"
+        "Please check your Threads installation."
+        THREADS_FOUND
+        "${THREADS_INCLUDE_DIR}"
+        "${THREADS_LIBRARIES}"
+)
+
+

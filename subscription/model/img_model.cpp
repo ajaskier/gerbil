@@ -1,4 +1,4 @@
-#include "imagemodel.h"
+#include "img_model.h"
 
 #include "task_scheduler.h"
 #include "task/task.h"

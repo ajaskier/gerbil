@@ -12,8 +12,8 @@
 #include "data_condition_informer.h"
 #include "multi_img.h"
 
-#include "model/imagemodel.h"
-#include "model/distmodel.h"
+#include "model/img_model.h"
+#include "model/dist_model.h"
 
 #include "normdock.h"
 
