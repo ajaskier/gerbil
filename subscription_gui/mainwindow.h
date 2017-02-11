@@ -22,6 +22,7 @@
 class NormDock;
 class DistModel;
 class ImgModel;
+class BandDock;
 
 
 namespace Ui {
@@ -58,11 +59,15 @@ private:
     std::unique_ptr<Subscription> imgSub;
     std::unique_ptr<Subscription> roiSub;
 
+
     QString representation = "IMG";
     int currentBand = 0;
     size_t maxBands = 0;
 
     NormDock* normDock;
+    BandDock* bandDock;
+
+    cv::Rect originalRoi;
 
 
 signals:
@@ -102,6 +107,7 @@ private slots:
     void on_bands_checkbox_toggled(bool visible);
     void on_img_checkbox_toggled(bool visible);
     void on_dist_checkbox_toggled(bool visible);
+    void on_labels_checkbox_toggled(bool checked);
 };
 
 #endif // MAINWINDOW_H

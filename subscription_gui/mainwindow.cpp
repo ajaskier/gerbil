@@ -16,6 +16,7 @@
 #include "model/dist_model.h"
 
 #include "normdock.h"
+#include "labels/banddock.h"
 
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -104,6 +105,8 @@ void MainWindow::imgUpdated()
     {
         Subscription::Lock<multi_img> lock(*imgSub);
         multi_img* img = lock();
+
+        originalRoi = img->roi;
         imageModel->setROI(img->roi);
         maxBands = img->size();
         imageModel->setBandsCount(maxBands);
@@ -270,5 +273,17 @@ void MainWindow::on_dist_checkbox_toggled(bool visible)
         distWindow->show();
     } else {
         distWindow->deleteLater();
+    }
+}
+
+void MainWindow::on_labels_checkbox_toggled(bool checked)
+{
+    if (checked) {
+        bandDock = new BandDock(originalRoi, this);
+        addDockWidget(Qt::BottomDockWidgetArea, bandDock);
+    } else {
+
+        removeDockWidget(bandDock);
+        bandDock->deleteLater();
     }
 }

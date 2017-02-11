@@ -24,6 +24,10 @@ vole_compile_library(
         dist/viewport_drawing2
         dist/viewport_input2
 
+        labels/banddock
+        labels/bandview
+        labels/modewidget
+
 )
 
 vole_moc_library(
@@ -40,6 +44,10 @@ vole_moc_library(
         dist/distviewgui2.h
         dist/viewport2.h
        # dist/distviewcompute2.h
+
+       labels/banddock.h
+       labels/bandview.h
+       labels/modewidget.h
 )
 
 vole_ui_library(
@@ -55,6 +63,9 @@ vole_ui_library(
         dist/viewportcontrol.ui
         dist/foldingbar.ui
         dist/distviewgui2.ui
+
+        labels/banddock.ui
+        labels/modewidget.ui
 )
 
 vole_add_executable("subscriptiongui" "main")
