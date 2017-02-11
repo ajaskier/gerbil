@@ -26,7 +26,7 @@ public:
     QString getId() { return id; }
 
 signals:
-    void finished(QString id, bool success);
+    void taskFinished(QString id, bool success);
 
 protected:
     virtual bool run() = 0;

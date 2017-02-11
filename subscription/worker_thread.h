@@ -13,7 +13,7 @@ class WorkerThread : public QThread
         auto success = t->start();
         //delete t;
 
-        emit finished(id, success);
+        emit taskFinished(id, success);
     }
 
 public:
@@ -21,11 +21,10 @@ public:
 
         connect(this, &WorkerThread::finished, this, &WorkerThread::deleteLater,
                 Qt::QueuedConnection);
-
     }
 
 signals:
-    void finished(QString id, bool success);
+    void taskFinished(QString id, bool success);
 
 private:
    std::shared_ptr<Task> t;

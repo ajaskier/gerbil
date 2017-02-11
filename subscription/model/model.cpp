@@ -27,7 +27,7 @@ void Model::sendTask(std::shared_ptr<Task> t)
         return;
     }
 
-    QObject::connect(t.get(), &Task::finished, this, &Model::taskFinished);
+    QObject::connect(t.get(), &Task::taskFinished, this, &Model::taskFinished);
     tasks[t->getId()] = t;
     scheduler->pushTask(t);
 }

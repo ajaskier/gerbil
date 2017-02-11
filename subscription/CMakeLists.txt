@@ -53,6 +53,7 @@ vole_compile_library(
 
         model/img_model
         model/dist_model
+        model/labels_model
 
         distviewcompute_utils
 
@@ -72,6 +73,7 @@ vole_moc_library(
 
         model/img_model.h
         model/dist_model.h
+        model/labels_model.h
 )
 
 vole_add_module()

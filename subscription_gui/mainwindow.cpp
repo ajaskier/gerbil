@@ -35,7 +35,7 @@ void MainWindow::initCrucials()
     imageModel = new ImgModel(false, sm, scheduler, this);
     distModel = new DistModel(sm, scheduler, this);
    // distModel = new DistModel(sm, scheduler, this);
-    imageModel->setFilename("/home/olek/gerbil_data/peppers_descriptor.txt");
+    imageModel->setFilename("/home/ocieslak/gerbil_data/fake_and_real_food.txt");
     imgSub = std::unique_ptr<Subscription>(SubscriptionFactory::create(Dependency("image", SubscriptionType::READ,
                                          AccessType::DEFERRED), this,
                                          std::bind(&MainWindow::imgUpdated, this)));

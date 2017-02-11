@@ -48,7 +48,7 @@ void Task::setSubscription(QString id, std::shared_ptr<Subscription> sub)
 
 bool Task::start() {
     bool success = run();
-    emit finished(this->id, success);
+    emit taskFinished(this->id, success);
     return success;
 }
 
