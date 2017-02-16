@@ -27,7 +27,6 @@ vole_compile_library(
         labels/banddock
         labels/bandview
         labels/modewidget
-
 )
 
 vole_moc_library(

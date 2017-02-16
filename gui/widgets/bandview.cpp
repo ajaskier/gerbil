@@ -450,7 +450,8 @@ void BandView::commitLabelChanges()
 		return; // label mask empty
 
 	ignoreUpdates = true;
-	emit alteredLabels(labels, uncommitedLabels);
+
+    emit alteredLabels(labels, uncommitedLabels);
 	ignoreUpdates = false;
 
 	/* it is important to create new matrix. Otherwise changes would overwrite

@@ -18,21 +18,12 @@ TaskSetLabels::TaskSetLabels(const Labeling &labeling, bool full)
 {
 }
 
+
+
 bool TaskSetLabels::run()
 {
+    Labels l = getLabels(labeling());
 
-    Labels l = getLabels();
-
-    full = full ||
-            (l.scopedlabels.cols == l.fullLabels.cols
-             && l.scopedlabels.rows == l.fullLabels.rows);
-
-    cv::Mat1s m = labeling();
-    if (full) {
-        m.copyTo(l.fullLabels);
-    } else {
-        m.copyTo(l.scopedlabels);
-    }
 
     if (labeling.colors().size() < 2) {
         setColors(Labeling::colors(2, true), l);
@@ -40,16 +31,41 @@ bool TaskSetLabels::run()
         setColors(labeling.colors(), l);
     }
 
+    Subscription::Lock<Labels> dest_lock(*sub("dest"));
+    dest_lock.swap(l);
+
+    Subscription::Lock<cv::Rect> roi_lock(*sub("ROI"));
+    dest_lock.setVersion(roi_lock.version());
+
     return true;
 
 }
 
-Labels TaskSetLabels::getLabels()
+Labels TaskSetLabels::getLabels(cv::Mat1s m)
 {
     Labels l;
     if (DataConditionInformer::isInitialized("labels")) {
         Subscription::Lock<Labels> dest_lock(*sub("dest"));
         l = *dest_lock();
+
+        Subscription::Lock<cv::Rect> roi_lock(*sub("ROI"));
+        cv::Rect roi = *roi_lock();
+
+        if (roi_lock.version() > dest_lock.version()) {
+            l.scopedlabels = cv::Mat1s(l.fullLabels, roi);
+        } else {
+
+            full = full ||
+                    (m.cols == l.fullLabels.cols
+                     && m.rows == l.fullLabels.rows);
+
+            if (full) {
+                m.copyTo(l.fullLabels);
+            } else {
+                m.copyTo(l.scopedlabels);
+            }
+        }
+
     } else {
         //initial
         Subscription::Lock<cv::Rect> roi_lock(*sub("ROI"));

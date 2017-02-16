@@ -14,9 +14,11 @@
 
 #include "model/img_model.h"
 #include "model/dist_model.h"
+#include "model/labels_model.h"
 
 #include "normdock.h"
 #include "labels/banddock.h"
+#include "labels/bandview.h"
 
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -35,6 +37,7 @@ void MainWindow::initCrucials()
 
     imageModel = new ImgModel(false, sm, scheduler, this);
     distModel = new DistModel(sm, scheduler, this);
+    labelsModel = new LabelsModel(sm, scheduler, this);
    // distModel = new DistModel(sm, scheduler, this);
     imageModel->setFilename("/home/ocieslak/gerbil_data/fake_and_real_food.txt");
     imgSub = std::unique_ptr<Subscription>(SubscriptionFactory::create(Dependency("image", SubscriptionType::READ,
@@ -281,6 +284,16 @@ void MainWindow::on_labels_checkbox_toggled(bool checked)
     if (checked) {
         bandDock = new BandDock(originalRoi, this);
         addDockWidget(Qt::BottomDockWidgetArea, bandDock);
+
+        connect(bandDock, &BandDock::newLabelRequested,
+                labelsModel, &LabelsModel::addLabel);
+
+        connect(bandDock->bandView(), &BandView::alteredLabels,
+                labelsModel, &LabelsModel::alterPixels);
+
+        connect(bandDock->bandView(), SIGNAL(newLabeling(cv::Mat1s)),
+                labelsModel, SLOT(setLabels(const cv::Mat1s&)));
+
     } else {
 
         removeDockWidget(bandDock);

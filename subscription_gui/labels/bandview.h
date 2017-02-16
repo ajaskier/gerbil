@@ -98,7 +98,7 @@ signals:
 	void labelSelected(int label);
 
 	// user changed some labels
-	void alteredLabels(const cv::Mat1s &labels, const cv::Mat1b &mask);
+    void alteredLabels(const cv::Mat1s &labels, const cv::Mat1b &mask);
 
 	// user wants full labeling update
 	void newLabeling(const cv::Mat1s &labels);

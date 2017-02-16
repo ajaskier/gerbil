@@ -13,6 +13,8 @@
 #include <QVector>
 
 #include "task/labels/task_set_labels.h"
+#include "task/labels/task_labels_alter_pixels.h"
+#include "task/labels/task_add_label.h"
 
 LabelsModel::LabelsModel(SubscriptionManager &sm,
                        TaskScheduler *scheduler, QObject *parent)
@@ -24,7 +26,8 @@ LabelsModel::LabelsModel(SubscriptionManager &sm,
 
 void LabelsModel::delegateTask(QString id, QString parentId)
 {
-    return;
+    setLabels(lastLabeling, true);
+ //   return;
 
 }
 
@@ -36,6 +39,20 @@ void LabelsModel::setLabels(const cv::Mat1s &labeling)
 
 void LabelsModel::setLabels(const Labeling &labeling, bool full)
 {
+    lastLabeling = labeling;
     std::shared_ptr<Task> task(new TaskSetLabels(labeling, full));
+    sendTask(task);
+}
+
+void LabelsModel::alterPixels(const cv::Mat1s &newLabels, const cv::Mat1b &mask)
+{
+    lastMask = mask.clone(); //looks tricky, but it's the best I can for now
+    std::shared_ptr<Task> task(new TaskLabelsAlterPixels(newLabels, lastMask));
+    sendTask(task);
+}
+
+void LabelsModel::addLabel()
+{
+    std::shared_ptr<Task> task(new TaskAddLabel());
     sendTask(task);
 }

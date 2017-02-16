@@ -10,6 +10,13 @@
 
 #include <QAction>
 
+#include "subscription_factory.h"
+#include "subscription.h"
+#include "dependency.h"
+#include "lock.h"
+
+#include "model/labels_model.h"
+
 /** Return a 32x32px icon filled with color. */
 static QIcon colorIcon(const QColor &color)
 {
@@ -24,10 +31,41 @@ BandDock::BandDock(cv::Rect fullImgSize, QWidget *parent)
 {
 	setupUi(this);
 	initUi();
+
+    QString image = "bands.IMG.0"; //TODO: fix this!
+    bandSub = SubscriptionFactory::create(Dependency(image,
+                                                     SubscriptionType::READ,
+                                                     AccessType::DEFERRED), this,
+                                          std::bind(&BandDock::bandUpdated, this));
+
+    labelsSub = SubscriptionFactory::create(Dependency("labels",
+                                                       SubscriptionType::READ,
+                                                       AccessType::DEFERRED), this,
+                                            std::bind(&BandDock::labelsUpdated, this));
+
 }
 
 BandDock::~BandDock()
 {
+    delete bandSub;
+}
+
+void BandDock::bandUpdated()
+{
+    Subscription::Lock<std::pair<QImage, QString>> lock(*bandSub);
+    QImage img = lock()->first;
+    QString desc = lock()->second;
+
+    changeBand(representation::IMG, 0, QPixmap::fromImage(img), desc);
+}
+
+void BandDock::labelsUpdated()
+{
+    Subscription::Lock<Labels> dest_lock(*labelsSub);
+    Labels l = *dest_lock();
+
+    processLabelingChange(l.scopedlabels, l.colors, true);
+
 }
 
 void BandDock::initUi()
@@ -279,7 +317,6 @@ void BandDock::loadSeeds()
 		return;
 	bv->setSeedMap(seeding);
 }
-
 
 void BandDock::screenshot()
 {

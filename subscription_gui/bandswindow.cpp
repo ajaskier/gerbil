@@ -5,7 +5,6 @@
 #include <functional>
 
 #include "subscription.h"
-#include "task_scheduler.h"
 #include "dependency.h"
 #include "lock.h"
 #include "subscription_factory.h"
@@ -24,7 +23,7 @@ BandsWindow::BandsWindow(QWidget *parent) :
 
 BandsWindow::~BandsWindow()
 {
-    delete bandsSub;
+    if (bandsSub) delete bandsSub;
 }
 
 void BandsWindow::display()

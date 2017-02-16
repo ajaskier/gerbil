@@ -32,13 +32,23 @@ public:
 
     virtual void delegateTask(QString id, QString parentId = "") override;
 
+public slots:
+
     void setLabels(const Labeling &labeling, bool full);
     void setLabels(const cv::Mat1s &labeling);
+
+    void alterPixels(const cv::Mat1s &newLabels,
+                     const cv::Mat1b &mask);
+
+    void addLabel();
 
 private:
 
     bool applyROI;
     QSize iconSize;
+
+    Labeling lastLabeling;
+    cv::Mat1b lastMask;
 };
 
 #endif // LABELS_MODEL_H

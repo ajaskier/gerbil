@@ -7,7 +7,7 @@
 	find it here: http://www.gnu.org/licenses/gpl.html
 */
 
-#include "widgets/bandview.h"
+#include "bandview.h"
 
 #include <stopwatch.h>
 #include <QPainter>
@@ -450,12 +450,13 @@ void BandView::commitLabelChanges()
 		return; // label mask empty
 
 	ignoreUpdates = true;
-	emit alteredLabels(labels, uncommitedLabels);
-	ignoreUpdates = false;
+
+    emit alteredLabels(labels, uncommitedLabels);
+    ignoreUpdates = false;
 
 	/* it is important to create new matrix. Otherwise changes would overwrite
 	 * the matrix we just sent out in a signal. OpenCV… */
-	uncommitedLabels = cv::Mat1b(labels.rows, labels.cols, (uchar)0);
+    uncommitedLabels = cv::Mat1b(labels.rows, labels.cols, (uchar)0);
 	labelTimer.stop();
 }
 

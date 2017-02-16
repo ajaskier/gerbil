@@ -22,6 +22,7 @@
 class NormDock;
 class DistModel;
 class ImgModel;
+class LabelsModel;
 class BandDock;
 
 
@@ -52,6 +53,7 @@ private:
     ModelD* modelD;
     ImgModel* imageModel;
     DistModel* distModel;
+    LabelsModel* labelsModel;
 
     SubscriptionManager sm;
     TaskScheduler* scheduler;

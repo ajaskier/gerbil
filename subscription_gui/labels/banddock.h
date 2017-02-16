@@ -2,6 +2,7 @@
 #define BANDDOCK_H
 
 #include "model/representation.h"
+#include <subscription_manager.h>
 
 #include "ui_banddock.h"
 #include <opencv2/core/core.hpp>
@@ -78,6 +79,8 @@ protected:
 
 	void initUi();
 	void initActions();
+    void bandUpdated();
+    void labelsUpdated();
 
 	// local copies
 	QVector<QColor> labelColors;
@@ -92,6 +95,9 @@ protected:
 	// our widget for graph segmentation controls
     //GraphSegWidget *gs;
 	ModeWidget *mw;
+
+    Subscription* bandSub;
+    Subscription* labelsSub;
 };
 
 #endif // BANDDOCK_H

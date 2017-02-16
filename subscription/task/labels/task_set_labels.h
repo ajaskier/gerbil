@@ -12,13 +12,12 @@ class TaskSetLabels : public Task
 
 public:
     explicit TaskSetLabels(const Labeling &labeling, bool full);
-    virtual ~TaskSetLabels();
 
     virtual bool run() override;
 
 protected:
 
-    Labels getLabels();
+    Labels getLabels(cv::Mat1s m);
     void setColors(const std::vector<cv::Vec3b> &newColors, Labels &l);
 
     const Labeling &labeling;
