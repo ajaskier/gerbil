@@ -24,6 +24,7 @@ class DistModel;
 class ImgModel;
 class LabelsModel;
 class BandDock;
+class LabelDock;
 
 
 namespace Ui {
@@ -68,6 +69,7 @@ private:
 
     NormDock* normDock;
     BandDock* bandDock;
+    LabelDock* labelDock;
 
     cv::Rect originalRoi;
 
@@ -110,6 +112,7 @@ private slots:
     void on_img_checkbox_toggled(bool visible);
     void on_dist_checkbox_toggled(bool visible);
     void on_labels_checkbox_toggled(bool checked);
+    void on_labels_icons_checkbox_toggled(bool checked);
 };
 
 #endif // MAINWINDOW_H

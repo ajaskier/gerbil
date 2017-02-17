@@ -15,18 +15,25 @@
 #include "task/labels/task_set_labels.h"
 #include "task/labels/task_labels_alter_pixels.h"
 #include "task/labels/task_add_label.h"
+#include "task/labels/task_labels_icons.h"
 
 LabelsModel::LabelsModel(SubscriptionManager &sm,
                        TaskScheduler *scheduler, QObject *parent)
-    : Model(sm, scheduler, parent)
+    : Model(sm, scheduler, parent), iconSize(32, 32)
 {
     registerData("labels", {"image.IMG", "ROI"});
-
+    registerData("labels.icons", {"labels"});
 }
 
 void LabelsModel::delegateTask(QString id, QString parentId)
 {
-    setLabels(lastLabeling, true);
+
+    if (id == "labels") {
+        setLabels(lastLabeling, true);
+    } else if (id == "labels.icons") {
+        std::shared_ptr<Task> task(new TaskLabelsIcons(iconSize, true));
+        sendTask(task);
+    }
  //   return;
 
 }

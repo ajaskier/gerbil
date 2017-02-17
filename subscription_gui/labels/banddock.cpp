@@ -192,6 +192,7 @@ void BandDock::changeBand(representation::t repr, int bandId,
 		return;
 	}
 
+    qDebug() << "band has width" << band.width() << "and height:" << band.height();
 	bv->setPixmap(band);
 	setWindowTitle(desc);
 }
@@ -292,6 +293,7 @@ void BandDock::processLabelingChange(const cv::Mat1s &labels,
 	}
 
 	// tell bandview about the update as well
+    qDebug() << "label width" << labels.cols << "labels height" << labels.rows;
 	bv->updateLabeling(labels, colors, colorsChanged);
 }
 

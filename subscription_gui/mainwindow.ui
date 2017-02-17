@@ -213,6 +213,13 @@
        </widget>
       </item>
       <item>
+       <widget class="QCheckBox" name="labels_icons_checkbox">
+        <property name="text">
+         <string>labels icons?</string>
+        </property>
+       </widget>
+      </item>
+      <item>
        <widget class="QCheckBox" name="img_checkbox">
         <property name="text">
          <string>show IMG</string>

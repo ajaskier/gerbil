@@ -24,6 +24,7 @@ vole_compile_library(
         dist/viewport_drawing2
         dist/viewport_input2
 
+        labels/labeldock
         labels/banddock
         labels/bandview
         labels/modewidget
@@ -44,6 +45,7 @@ vole_moc_library(
         dist/viewport2.h
        # dist/distviewcompute2.h
 
+       labels/labeldock.h
        labels/banddock.h
        labels/bandview.h
        labels/modewidget.h
@@ -63,6 +65,7 @@ vole_ui_library(
         dist/foldingbar.ui
         dist/distviewgui2.ui
 
+        labels/labeldock.ui
         labels/banddock.ui
         labels/modewidget.ui
 )

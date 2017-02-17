@@ -20,6 +20,8 @@
 #include "labels/banddock.h"
 #include "labels/bandview.h"
 
+#include "labels/labeldock.h"
+
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -298,5 +300,18 @@ void MainWindow::on_labels_checkbox_toggled(bool checked)
 
         removeDockWidget(bandDock);
         bandDock->deleteLater();
+    }
+}
+
+void MainWindow::on_labels_icons_checkbox_toggled(bool checked)
+{
+    if (checked) {
+        labelDock = new LabelDock(this);
+        labelDock->setImageSize(cv::Size(originalRoi.width,
+                                         originalRoi.height));
+        addDockWidget(Qt::RightDockWidgetArea, labelDock);
+    } else {
+        removeDockWidget(labelDock);
+        labelDock->deleteLater();
     }
 }

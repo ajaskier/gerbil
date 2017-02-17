@@ -18,18 +18,11 @@ TaskSetLabels::TaskSetLabels(const Labeling &labeling, bool full)
 {
 }
 
-
-
 bool TaskSetLabels::run()
 {
     Labels l = getLabels(labeling());
 
 
-    if (labeling.colors().size() < 2) {
-        setColors(Labeling::colors(2, true), l);
-    } else {
-        setColors(labeling.colors(), l);
-    }
 
     Subscription::Lock<Labels> dest_lock(*sub("dest"));
     dest_lock.swap(l);
@@ -53,6 +46,7 @@ Labels TaskSetLabels::getLabels(cv::Mat1s m)
 
         if (roi_lock.version() > dest_lock.version()) {
             l.scopedlabels = cv::Mat1s(l.fullLabels, roi);
+            return l;
         } else {
 
             full = full ||
@@ -74,6 +68,12 @@ Labels TaskSetLabels::getLabels(cv::Mat1s m)
         l.fullLabels = cv::Mat1s(roi.height, roi.width, (short)0);
         l.scopedlabels = cv::Mat1s(l.fullLabels, roi);
 
+    }
+
+    if (labeling.colors().size() < 2) {
+        setColors(Labeling::colors(2, true), l);
+    } else {
+        setColors(labeling.colors(), l);
     }
 
     return l;

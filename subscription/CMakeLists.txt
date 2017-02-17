@@ -51,6 +51,7 @@ vole_compile_library(
         task/dist/task_dist_sub_arg
         task/dist/task_dist_add_arg
 
+        task/labels/task_labels_icons
         task/labels/task_set_labels
         task/labels/task_labels_alter_pixels
         task/labels/task_add_label
