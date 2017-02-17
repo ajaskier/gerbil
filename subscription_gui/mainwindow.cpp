@@ -310,6 +310,13 @@ void MainWindow::on_labels_icons_checkbox_toggled(bool checked)
         labelDock->setImageSize(cv::Size(originalRoi.width,
                                          originalRoi.height));
         addDockWidget(Qt::RightDockWidgetArea, labelDock);
+
+        connect(labelDock, &LabelDock::applyROIChanged,
+                labelsModel, &LabelsModel::setApplyROI);
+
+        connect(labelDock, &LabelDock::labelMaskIconsRequested,
+                labelsModel, &LabelsModel::setIconsSize);
+
     } else {
         removeDockWidget(labelDock);
         labelDock->deleteLater();

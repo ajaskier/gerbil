@@ -31,10 +31,8 @@ void LabelsModel::delegateTask(QString id, QString parentId)
     if (id == "labels") {
         setLabels(lastLabeling, true);
     } else if (id == "labels.icons") {
-        std::shared_ptr<Task> task(new TaskLabelsIcons(iconSize, true));
-        sendTask(task);
+        computeIcons();
     }
- //   return;
 
 }
 
@@ -62,4 +60,22 @@ void LabelsModel::addLabel()
 {
     std::shared_ptr<Task> task(new TaskAddLabel());
     sendTask(task);
+}
+
+void LabelsModel::computeIcons()
+{
+    std::shared_ptr<Task> task(new TaskLabelsIcons(iconSize, applyROI));
+    sendTask(task);
+}
+
+void LabelsModel::setApplyROI(bool applyROI)
+{
+    this->applyROI = applyROI;
+    computeIcons();
+}
+
+void LabelsModel::setIconsSize(QSize size)
+{
+    this->iconSize = size;
+    computeIcons();
 }

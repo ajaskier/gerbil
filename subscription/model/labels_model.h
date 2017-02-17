@@ -32,6 +32,7 @@ public:
 
     virtual void delegateTask(QString id, QString parentId = "") override;
 
+
 public slots:
 
     void setLabels(const Labeling &labeling, bool full);
@@ -41,8 +42,12 @@ public slots:
                      const cv::Mat1b &mask);
 
     void addLabel();
+    void setApplyROI(bool applyROI);
+    void setIconsSize(QSize size);
 
 private:
+
+    void computeIcons();
 
     bool applyROI;
     QSize iconSize;
