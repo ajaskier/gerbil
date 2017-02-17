@@ -213,12 +213,12 @@ void LabelDock::setLabeling(const cv::Mat1s & labels,
 	deselectSelectedLabels();
 
 	//GGDBGM("requesting new label icons" << endl);
-	emit labelMaskIconsRequested();
+    //emit labelMaskIconsRequested();
 }
 
 void LabelDock::processPartialLabelUpdate(const cv::Mat1s &, const cv::Mat1b &)
 {
-	emit labelMaskIconsRequested();
+    //emit labelMaskIconsRequested();
 }
 
 void LabelDock::mergeOrDeleteSelected()
@@ -246,7 +246,7 @@ void LabelDock::mergeOrDeleteSelected()
 		emit mergeLabelsRequested(selectedLabels);
 	}
 
-	emit labelMaskIconsRequested();
+    //emit labelMaskIconsRequested();
 }
 
 void LabelDock::deselectSelectedLabels()

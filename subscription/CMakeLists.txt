@@ -55,6 +55,7 @@ vole_compile_library(
         task/labels/task_set_labels
         task/labels/task_labels_alter_pixels
         task/labels/task_add_label
+        task/labels/task_merge_labels
 
         model/img_model
         model/dist_model

@@ -42,8 +42,13 @@ public slots:
                      const cv::Mat1b &mask);
 
     void addLabel();
+    void mergeLabels(const QVector<int> mlabels);
+
+
+
     void setApplyROI(bool applyROI);
     void setIconsSize(QSize size);
+
 
 private:
 

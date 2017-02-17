@@ -59,7 +59,7 @@ public slots:
 signals:
 
 	/** The user has selected labels and wants them to be merged. */
-	void mergeLabelsRequested(const QVector<int>& labels);
+    void mergeLabelsRequested(const QVector<int> labels);
 
 	/** The user has selected labels and wants them to be deleted. */
 	void deleteLabelsRequested(const QVector<int>& labels);

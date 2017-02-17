@@ -317,6 +317,9 @@ void MainWindow::on_labels_icons_checkbox_toggled(bool checked)
         connect(labelDock, &LabelDock::labelMaskIconsRequested,
                 labelsModel, &LabelsModel::setIconsSize);
 
+        connect(labelDock, &LabelDock::mergeLabelsRequested,
+                labelsModel, &LabelsModel::mergeLabels);
+
     } else {
         removeDockWidget(labelDock);
         labelDock->deleteLater();

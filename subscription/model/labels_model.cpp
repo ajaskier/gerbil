@@ -16,6 +16,7 @@
 #include "task/labels/task_labels_alter_pixels.h"
 #include "task/labels/task_add_label.h"
 #include "task/labels/task_labels_icons.h"
+#include "task/labels/task_merge_labels.h"
 
 LabelsModel::LabelsModel(SubscriptionManager &sm,
                        TaskScheduler *scheduler, QObject *parent)
@@ -78,4 +79,10 @@ void LabelsModel::setIconsSize(QSize size)
 {
     this->iconSize = size;
     computeIcons();
+}
+
+void LabelsModel::mergeLabels(const QVector<int> mlabels)
+{
+    std::shared_ptr<Task> task(new TaskMergeLabels(mlabels));
+    sendTask(task);
 }
