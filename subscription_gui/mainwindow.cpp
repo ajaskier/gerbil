@@ -309,7 +309,8 @@ void MainWindow::on_labels_icons_checkbox_toggled(bool checked)
         labelDock = new LabelDock(this);
         labelDock->setImageSize(cv::Size(originalRoi.width,
                                          originalRoi.height));
-        addDockWidget(Qt::RightDockWidgetArea, labelDock);
+        addDockWidget(Qt::BottomDockWidgetArea, labelDock);
+//        addDockWidget(Qt::RightDockWidgetArea, labelDock);
 
         connect(labelDock, &LabelDock::applyROIChanged,
                 labelsModel, &LabelsModel::setApplyROI);
@@ -319,6 +320,12 @@ void MainWindow::on_labels_icons_checkbox_toggled(bool checked)
 
         connect(labelDock, &LabelDock::mergeLabelsRequested,
                 labelsModel, &LabelsModel::mergeLabels);
+
+        connect(labelDock, &LabelDock::deleteLabelsRequested,
+                labelsModel, &LabelsModel::deleteLabels);
+
+        connect(labelDock, &LabelDock::consolidateLabelsRequested,
+                labelsModel, &LabelsModel::consolidateLabels);
 
     } else {
         removeDockWidget(labelDock);

@@ -43,6 +43,8 @@ public slots:
 
     void addLabel();
     void mergeLabels(const QVector<int> mlabels);
+    void deleteLabels(const QVector<int> mlabels);
+    void consolidateLabels();
 
 
 

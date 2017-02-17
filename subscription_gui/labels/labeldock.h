@@ -62,7 +62,7 @@ signals:
     void mergeLabelsRequested(const QVector<int> labels);
 
 	/** The user has selected labels and wants them to be deleted. */
-	void deleteLabelsRequested(const QVector<int>& labels);
+    void deleteLabelsRequested(const QVector<int> labels);
 
 	/** The user pressed the clean-up button */
 	void consolidateLabelsRequested();

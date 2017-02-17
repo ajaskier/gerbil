@@ -22,8 +22,6 @@ bool TaskSetLabels::run()
 {
     Labels l = getLabels(labeling());
 
-
-
     Subscription::Lock<Labels> dest_lock(*sub("dest"));
     dest_lock.swap(l);
 
