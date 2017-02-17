@@ -70,6 +70,10 @@ vole_ui_library(
         labels/modewidget.ui
 )
 
+vole_add_resources(
+        gerbil.qrc
+)
+
 vole_add_executable("subscriptiongui" "main")
 
 vole_add_module()
