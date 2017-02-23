@@ -17,7 +17,7 @@ public:
 
 protected:
 
-    const QVector<int> mlabels;
+    QVector<int> mlabels;
 };
 
 
