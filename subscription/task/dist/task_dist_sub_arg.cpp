@@ -11,6 +11,8 @@
 #include "labeling.h"
 #include "qtopencv.h"
 
+#include "model/labels_model.h"
+
 #define REUSE_THRESHOLD 0.1
 
 TaskDistSubArg::TaskDistSubArg(QString destId, SourceDeclaration sourceId, ViewportCtx *args,
@@ -32,7 +34,10 @@ bool TaskDistSubArg::run()
 
     Subscription::Lock<std::vector<BinSet>, ViewportCtx> dest_lock(*sub("dest"));
 
-    std::vector<BinSet> result = coreExecution(args);
+    Subscription::Lock<Labels> labels_lock(*sub("labels"));
+    Labels l = *labels_lock();
+
+    std::vector<BinSet> result = coreExecution(args, l.scopedlabels, l.colors);
 
     if (isCancelled() || result.empty()) {
         return false;

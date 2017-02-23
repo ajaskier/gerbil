@@ -11,6 +11,7 @@ class DataConditionInformer
 public:
     static void init(SubscriptionManager *subscriptionManager);
     static bool isInitialized(QString dataId);
+    static bool isUpToDate(QString dataId);
 
     static int majorVersion(QString dataId);
     static int minorVersion(QString dataId);

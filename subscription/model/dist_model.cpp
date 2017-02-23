@@ -23,8 +23,8 @@ DistModel::DistModel(SubscriptionManager &sm,
                        TaskScheduler *scheduler, QObject *parent)
     : Model(sm, scheduler, parent)
 {
-    registerData("dist.tmp.IMG", {"image.IMG", "ROI"});
-    registerData("dist.IMG", {"image.IMG", "ROI"}); // it needs dist.tmp.IMG too!
+    registerData("dist.tmp.IMG", {"image.IMG", "labels", "ROI"});
+    registerData("dist.IMG", {"image.IMG", "labels", "ROI"}); // it needs dist.tmp.IMG too!
 
 }
 
@@ -33,8 +33,9 @@ void DistModel::imageIMGUpdated()
     qDebug() << "inside distModel on image.IMG updated";
 
     int imageMinorVersion = DataConditionInformer::minorVersion("image.IMG");
+    int labelsMinorVersion = DataConditionInformer::minorVersion("labels");
     qDebug() << "image minor version" << imageMinorVersion;
-    if (imageMinorVersion > 0 || directRequest) {
+    if (imageMinorVersion > 0 || labelsMinorVersion > 0 || directRequest) {
         qDebug() << "non-ROI update";
         addImage(/*context, */false);
     } else {
@@ -42,6 +43,12 @@ void DistModel::imageIMGUpdated()
         addImage(/*context, */true);
     }
 }
+
+// ######### THIS SHOULD BE POTENTIALLY IMPLEMENTED
+//void DistModel::labelsUpdated()
+//{
+//    qDebug() << "inside distModel on labels updated";
+//}
 
 
 void DistModel::delegateTask(QString id, QString parentId)
@@ -59,7 +66,10 @@ void DistModel::delegateTask(QString id, QString parentId)
 
         directRequest = true;
 
-        if (DataConditionInformer::isInitialized("image.IMG")) {
+        //if (DataConditionInformer::isUpToDate("labels")) {
+            //labelsUpdated();
+        //} else
+        if (DataConditionInformer::isUpToDate("image.IMG")) {
             imageIMGUpdated();
         }
     }
@@ -75,6 +85,12 @@ void DistModel::delegateTask(QString id, QString parentId)
                                                                                AccessType::DIRECT)));
     }
 
+//    if (!labelsSub) {
+//        labelsSub = std::unique_ptr<Subscription>(SubscriptionFactory::create(Dependency("labels", SubscriptionType::READ,
+//                                                                                         AccessType::DIRECT), this,
+//                                                                              std::bind(&DistModel::labelsUpdated, this)));
+//    }
+
 }
 
 void DistModel::taskFinished(QString id, bool success)
@@ -84,6 +100,8 @@ void DistModel::taskFinished(QString id, bool success)
     if (id == "taskAdd" || id == "taskAddArg") {
         distTmpSub.reset(nullptr);
         imgSub.reset(nullptr);
+        //labelsSub.reset(nullptr);
+
     }
     directRequest = false;
 
@@ -127,7 +145,7 @@ void DistModel::addImage(bool withTemp)
 ViewportCtx* DistModel::createInitialContext()
 {
     ViewportCtx *ctx = new ViewportCtx();
-    ctx->ignoreLabels = true;
+    ctx->ignoreLabels = false;
     ctx->nbins = 64;
 
     ctx->valid = false;

@@ -199,6 +199,12 @@ bool SubscriptionManager::isDataInitialized(QString dataId)
     return dataPool[dataId].initialized;// && dataPool[dataId].upToDate;
 }
 
+bool SubscriptionManager::isUpToDate(QString dataId)
+{
+    std::unique_lock<std::recursive_mutex> lock(mu);
+    return dataPool[dataId].upToDate;
+}
+
 void SubscriptionManager::sendUpdate(QString id)
 {
     qDebug() << "update signal of" << id << "on unsubscribe";

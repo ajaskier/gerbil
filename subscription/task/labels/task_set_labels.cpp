@@ -13,7 +13,7 @@
 #define REUSE_THRESHOLD 0.1
 
 TaskSetLabels::TaskSetLabels(const Labeling &labeling, bool full)
-    : Task("setLabels", "labels", { {"source", {"image.IMG"}}, {"ROI", {"ROI"}} }),
+    : Task("setLabels", "labels", { {"ROI", {"ROI"}} }),
                       labeling(labeling), full(full)
 {
 }

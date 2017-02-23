@@ -22,20 +22,18 @@ bool TaskMergeLabels::run()
     Subscription::Lock<Labels> dest_lock(*sub("dest"));
     Labels l = *dest_lock();
 
-    QVector<int> xmlabels = mlabels;
-
     // sort the labels to merge by id
-    qSort(xmlabels);
+    qSort(mlabels);
 
     // target: the label to merge into
-    short target = xmlabels[0];
+    short target = mlabels[0];
 
     // mask: all pixels which are to be merged into the target label
     cv::Mat1b mask = cv::Mat1b::zeros(l.fullLabels.rows, l.fullLabels.cols);
 
     // build mask and new color array
-    for(int i=1; i<xmlabels.size(); i++) {
-        short label = xmlabels.at(i);
+    for(int i=1; i<mlabels.size(); i++) {
+        short label = mlabels.at(i);
         cv::Mat1b dmask = (l.fullLabels == label);
         mask = mask | dmask;
     }

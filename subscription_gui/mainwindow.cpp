@@ -38,8 +38,8 @@ void MainWindow::initCrucials()
     DataConditionInformer::init(&sm);
 
     imageModel = new ImgModel(false, sm, scheduler, this);
-    distModel = new DistModel(sm, scheduler, this);
     labelsModel = new LabelsModel(sm, scheduler, this);
+    distModel = new DistModel(sm, scheduler, this);
    // distModel = new DistModel(sm, scheduler, this);
     imageModel->setFilename("/home/ocieslak/gerbil_data/fake_and_real_food.txt");
     imgSub = std::unique_ptr<Subscription>(SubscriptionFactory::create(Dependency("image", SubscriptionType::READ,

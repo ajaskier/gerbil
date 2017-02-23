@@ -11,11 +11,13 @@
 #include "labeling.h"
 #include "qtopencv.h"
 
+#include "model/labels_model.h"
+
 #define REUSE_THRESHOLD 0.1
 
 TaskDistAdd::TaskDistAdd(QString destId, SourceDeclaration sourceImgId,
                          std::vector<multi_img::Value> &illuminant, const cv::Mat1b &mask, bool apply)
-    : TaskDistviewBinsTbb("taskAdd", destId, {{"source", sourceImgId}, {"ROI", {"ROI"}}},
+    : TaskDistviewBinsTbb("taskAdd", destId, {{"source", sourceImgId}, {"labels", {"labels"}}, {"ROI", {"ROI"}}},
                       illuminant, mask), apply(apply)
 {
 }
@@ -23,7 +25,7 @@ TaskDistAdd::TaskDistAdd(QString destId, SourceDeclaration sourceImgId,
 TaskDistAdd::TaskDistAdd(QString destId, SourceDeclaration sourceImgId, SourceDeclaration sourceTempId,
                          std::vector<multi_img::Value> &illuminant, const cv::Mat1b &mask, bool apply)
     : TaskDistviewBinsTbb("taskAdd", destId,
-                    {{"source", sourceImgId}, {"temp", sourceTempId}, {"ROI", {"ROI"}}},
+                    {{"source", sourceImgId}, {"temp", sourceTempId}, {"labels", {"labels"}}, {"ROI", {"ROI"}}},
                       illuminant, mask), apply(apply)
 {
 }
@@ -33,26 +35,27 @@ TaskDistAdd::~TaskDistAdd()
 
 }
 
-std::vector<BinSet> TaskDistAdd::coreExecution(ViewportCtx *args)
+std::vector<BinSet> TaskDistAdd::coreExecution(ViewportCtx *args, cv::Mat1s& labels,
+                                               QVector<QColor>& colors)
 {
     Subscription::Lock<multi_img> source_lock(*sub("source"));
     multi_img* source = source_lock();
 
-    /* ------ TEMP */
-    labels = cv::Mat1s(source->height, source->width, (short)0);
-    QVector<QColor> col = Vec2QColor(Labeling::colors(2, true));
-    col[0] = Qt::white;
-    colors.swap(col);
-    /* TEMP ------ */
+//    /* ------ TEMP */
+//    labels = cv::Mat1s(source->height, source->width, (short)0);
+//    QVector<QColor> col = Vec2QColor(Labeling::colors(2, true));
+//    col[0] = Qt::white;
+//    colors.swap(col);
+//    /* TEMP ------ */
 
     Subscription::Lock<
             cv::Rect,
             std::pair<std::vector<cv::Rect>, std::vector<cv::Rect>>
             > roi_lock(*sub("ROI"));
 
-    std::pair<std::vector<cv::Rect>, std::vector<cv::Rect>>* roidiff = roi_lock.meta();
+    std::pair<std::vector<cv::Rect>, std::vector<cv::Rect>> roidiff = *(roi_lock.meta());
 
-    bool reuse = !roidiff->second.empty();
+    bool reuse = !roidiff.second.empty();
     bool keepOldContext;
 
 
@@ -64,7 +67,7 @@ std::vector<BinSet> TaskDistAdd::coreExecution(ViewportCtx *args)
 
         if (!keepOldContext) {
             reuse = false;
-            roidiff->second.clear();
+            roidiff.second.clear();
         }
     }
 
@@ -74,15 +77,16 @@ std::vector<BinSet> TaskDistAdd::coreExecution(ViewportCtx *args)
         Subscription::Lock<std::vector<BinSet>, ViewportCtx> temp_lock(*sub("temp"));
         if(temp_lock()) result = *temp_lock();
     } else {
-        roidiff->second.push_back(cv::Rect(0, 0, source->width, source->height));
+        roidiff.second.clear();
+        roidiff.second.push_back(cv::Rect(0, 0, source->width, source->height));
     }
 
-    createBinSets(*source, result);
+    createBinSets(*source, colors, result);
 
     //if (!keepOldContext)
         updateContext(*source, args);
 
-    expression(false, roidiff->second, *source, result, args);
+    expression(false, roidiff.second, *source, result, labels, args);
 
     return result;
 }
@@ -95,7 +99,10 @@ bool TaskDistAdd::run()
     Subscription::Lock<std::vector<BinSet>, ViewportCtx> dest_lock(*sub("dest"));
     ViewportCtx* args = dest_lock.meta();
 
-    std::vector<BinSet> result = coreExecution(args);
+    Subscription::Lock<Labels> labels_lock(*sub("labels"));
+    Labels l = *labels_lock();
+
+    std::vector<BinSet> result = coreExecution(args, l.scopedlabels, l.colors);
 
 
     if (isCancelled()) {

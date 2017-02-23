@@ -23,7 +23,7 @@ LabelsModel::LabelsModel(SubscriptionManager &sm,
                        TaskScheduler *scheduler, QObject *parent)
     : Model(sm, scheduler, parent), iconSize(32, 32)
 {
-    registerData("labels", {"image.IMG", "ROI"});
+    registerData("labels", {"ROI"});
     registerData("labels.icons", {"labels"});
 }
 

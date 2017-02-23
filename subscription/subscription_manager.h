@@ -27,6 +27,7 @@ public:
     void unsubscribe(QString dataId, SubscriptionType sub, int version, Subscription* subObj,
                      bool consumed = true);
     bool isDataInitialized(QString dataId);
+    bool isUpToDate(QString dataId);
 
 private:
 

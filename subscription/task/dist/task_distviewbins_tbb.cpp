@@ -104,8 +104,9 @@ bool TaskDistviewBinsTbb::run()
 }
 
 void TaskDistviewBinsTbb::expression(bool subtract, std::vector<cv::Rect> &collection,
-                                 multi_img &multi, std::vector<BinSet> &sets,
-                                 const ViewportCtx *args)
+                                     multi_img &multi, std::vector<BinSet> &sets,
+                                     cv::Mat1s& labels,
+                                     const ViewportCtx *args)
 {
 
     for (auto it = collection.begin(); it != collection.end(); ++it) {
@@ -120,7 +121,9 @@ void TaskDistviewBinsTbb::expression(bool subtract, std::vector<cv::Rect> &colle
 
 }
 
-void TaskDistviewBinsTbb::createBinSets(multi_img &multi, std::vector<BinSet> &sets)
+void TaskDistviewBinsTbb::createBinSets(multi_img &multi,
+                                        QVector<QColor>& colors,
+                                        std::vector<BinSet> &sets)
 {
     for (int i = sets.size(); i < colors.size(); ++i) {
         sets.push_back(BinSet(colors[i], multi.size()));

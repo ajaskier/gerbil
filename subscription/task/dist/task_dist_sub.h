@@ -22,7 +22,8 @@ public:
 
 protected:
 
-    std::vector<BinSet> coreExecution(ViewportCtx* args);
+    std::vector<BinSet> coreExecution(ViewportCtx* args, cv::Mat1s &labels,
+                                      QVector<QColor> &colors);
     //virtual bool isCancelled() { return stopper.is_group_execution_cancelled(); }
 
     bool apply;

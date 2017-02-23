@@ -33,11 +33,13 @@ public slots:
 private:
 
     void imageIMGUpdated();
+   // void labelsUpdated();
 
     ViewportCtx* createInitialContext();
 
     std::unique_ptr<Subscription> imgSub;
     std::unique_ptr<Subscription> distTmpSub;
+   // std::unique_ptr<Subscription> labelsSub;
 
     representation::t type;
     cv::Mat1s labels;

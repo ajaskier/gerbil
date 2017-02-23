@@ -34,9 +34,9 @@ public:
 protected:
 
     void expression(bool subtract, std::vector<cv::Rect> &collection,
-                    multi_img &multi, std::vector<BinSet> &sets,
+                    multi_img &multi, std::vector<BinSet> &sets, cv::Mat1s &labels,
                     const ViewportCtx *args);
-    void createBinSets(multi_img &multi, std::vector<BinSet> &sets);
+    void createBinSets(multi_img &multi, QVector<QColor> &colors, std::vector<BinSet> &sets);
     void updateContext(multi_img &multi, ViewportCtx *args);
     virtual bool isCancelled() { return stopper.is_group_execution_cancelled(); }
 
@@ -48,8 +48,8 @@ private:
     std::vector<multi_img::Value> illuminant;
 
 protected:
-    cv::Mat1s labels;
-    QVector<QColor> colors;
+//    cv::Mat1s labels;
+//    QVector<QColor> colors;
 
 };
 
