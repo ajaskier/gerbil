@@ -18,7 +18,7 @@ class BandDock : public QDockWidget, private Ui::BandDock
 	
 public:
 	explicit BandDock(cv::Rect fullImgSize, QWidget *parent = 0);
-	~BandDock();
+    virtual ~BandDock();
 	/** Returns the BandView. */
 	// It is OK for the controller to access BandView directly. It is a
 	// separate entity and not just a GUI element. This is cleaner than

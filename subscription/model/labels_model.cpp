@@ -47,27 +47,23 @@ void LabelsModel::setLabels(const cv::Mat1s &labeling)
 void LabelsModel::setLabels(const Labeling &labeling, bool full)
 {
     lastLabeling = labeling;
-    std::shared_ptr<Task> task(new TaskSetLabels(labeling, full));
-    sendTask(task);
+    sendTask(std::make_shared<TaskSetLabels>(labeling, full));
 }
 
 void LabelsModel::alterPixels(const cv::Mat1s &newLabels, const cv::Mat1b &mask)
 {
     lastMask = mask.clone(); //looks tricky, but it's the best I can for now
-    std::shared_ptr<Task> task(new TaskLabelsAlterPixels(newLabels, lastMask));
-    sendTask(task);
+    sendTask(std::make_shared<TaskLabelsAlterPixels>(newLabels, lastMask));
 }
 
 void LabelsModel::addLabel()
 {
-    std::shared_ptr<Task> task(new TaskAddLabel());
-    sendTask(task);
+    sendTask(std::make_shared<TaskAddLabel>());
 }
 
 void LabelsModel::computeIcons()
 {
-    std::shared_ptr<Task> task(new TaskLabelsIcons(iconSize, applyROI));
-    sendTask(task);
+    sendTask(std::make_shared<TaskLabelsIcons>(iconSize, applyROI));
 }
 
 void LabelsModel::setApplyROI(bool applyROI)
@@ -84,20 +80,18 @@ void LabelsModel::setIconsSize(QSize size)
 
 void LabelsModel::mergeLabels(const QVector<int> mlabels)
 {
-    std::shared_ptr<Task> task(new TaskMergeLabels(mlabels));
-    sendTask(task);
+    sendTask(std::make_shared<TaskMergeLabels>(mlabels));
 }
 
 void LabelsModel::deleteLabels(const QVector<int> mlabels)
 {
     QVector<int> tmp = mlabels;
     tmp.append(0);
-    std::shared_ptr<Task> task(new TaskMergeLabels(tmp));
-    sendTask(task);
+
+    sendTask(std::make_shared<TaskMergeLabels>(tmp));
 }
 
 void LabelsModel::consolidateLabels()
 {
-    std::shared_ptr<Task> task(new TaskLabelsConsolidate());
-    sendTask(task);
+    sendTask(std::make_shared<TaskLabelsConsolidate>());
 }

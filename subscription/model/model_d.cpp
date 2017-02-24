@@ -16,9 +16,6 @@ ModelD::ModelD(int d, SubscriptionManager &sm, TaskScheduler* scheduler,
 void ModelD::delegateTask(QString id, QString parentId)
 {
     if (id == "DATA_D") {
-        //Task* task = new TaskD(d);
-        std::shared_ptr<Task> task(new TaskD(d));
-        //scheduler->pushTask(task);
-        sendTask(task);
+        sendTask(std::make_shared<TaskD>(d));
     }
 }

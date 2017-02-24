@@ -12,12 +12,15 @@ class TaskDistAdd : public TaskDistviewBinsTbb
 public:
     explicit TaskDistAdd(QString destId, SourceDeclaration sourceImgId,
                          std::vector<multi_img::Value> &illuminant,
-                         const cv::Mat1b &mask = cv::Mat1b(), bool apply = true);
+                         const cv::Mat1b &mask, bool apply);
+
+                        // const cv::Mat1b &mask = cv::Mat1b(), bool apply = true);
 
     explicit TaskDistAdd(QString destId,
                          SourceDeclaration sourceImgId, SourceDeclaration sourceTempId,
                          std::vector<multi_img_base::Value> &illuminant,
-                         const cv::Mat1b &mask, bool apply = true);
+                         const cv::Mat1b &mask, bool apply);
+                         //const cv::Mat1b &mask, bool apply = true);
 
     virtual ~TaskDistAdd();
 

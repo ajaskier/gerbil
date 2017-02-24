@@ -18,13 +18,10 @@ ModelB::ModelB(int b, int c, SubscriptionManager &sm, TaskScheduler* scheduler,
 
 void ModelB::delegateTask(QString id, QString parentId)
 {
-    //Task* task;
     std::shared_ptr<Task> task;
     if (id == "DATA_B") {
-        task = std::shared_ptr<Task>(new TaskB(b));
+        sendTask(std::make_shared<TaskB>(b));
     } else if (id == "DATA_C") {
-        task = std::shared_ptr<Task>(new TaskC(c));
+        sendTask(std::make_shared<TaskC>(c));
     }
-    //scheduler->pushTask(task);
-    sendTask(task);
 }
