@@ -11,12 +11,12 @@ class TaskLabelsConsolidate : public Task
 {
 
 public:
-    explicit TaskLabelsConsolidate();
+    explicit TaskLabelsConsolidate(const cv::Size originalImageSize);
 
     virtual bool run() override;
 
-protected:
-
+private:
+    const cv::Size originalImageSize;
 };
 
 

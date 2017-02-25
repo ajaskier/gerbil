@@ -28,6 +28,9 @@ vole_compile_library(
         labels/banddock
         labels/bandview
         labels/modewidget
+
+        roi/roidock
+        roi/roiview
 )
 
 vole_moc_library(
@@ -49,6 +52,9 @@ vole_moc_library(
        labels/banddock.h
        labels/bandview.h
        labels/modewidget.h
+
+       roi/roidock.h
+       roi/roiview.h
 )
 
 vole_ui_library(
@@ -68,6 +74,9 @@ vole_ui_library(
         labels/labeldock.ui
         labels/banddock.ui
         labels/modewidget.ui
+
+        roi/roidock.ui
+        roi/roidock_buttons.ui
 )
 
 vole_add_resources(

@@ -11,7 +11,8 @@ class TaskSetLabels : public Task
 {
 
 public:
-    explicit TaskSetLabels(const Labeling &labeling, bool full);
+    explicit TaskSetLabels(const Labeling &labeling, const cv::Size originalImageSize,
+                            bool full);
 
     virtual bool run() override;
 
@@ -21,6 +22,7 @@ protected:
     void setColors(const std::vector<cv::Vec3b> &newColors, Labels &l);
 
     const Labeling &labeling;
+    const cv::Size originalImageSize;
     bool full;
 
 };

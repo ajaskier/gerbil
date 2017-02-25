@@ -12,9 +12,11 @@
 
 #define REUSE_THRESHOLD 0.1
 
-TaskSetLabels::TaskSetLabels(const Labeling &labeling, bool full)
+TaskSetLabels::TaskSetLabels(const Labeling &labeling, const cv::Size originalImageSize,
+                                bool full)
     : Task("setLabels", "labels", { {"ROI", {"ROI"}} }),
-                      labeling(labeling), full(full)
+    labeling(labeling), originalImageSize(originalImageSize),
+    full(full)
 {
 }
 
@@ -63,7 +65,9 @@ Labels TaskSetLabels::getLabels(cv::Mat1s m)
         Subscription::Lock<cv::Rect> roi_lock(*sub("ROI"));
         cv::Rect roi = *roi_lock();
 
-        l.fullLabels = cv::Mat1s(roi.height, roi.width, (short)0);
+        l.fullLabels = cv::Mat1s(originalImageSize.height,
+                                    originalImageSize.width,
+                                    (short)0);
         l.scopedlabels = cv::Mat1s(l.fullLabels, roi);
 
     }

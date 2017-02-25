@@ -38,6 +38,11 @@ void LabelsModel::delegateTask(QString id, QString parentId)
 
 }
 
+void LabelsModel::setImageSize(cv::Size imgSize)
+{
+    originalImageSize = imgSize;
+}
+
 void LabelsModel::setLabels(const cv::Mat1s &labeling)
 {
     Labeling vl(labeling, false);
@@ -47,7 +52,7 @@ void LabelsModel::setLabels(const cv::Mat1s &labeling)
 void LabelsModel::setLabels(const Labeling &labeling, bool full)
 {
     lastLabeling = labeling;
-    sendTask(std::make_shared<TaskSetLabels>(labeling, full));
+    sendTask(std::make_shared<TaskSetLabels>(labeling, originalImageSize, full));
 }
 
 void LabelsModel::alterPixels(const cv::Mat1s &newLabels, const cv::Mat1b &mask)
@@ -93,5 +98,5 @@ void LabelsModel::deleteLabels(const QVector<int> mlabels)
 
 void LabelsModel::consolidateLabels()
 {
-    sendTask(std::make_shared<TaskLabelsConsolidate>());
+    sendTask(std::make_shared<TaskLabelsConsolidate>(originalImageSize));
 }

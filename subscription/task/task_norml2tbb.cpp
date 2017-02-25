@@ -11,7 +11,7 @@
 #include <tbb/parallel_for.h>
 
 TaskNormL2Tbb::TaskNormL2Tbb()
-    : Task("image.NORM", {{"source", {"image.IMG"}}})
+    : Task("image.NORM", {{"source", {"image.IMG"}} })
 {
 }
 

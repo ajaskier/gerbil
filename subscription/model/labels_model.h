@@ -46,7 +46,7 @@ public slots:
     void deleteLabels(const QVector<int> mlabels);
     void consolidateLabels();
 
-
+    void setImageSize(cv::Size imgSize);
 
     void setApplyROI(bool applyROI);
     void setIconsSize(QSize size);
@@ -61,6 +61,8 @@ private:
 
     Labeling lastLabeling;
     cv::Mat1b lastMask;
+
+    cv::Size originalImageSize;
 };
 
 #endif // LABELS_MODEL_H

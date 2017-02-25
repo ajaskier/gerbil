@@ -26,7 +26,6 @@ public:
 
     void setFilename(QString filename);
     void setROI(cv::Rect newROI_arg);
-    //void calculateROIdiff();
 
     void runImg();
 
@@ -40,6 +39,7 @@ private:
     size_t nBands;
     size_t nBandsOld;
     size_t rescaleBands;
+
 
     std::map<representation::t, multi_img::NormMode> normalizationModes;
     std::map<representation::t, multi_img_base::Range> normalizationRanges;

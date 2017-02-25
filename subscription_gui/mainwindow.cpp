@@ -21,6 +21,7 @@
 #include "labels/bandview.h"
 
 #include "labels/labeldock.h"
+#include "roi/roidock.h"
 
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -115,6 +116,9 @@ void MainWindow::imgUpdated()
         imageModel->setROI(img->roi);
         maxBands = img->size();
         imageModel->setBandsCount(maxBands);
+
+        labelsModel->setImageSize(cv::Size(originalRoi.width,
+                                    originalRoi.height));
     }
 
     initRest();
@@ -330,5 +334,19 @@ void MainWindow::on_labels_icons_checkbox_toggled(bool checked)
     } else {
         removeDockWidget(labelDock);
         labelDock->deleteLater();
+    }
+}
+
+void MainWindow::on_roi_checkbox_toggled(bool checked)
+{
+    if (checked) {
+        roiDock = new RoiDock(this);
+        addDockWidget(Qt::RightDockWidgetArea, roiDock);
+
+        connect(roiDock, &RoiDock::roiRequested,
+                imageModel, &ImgModel::setROI);
+    } else {
+        removeDockWidget(roiDock);
+        roiDock->deleteLater();
     }
 }

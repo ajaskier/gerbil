@@ -14,8 +14,9 @@
 
 #define REUSE_THRESHOLD 0.1
 
-TaskLabelsConsolidate::TaskLabelsConsolidate()
-    : Task("consolidateLabels", "labels", { {"ROI", {"ROI"}} })
+TaskLabelsConsolidate::TaskLabelsConsolidate(const cv::Size originalImageSize)
+    : Task("consolidateLabels", "labels", { {"ROI", {"ROI"}} }),
+    originalImageSize(originalImageSize)
 {
 }
 
@@ -33,7 +34,7 @@ bool TaskLabelsConsolidate::run()
     auto roiId = sub("ROI")->getDependency().dataId;
 
 
-    TaskSetLabels setLabelsTask(newfull, true);
+    TaskSetLabels setLabelsTask(newfull, originalImageSize, true);
     setLabelsTask.setSubscription(destId, sub("dest"));
     setLabelsTask.setSubscription(roiId, sub("ROI"));
     bool success = setLabelsTask.start();

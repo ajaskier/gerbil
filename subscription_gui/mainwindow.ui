@@ -206,6 +206,13 @@
        </widget>
       </item>
       <item>
+       <widget class="QCheckBox" name="roi_checkbox">
+        <property name="text">
+         <string>roi</string>
+        </property>
+       </widget>
+      </item>
+      <item>
        <widget class="QCheckBox" name="labels_checkbox">
         <property name="text">
          <string>labels</string>

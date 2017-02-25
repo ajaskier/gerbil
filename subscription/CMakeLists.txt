@@ -16,8 +16,8 @@ vole_compile_library(
 	subscription_type
 	task_scheduler
 	worker_thread
-        data_condition_informer
-        source_declaration
+    data_condition_informer
+    source_declaration
 
 	model/model
 	model/model_a
@@ -29,40 +29,42 @@ vole_compile_library(
 	task/task_b
 	task/task_c
 	task/task_d
-        task/task_image_lim
-        task/task_scope_image
-        task/task_rescale_tbb
-        task/task_norml2tbb
-        task/task_gradient_tbb
-        task/task_image_img
-        task/task_pca_tbb
-        task/task_band
-        task/task_band2qimage_tbb
-        task/task_datarange_tbb
-        task/task_normrange_tbb
-        task/task_image_norm
-        task/task_image_grad
-        task/task_image_pca
+    task/task_image_lim
+    task/task_image_rgb_tbb
+    task/task_image_bgr_tbb
+    task/task_scope_image
+    task/task_rescale_tbb
+    task/task_norml2tbb
+    task/task_gradient_tbb
+    task/task_image_img
+    task/task_pca_tbb
+    task/task_band
+    task/task_band2qimage_tbb
+    task/task_datarange_tbb
+    task/task_normrange_tbb
+    task/task_image_norm
+    task/task_image_grad
+    task/task_image_pca
 
-        task/task_roi
-        task/dist/task_distviewbins_tbb
-        task/dist/task_dist_sub
-        task/dist/task_dist_add
-        task/dist/task_dist_sub_arg
-        task/dist/task_dist_add_arg
+    task/task_roi
+    task/dist/task_distviewbins_tbb
+    task/dist/task_dist_sub
+    task/dist/task_dist_add
+    task/dist/task_dist_sub_arg
+    task/dist/task_dist_add_arg
 
-        task/labels/task_labels_icons
-        task/labels/task_set_labels
-        task/labels/task_labels_alter_pixels
-        task/labels/task_add_label
-        task/labels/task_merge_labels
-        task/labels/task_labels_consolidate
+    task/labels/task_labels_icons
+    task/labels/task_set_labels
+    task/labels/task_labels_alter_pixels
+    task/labels/task_add_label
+    task/labels/task_merge_labels
+    task/labels/task_labels_consolidate
 
-        model/img_model
-        model/dist_model
-        model/labels_model
+    model/img_model
+    model/dist_model
+    model/labels_model
 
-        distviewcompute_utils
+    distviewcompute_utils
 
 )
 
@@ -72,15 +74,15 @@ vole_moc_library(
 	task_scheduler.h
 	worker_thread.h
 
-        task/task.h
+    task/task.h
 	model/model.h
 	model/model_a.h
 	model/model_b.h
 	model/model_d.h
 
-        model/img_model.h
-        model/dist_model.h
-        model/labels_model.h
+    model/img_model.h
+    model/dist_model.h
+    model/labels_model.h
 )
 
 vole_add_module()

@@ -13,6 +13,9 @@
 #include "task/task_band.h"
 #include "task/task_roi.h"
 
+#include "task/task_image_bgr_tbb.h"
+#include "task/task_image_rgb_tbb.h"
+
 #include "lock.h"
 #include "subscription_factory.h"
 #include <rectangles.h>
@@ -23,6 +26,8 @@ ImgModel::ImgModel(bool limitedMode, SubscriptionManager &sm,
     : Model(sm, scheduler, parent), limitedMode(limitedMode)
 {
     registerData("image", {});
+    registerData("image.bgr", {"image"});
+    registerData("image.rgb", {"image.bgr"});
     registerData("ROI", {});
     registerData("image.IMG", {"image", "ROI"});
     registerData("image.NORM", {"image.IMG"});
@@ -49,6 +54,14 @@ void ImgModel::delegateTask(QString id, QString parentId)
     //std::shared_ptr<Task> task;
     if (id == "image") {
         sendTask(std::make_shared<TaskImageLim>(filename, limitedMode));
+
+    } else if (id == "image.bgr") {
+
+        sendTask(std::make_shared<TaskImageBgrTbb>("image.bgr", "image"));
+
+    } else if (id == "image.rgb") {
+
+        sendTask(std::make_shared<TaskImageRgbTbb>("image.rgb", "image.bgr"));
 
     } else if (id == "image.IMG") {
 
