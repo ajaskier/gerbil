@@ -23,7 +23,7 @@ void Model::sendTask(std::shared_ptr<Task> t)
 {
     QString id = t->getId();
     if (isTaskCurrent(id)) {
-        qDebug() << "I'm not sending the task" << id;
+        qDebug() << "Task is current, new task will not be sent" << id;
         return;
     }
 

@@ -13,7 +13,8 @@
 
 TaskRescaleTbb::TaskRescaleTbb(size_t bands, size_t roiBands,
                                bool includecache)
-    : Task("image.IMG", {{"source", {"image"}}}), bands(bands), roiBands(roiBands),
+    : Task("image.IMG", {{"source", {"image"}}}),
+      bands(bands), roiBands(roiBands),
       includecache(includecache)
 {
 }

@@ -11,6 +11,7 @@ class SubscriptionManager;
 class TaskScheduler : public QObject
 {
     Q_OBJECT
+
 public:
     TaskScheduler(SubscriptionManager& sm);
     void pushTask(std::shared_ptr<Task> task);

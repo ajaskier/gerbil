@@ -13,6 +13,7 @@ enum class SubscriptionType;
 class Model : public QObject
 {
     Q_OBJECT
+
 public:
     explicit Model(SubscriptionManager& sm, TaskScheduler* scheduler,
                    QObject *parent = 0);

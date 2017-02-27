@@ -39,7 +39,8 @@ void Task::setSubscription(QString id, std::shared_ptr<Subscription> sub)
 {
 
     //TODO: this can be done better!
-    auto it = std::find_if(sources.begin(), sources.end(), [=](const std::pair<QString, SourceDeclaration>& v) {
+    auto it = std::find_if(sources.begin(), sources.end(),
+	                       [=](const std::pair<QString, SourceDeclaration>& v) {
         return v.second.dataId == id;
     });
     QString parsedId = it->first;

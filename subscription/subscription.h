@@ -19,11 +19,12 @@ enum class AccessType {
 class Subscription : public QObject
 {
     Q_OBJECT
-public:
 
+public:
     virtual ~Subscription() override;
     void returnData();
     void forceUnsubscribe();
+
     int getId() { return id; }
     AccessType getAccessType() { return dependency.accessType; }
     Dependency getDependency() { return dependency; }
