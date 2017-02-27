@@ -15,10 +15,9 @@ public:
           accessType(accessType), version(version) {}
 
     QString dataId;
-    int version;
-    AccessType accessType;
     SubscriptionType subscription;
-
+	AccessType accessType;
+	int version;
 };
 
 

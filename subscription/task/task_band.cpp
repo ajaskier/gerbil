@@ -22,9 +22,7 @@ bool TaskBand::run()
     {
         Subscription::Lock<multi_img> source_lock(*sub("source"));
         multi_img* source = source_lock();
-
-        int size = source->size();
-        if (dim >= size)
+        if (dim >= source->size())
             dim = 0;
 
     }
