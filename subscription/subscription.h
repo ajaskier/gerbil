@@ -36,11 +36,9 @@ signals:
 
 private:
     explicit Subscription(Dependency dependency, /*AccessType accessType,*/
-                          int id, SubscriptionManager& sm);
-
-    explicit Subscription(Dependency dependency, /*AccessType accessType,*/
-                          int id, SubscriptionManager& sm, QObject* requester,
-                          std::function<void(void)> updateSlot);
+                          int id, SubscriptionManager& sm,
+	                      QObject* requester = {},
+	                      std::function<void(void)> updateSlot = {});
     handle_pair leaseData();
     int version();
     void setVersion(int version);

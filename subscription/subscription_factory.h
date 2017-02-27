@@ -14,9 +14,9 @@ class SubscriptionFactory
 
 public:
     static void init(SubscriptionManager *subscriptionManager);
-    static Subscription* create(Dependency dependency);
     static Subscription* create(Dependency dependency,
-                                QObject *requester, std::function<void(void)> updateSlot);
+	                            QObject *requester = {},
+	                            std::function<void(void)> updateSlot = {});
 
 private:
 

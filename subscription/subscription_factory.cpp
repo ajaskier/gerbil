@@ -12,13 +12,6 @@ void SubscriptionFactory::init(SubscriptionManager* subscriptionManager) {
     sm = subscriptionManager;
 }
 
-Subscription* SubscriptionFactory::create(Dependency dependency/*,
-                                          AccessType accessType*/)
-{
-    assert(sm);
-    return new Subscription(dependency,/* accessType,*/ idCounter++, *sm);
-}
-
 Subscription* SubscriptionFactory::create(Dependency dependency,
 //                                          AccessType accessType,
                                           QObject *requester,
