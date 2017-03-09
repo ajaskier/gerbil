@@ -53,7 +53,7 @@ private:
     static int destroyCounter;
 
     bool forcedDelete = false;
-    friend class SubscriptionFactory;
+	friend class DataRegister;
 };
 
 #endif // SUBSCRIPTION_H

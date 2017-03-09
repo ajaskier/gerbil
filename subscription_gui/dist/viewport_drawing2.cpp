@@ -12,9 +12,7 @@
 #include <gerbil_gui_debug.h>
 
 #include "subscription.h"
-#include "dependency.h"
 #include "lock.h"
-#include "subscription_factory.h"
 
 bool Viewport2::drawScene(QPainter *painter, bool withDynamics)
 {

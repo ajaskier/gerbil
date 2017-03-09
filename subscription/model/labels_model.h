@@ -27,8 +27,7 @@ class LabelsModel : public Model
     Q_OBJECT
 
 public:
-    explicit LabelsModel(SubscriptionManager& sm,
-                        TaskScheduler* scheduler, QObject *parent = nullptr);
+	explicit LabelsModel(TaskScheduler* scheduler, QObject *parent = nullptr);
 
     virtual void delegateTask(QString id, QString parentId = "") override;
 

@@ -8,7 +8,7 @@
 #include "dependency.h"
 #include "data.h"
 #include "lock.h"
-#include "subscription_factory.h"
+#include "data_register.h"
 
 
 
@@ -21,7 +21,7 @@ AWindow::AWindow(QWidget *parent) :
 
 
     qDebug() << "displayA";
-    dataASub = SubscriptionFactory::create(Dependency("DATA_A", SubscriptionType::READ,
+    dataASub = DataRegister::subscribe(Dependency("DATA_A", SubscriptionType::READ,
                                            AccessType::DEFERRED), this,
                                            std::bind(&AWindow::displayA, this));
 

@@ -13,8 +13,8 @@ class ImgModel : public Model
     Q_OBJECT
 
 public:
-    explicit ImgModel(bool limitedMode, SubscriptionManager& sm,
-                        TaskScheduler* scheduler, QObject *parent = nullptr);
+	explicit ImgModel(bool limitedMode,
+	                  TaskScheduler* scheduler, QObject *parent = nullptr);
 
     virtual void delegateTask(QString id, QString parentId = "") override;
     void spawn(representation::t type, const cv::Rect &newROI, int bands);

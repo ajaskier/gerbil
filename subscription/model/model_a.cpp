@@ -5,13 +5,10 @@
 #include <data.h>
 #include "lock.h"
 
-#include "subscription_factory.h"
-#include "subscription.h"
-
 #include <QDebug>
 
-ModelA::ModelA(int a, SubscriptionManager& sm, TaskScheduler *scheduler, QObject *parent)
-    : Model(sm, scheduler, parent), a(a)
+ModelA::ModelA(int a, TaskScheduler *scheduler, QObject *parent)
+    : Model(scheduler, parent), a(a)
 {
     registerData("DATA_A", {});
 }

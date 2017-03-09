@@ -3,10 +3,9 @@
 #include "task_scheduler.h"
 #include "task/task.h"
 
-#include "subscription_factory.h"
+#include "data_register.h"
 #include "data.h"
 #include "lock.h"
-#include "data_condition_informer.h"
 
 #include "qtopencv.h"
 
@@ -19,9 +18,8 @@
 #include "task/labels/task_merge_labels.h"
 #include "task/labels/task_labels_consolidate.h"
 
-LabelsModel::LabelsModel(SubscriptionManager &sm,
-                       TaskScheduler *scheduler, QObject *parent)
-    : Model(sm, scheduler, parent), iconSize(32, 32)
+LabelsModel::LabelsModel(TaskScheduler *scheduler, QObject *parent)
+    : Model(scheduler, parent), iconSize(32, 32)
 {
     registerData("labels", {"ROI"});
     registerData("labels.icons", {"labels"});

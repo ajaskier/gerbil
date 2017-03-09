@@ -8,8 +8,7 @@
 #include "task_scheduler.h"
 #include "dependency.h"
 #include "lock.h"
-#include "subscription_factory.h"
-#include "data_condition_informer.h"
+#include "data_register.h"
 #include "multi_img.h"
 
 
@@ -20,7 +19,7 @@ ImgWindow::ImgWindow(QWidget *parent) :
     ui(new Ui::ImgWindow)
 {
     ui->setupUi(this);
-    sub = SubscriptionFactory::create(Dependency("image.IMG", SubscriptionType::READ,
+    sub = DataRegister::subscribe(Dependency("image.IMG", SubscriptionType::READ,
                                            AccessType::DEFERRED), this,
                                            std::bind(&ImgWindow::display, this));
 }

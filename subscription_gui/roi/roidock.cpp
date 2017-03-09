@@ -4,7 +4,7 @@
 
 #include <iostream>
 
-#include "subscription_factory.h"
+#include "data_register.h"
 #include "subscription.h"
 #include "dependency.h"
 #include "lock.h"
@@ -26,12 +26,12 @@ RoiDock::RoiDock(QWidget *parent) :
 	setupUi(this);
 	initUi();
 
-    imageSub = SubscriptionFactory::create(Dependency("image.rgb",
+    imageSub = DataRegister::subscribe(Dependency("image.rgb",
                                                      SubscriptionType::READ,
                                                      AccessType::DEFERRED), this,
                                           std::bind(&RoiDock::imageUpdated, this));
 
-    roiSub = SubscriptionFactory::create(Dependency("ROI",
+    roiSub = DataRegister::subscribe(Dependency("ROI",
                                                     SubscriptionType::READ,
                                                     AccessType::DEFERRED), this,
                                             std::bind(&RoiDock::roiUpdated, this));

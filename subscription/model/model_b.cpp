@@ -8,9 +8,9 @@
 #include <subscription_manager.h>
 #include <task_scheduler.h>
 
-ModelB::ModelB(int b, int c, SubscriptionManager &sm, TaskScheduler* scheduler,
+ModelB::ModelB(int b, int c, TaskScheduler* scheduler,
                QObject *parent)
-    : Model(sm, scheduler, parent), b(b), c(c)
+    : Model(scheduler, parent), b(b), c(c)
 {
     registerData("DATA_B", {"DATA_A"});
     registerData("DATA_C", {"DATA_B", "DATA_A"});

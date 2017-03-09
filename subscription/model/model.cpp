@@ -1,9 +1,10 @@
 #include "model.h"
 #include "task_scheduler.h"
+#include "data_register.h"
 #include <QDebug>
 
-Model::Model(SubscriptionManager &sm, TaskScheduler *scheduler, QObject *parent)
-    : QObject(parent), sm(sm), scheduler(scheduler)
+Model::Model(TaskScheduler *scheduler, QObject *parent)
+    : QObject(parent), scheduler(scheduler)
 {}
 
 Model::~Model()
@@ -11,7 +12,7 @@ Model::~Model()
 
 void Model::registerData(QString dataId, std::vector<QString> dependencies)
 {
-    sm.registerCreator(this, dataId, dependencies);
+	DataRegister::add(this, dataId, dependencies);
 }
 
 bool Model::isTaskCurrent(QString id)

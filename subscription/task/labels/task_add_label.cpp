@@ -2,7 +2,6 @@
 
 #include "subscription.h"
 #include "lock.h"
-#include "data_condition_informer.h"
 
 #include "data.h"
 #include "QDebug"

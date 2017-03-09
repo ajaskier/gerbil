@@ -12,7 +12,7 @@
 #include "widgets/autohideview.h"
 #include "widgets/autohidewidget.h"
 
-#include "subscription_factory.h"
+#include "data_register.h"
 #include "subscription.h"
 #include "dependency.h"
 #include "lock.h"
@@ -39,7 +39,7 @@ LabelDock::LabelDock(QWidget *parent) :
 	init();
 	restoreState();
 
-    iconsSub = SubscriptionFactory::create(Dependency("labels.icons",
+    iconsSub = DataRegister::subscribe(Dependency("labels.icons",
                                                        SubscriptionType::READ,
                                                        AccessType::DEFERRED), this,
                                             std::bind(&LabelDock::iconsUpdated, this));

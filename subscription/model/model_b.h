@@ -9,7 +9,7 @@ class ModelB : public Model
 {
     Q_OBJECT
 public:
-    explicit ModelB(int b, int c, SubscriptionManager& sm, TaskScheduler *scheduler, QObject *parent = 0);
+	explicit ModelB(int b, int c, TaskScheduler *scheduler, QObject *parent = 0);
 
 public slots:
     virtual void delegateTask(QString id, QString parentId = "") override;

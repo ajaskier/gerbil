@@ -13,7 +13,7 @@ SubscriptionManager::SubscriptionManager(QObject *parent)
 {
 }
 
-void SubscriptionManager::registerCreator(Model* creator, QString dataId,
+void SubscriptionManager::registerData(Model* creator, QString dataId,
                                           std::vector<QString> dependencies) {
 
     //assert(dataPool.find(dataId) == dataPool.end());

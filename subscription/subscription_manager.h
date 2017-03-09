@@ -19,10 +19,10 @@ class Dependency;
 class SubscriptionManager : public QObject
 {
     Q_OBJECT
-public:
 
+public:
     explicit SubscriptionManager(QObject* parent = nullptr);
-    void registerCreator(Model* creator, QString dataId, std::vector<QString> dependencies);
+	void registerData(Model* creator, QString dataId, std::vector<QString> dependencies);
     void subscribe(QString dataId, SubscriptionType sub, int version, Subscription* subObj);
     void unsubscribe(QString dataId, SubscriptionType sub, int version, Subscription* subObj,
                      bool consumed = true);
@@ -71,7 +71,7 @@ private:
 
     friend class TaskScheduler;
     friend class Subscription;
-    friend class DataConditionInformer;
+	friend class DataRegister;
 };
 
 

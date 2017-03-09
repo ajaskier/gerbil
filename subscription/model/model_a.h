@@ -9,7 +9,7 @@ class ModelA : public Model
 {
     Q_OBJECT
 public:
-    explicit ModelA(int a, SubscriptionManager& sm, TaskScheduler* scheduler,
+	explicit ModelA(int a, TaskScheduler* scheduler,
                     QObject *parent = 0);
 
 public slots:

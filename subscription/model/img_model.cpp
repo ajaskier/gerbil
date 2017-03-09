@@ -17,13 +17,13 @@
 #include "task/task_image_rgb_tbb.h"
 
 #include "lock.h"
-#include "subscription_factory.h"
+#include "data_register.h"
 #include <rectangles.h>
 #include <QVector>
 
-ImgModel::ImgModel(bool limitedMode, SubscriptionManager &sm,
-                       TaskScheduler *scheduler, QObject *parent)
-    : Model(sm, scheduler, parent), limitedMode(limitedMode)
+ImgModel::ImgModel(bool limitedMode,
+                   TaskScheduler *scheduler, QObject *parent)
+    : Model(scheduler, parent), limitedMode(limitedMode)
 {
     registerData("image", {});
     registerData("image.bgr", {"image"});

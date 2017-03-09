@@ -10,7 +10,7 @@
 
 #include <QAction>
 
-#include "subscription_factory.h"
+#include "data_register.h"
 #include "subscription.h"
 #include "dependency.h"
 #include "lock.h"
@@ -33,12 +33,12 @@ BandDock::BandDock(cv::Rect fullImgSize, QWidget *parent)
 	initUi();
 
     QString image = "bands.IMG.0"; //TODO: fix this!
-    bandSub = SubscriptionFactory::create(Dependency(image,
+    bandSub = DataRegister::subscribe(Dependency(image,
                                                      SubscriptionType::READ,
                                                      AccessType::DEFERRED), this,
                                           std::bind(&BandDock::bandUpdated, this));
 
-    labelsSub = SubscriptionFactory::create(Dependency("labels",
+    labelsSub = DataRegister::subscribe(Dependency("labels",
                                                        SubscriptionType::READ,
                                                        AccessType::DEFERRED), this,
                                             std::bind(&BandDock::labelsUpdated, this));

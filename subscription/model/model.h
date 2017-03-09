@@ -4,7 +4,6 @@
 #include <QObject>
 #include <utility>
 #include <memory>
-#include "subscription_manager.h"
 #include "task/task.h"
 
 class TaskScheduler;
@@ -15,7 +14,7 @@ class Model : public QObject
     Q_OBJECT
 
 public:
-    explicit Model(SubscriptionManager& sm, TaskScheduler* scheduler,
+	explicit Model(TaskScheduler* scheduler,
                    QObject *parent = 0);
     virtual ~Model();
 
@@ -29,12 +28,8 @@ protected:
     void sendTask(std::shared_ptr<Task> t);
 
 private:
-
-    SubscriptionManager& sm;
     TaskScheduler* scheduler;
-
     std::map<QString, std::shared_ptr<Task>> tasks;
-
 };
 
 #endif // MODEL_H

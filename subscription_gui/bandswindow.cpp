@@ -7,8 +7,7 @@
 #include "subscription.h"
 #include "dependency.h"
 #include "lock.h"
-#include "subscription_factory.h"
-#include "data_condition_informer.h"
+#include "data_register.h"
 #include "multi_img.h"
 
 
@@ -44,7 +43,7 @@ void BandsWindow::on_imageModelButton_clicked()
 {
     QString image = "bands." + representation + "." + QString::number(currentBand);
 
-    bandsSub = SubscriptionFactory::create(Dependency(image,
+    bandsSub = DataRegister::subscribe(Dependency(image,
                                                         SubscriptionType::READ,
                                              AccessType::DEFERRED), this,
                                              std::bind(&BandsWindow::display, this));

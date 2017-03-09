@@ -19,8 +19,7 @@ class DistModel : public Model
     Q_OBJECT
 
 public:
-    explicit DistModel(SubscriptionManager& sm,
-                        TaskScheduler* scheduler, QObject *parent = nullptr);
+	explicit DistModel(TaskScheduler* scheduler, QObject *parent = nullptr);
 
     virtual void delegateTask(QString id, QString parentId = "") override;
 
