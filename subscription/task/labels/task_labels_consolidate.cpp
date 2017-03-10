@@ -29,15 +29,10 @@ bool TaskLabelsConsolidate::run()
     }
     newfull.consolidate();
 
-    auto destId = sub("dest")->getDependency().dataId;
-    auto roiId = sub("ROI")->getDependency().dataId;
-
-
     TaskSetLabels setLabelsTask(newfull, originalImageSize, true);
-    setLabelsTask.setSubscription(destId, sub("dest"));
-    setLabelsTask.setSubscription(roiId, sub("ROI"));
-    bool success = setLabelsTask.start();
-    return success;
+	setLabelsTask.importSubscription(sub("dest"));
+	setLabelsTask.importSubscription(sub("ROI"));
 
+	return setLabelsTask.start();
 }
 

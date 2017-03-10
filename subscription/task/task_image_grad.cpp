@@ -20,17 +20,14 @@ TaskImageGRAD::~TaskImageGRAD()
 
 bool TaskImageGRAD::run()
 {
-    auto sourceId = sub("source")->getDependency().dataId;
-    auto destId = sub("dest")->getDependency().dataId;
-
     TaskGradientTbb taskGrad(includecache);
-    taskGrad.setSubscription(sourceId, sub("source"));
-    taskGrad.setSubscription(destId, sub("dest"));
+	taskGrad.importSubscription(sub("source"));
+	taskGrad.importSubscription(sub("dest"));
     auto success = taskGrad.start();
     if (!success) return success;
 
     TaskNormRangeTbb normRangeTbb("image.GRAD", normMode, normRange.min,
                                   normRange.max, type, update);
-    normRangeTbb.setSubscription(destId, sub("dest"));
+	normRangeTbb.importSubscription(sub("dest"));
     return normRangeTbb.start();
 }

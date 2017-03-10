@@ -19,8 +19,8 @@ public:
 
     virtual ~Task();
     virtual bool start() final;
-    virtual void setSubscription(QString id, std::shared_ptr<Subscription> sub) final;
-    virtual void invalidateSubscriptions() final;
+	virtual void importSubscription(std::shared_ptr<Subscription> sub) final;
+	virtual void invalidateSubscriptions() final;
 
     std::vector<Dependency>& getDependencies() { return dependencies; }
     QString getId() { return id; }

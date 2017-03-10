@@ -26,12 +26,9 @@ void TaskScheduler::printPool()
 
 void TaskScheduler::createSubscriptions(std::shared_ptr<Task> task)
 {
-    auto dependencies = task->getDependencies();
-    for(auto& dependency : dependencies) {
-
-        std::shared_ptr<Subscription> s(
-                    DataRegister::subscribe(dependency));
-        task->setSubscription(dependency.dataId, std::move(s));
+	for (auto& dependency : task->getDependencies()) {
+		std::shared_ptr<Subscription> s(DataRegister::subscribe(dependency));
+		task->importSubscription(std::move(s));
     }
 }
 

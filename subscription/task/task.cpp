@@ -35,16 +35,21 @@ void Task::setDependencies(QString target)
     this->sources["dest"] = target;
 }
 
-void Task::setSubscription(QString id, std::shared_ptr<Subscription> sub)
+void Task::importSubscription(std::shared_ptr<Subscription> sub)
 {
+	/* get global data id */
+	auto id = sub->getDependency().dataId;
 
-    //TODO: this can be done better!
-    auto it = std::find_if(sources.begin(), sources.end(),
+	/* find task-local identifier */
+	//TODO: this can be done better!
+	auto it = std::find_if(sources.begin(), sources.end(),
 	                       [=](const std::pair<QString, SourceDeclaration>& v) {
-        return v.second.dataId == id;
-    });
-    QString parsedId = it->first;
-    subscriptions[parsedId] = sub;
+		return v.second.dataId == id;
+	});
+	QString parsedId = it->first;
+
+	/* add accordingly */
+	subscriptions[parsedId] = sub;
 }
 
 bool Task::start() {

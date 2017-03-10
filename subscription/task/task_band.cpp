@@ -29,10 +29,10 @@ bool TaskBand::run()
 
     auto sourceId = sub("source")->getDependency().dataId;
     auto destId = sub("dest")->getDependency().dataId;
-
     TaskBand2QImageTbb taskConvert(sourceId, destId, dim);
-    taskConvert.setSubscription(sourceId, sub("source"));
-    taskConvert.setSubscription(destId, sub("dest"));
+
+	taskConvert.importSubscription(sub("source"));
+	taskConvert.importSubscription(sub("dest"));
     auto success = taskConvert.start();
 
     if(success) {

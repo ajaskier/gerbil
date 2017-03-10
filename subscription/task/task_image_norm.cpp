@@ -19,17 +19,14 @@ TaskImageNORM::~TaskImageNORM()
 
 bool TaskImageNORM::run()
 {
-    auto sourceId = sub("source")->getDependency().dataId;
-    auto destId = sub("dest")->getDependency().dataId;
-
     TaskNormL2Tbb taskNorm;
-    taskNorm.setSubscription(sourceId, sub("source"));
-    taskNorm.setSubscription(destId, sub("dest"));
+	taskNorm.importSubscription(sub("source"));
+	taskNorm.importSubscription(sub("dest"));
     auto success = taskNorm.start();
     if (!success) return success;
 
     TaskNormRangeTbb normRangeTbb("image.NORM", normMode, normRange.min,
                                   normRange.max, type, update);
-    normRangeTbb.setSubscription(destId, sub("dest"));
+	normRangeTbb.importSubscription(sub("dest"));
     return normRangeTbb.start();
 }
