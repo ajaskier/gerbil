@@ -50,79 +50,52 @@ void ImgModel::setBandsCount(size_t bands)
 
 void ImgModel::delegateTask(QString id, QString parentId)
 {
-
-    //std::shared_ptr<Task> task;
     if (id == "image") {
-        sendTask(std::make_shared<TaskImageLim>(filename, limitedMode));
-
+        sendTask<TaskImageLim>(filename, limitedMode);
     } else if (id == "image.bgr") {
-
-        sendTask(std::make_shared<TaskImageBgrTbb>("image.bgr", "image"));
-
+        sendTask<TaskImageBgrTbb>("image.bgr", "image");
     } else if (id == "image.rgb") {
-
-        sendTask(std::make_shared<TaskImageRgbTbb>("image.rgb", "image.bgr"));
-
+        sendTask<TaskImageRgbTbb>("image.rgb", "image.bgr");
     } else if (id == "image.IMG") {
-
         auto range = normalizationRanges[representation::IMG];
         auto mode = normalizationModes[representation::IMG];
 
-        sendTask(std::make_shared<TaskImageIMG>(rescaleBands, nBands, mode, range,
-                                                representation::IMG, true));
-
+        sendTask<TaskImageIMG>(rescaleBands, nBands, mode, range,
+		                       representation::IMG, true);
     } else if (id == "image.NORM") {
-
         auto range = normalizationRanges[representation::NORM];
         auto mode = normalizationModes[representation::NORM];
 
-        sendTask(std::make_shared<TaskImageNORM>(mode, range,
-                                                representation::NORM, true));
-
+        sendTask<TaskImageNORM>(mode, range,
+		                        representation::NORM, true);
     } else if (id == "image.GRAD") {
-
         auto range = normalizationRanges[representation::GRAD];
         auto mode = normalizationModes[representation::GRAD];
 
-        sendTask(std::make_shared<TaskImageGRAD>(mode, range,
-                                                representation::GRAD, true));
-
-
+        sendTask<TaskImageGRAD>(mode, range,
+		                        representation::GRAD, true);
     } else if (id == "image.IMGPCA") {
-
         auto range = normalizationRanges[representation::IMGPCA];
         auto mode = normalizationModes[representation::IMGPCA];
 
-        sendTask(std::make_shared<TaskImagePCA>("image.IMG", "image.IMGPCA",
-                                                mode, range,
-                                                representation::IMGPCA, true, 10));
-
+        sendTask<TaskImagePCA>("image.IMG", "image.IMGPCA",
+		                       mode, range,
+		                       representation::IMGPCA, true, 10);
     } else if (id == "image.GRADPCA") {
-
         auto range = normalizationRanges[representation::GRADPCA];
         auto mode = normalizationModes[representation::GRADPCA];
 
-        sendTask(std::make_shared<TaskImagePCA>("image.GRAD", "image.GRADPCA",
-                                                mode, range, representation::GRADPCA,
-                                                true, 0));
-
+        sendTask<TaskImagePCA>("image.GRAD", "image.GRADPCA",
+		                       mode, range, representation::GRADPCA,
+		                       true, 0);
     } else if (id.startsWith("bands")) {
         auto args = id.split(".");
+        auto repr = representation::fromStr(args[1]);
 
-        representation::t repr;
-        if (args[1] == "IMG") repr = representation::IMG;
-        else if (args[1] == "NORM") repr = representation::NORM;
-        else if (args[1] == "GRAD") repr = representation::GRAD;
-        else if (args[1] == "IMGPCA") repr = representation::IMGPCA;
-        else if (args[1] == "GRADPCA") repr = representation::GRADPCA;
-
-        sendTask(std::make_shared<TaskBand>("image."+args[1], id, args[2].toInt(), repr));
-
+        sendTask<TaskBand>("image." + args[1], id, args[2].toInt(), repr);
     } else if (id == "ROI") {
         return;
     }
-
-    //sendTask(task);
 }
 
 void ImgModel::runImg()
@@ -164,6 +137,6 @@ void ImgModel::setROI(cv::Rect newROI_arg)
     roi = newRoi;
     newRoi = newROI_arg;
 
-    sendTask(std::make_shared<TaskRoi>(roi, newRoi));
+    sendTask<TaskRoi>(roi, newRoi);
 
 }

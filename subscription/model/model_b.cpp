@@ -20,8 +20,8 @@ void ModelB::delegateTask(QString id, QString parentId)
 {
     std::shared_ptr<Task> task;
     if (id == "DATA_B") {
-        sendTask(std::make_shared<TaskB>(b));
+        sendTask<TaskB>(b);
     } else if (id == "DATA_C") {
-        sendTask(std::make_shared<TaskC>(c));
+        sendTask<TaskC>(c);
     }
 }

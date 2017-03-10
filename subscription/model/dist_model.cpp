@@ -109,28 +109,25 @@ void DistModel::addImage(bool withTemp)
 	if (DataRegister::isInitialized("dist.IMG")) {
 
         if (withTemp) {
-            sendTask(std::make_shared<TaskDistAdd>("dist.IMG", SourceDeclaration("image.IMG"),
-                                                    SourceDeclaration("dist.tmp.IMG"), illuminant,
-                                                    cv::Mat1b(), true));
+			sendTask<TaskDistAdd>("dist.IMG", SourceDeclaration("image.IMG"),
+			                      SourceDeclaration("dist.tmp.IMG"), illuminant,
+			                      cv::Mat1b(), true);
 
         } else {                            
-            sendTask(std::make_shared<TaskDistAdd>("dist.IMG", SourceDeclaration("image.IMG"),
-                                                    illuminant, cv::Mat1b(), true)
-                    );
+            sendTask<TaskDistAdd>("dist.IMG", SourceDeclaration("image.IMG"),
+			                      illuminant, cv::Mat1b(), true);
         }
 
     } else {
         ViewportCtx* ctx = createInitialContext();
 
         if (withTemp) {
-            sendTask(std::make_shared<TaskDistAddArg>("dist.IMG", SourceDeclaration("image.IMG"),
-                                                        SourceDeclaration("dist.tmp.IMG"), ctx,
-                                                        illuminant, cv::Mat1b(),
-                                                        true));
+            sendTask<TaskDistAddArg>("dist.IMG", SourceDeclaration("image.IMG"),
+			                         SourceDeclaration("dist.tmp.IMG"), ctx,
+			                         illuminant, cv::Mat1b(), true);
         } else {
-            sendTask(std::make_shared<TaskDistAddArg>("dist.IMG", SourceDeclaration("image.IMG"),
-                                                        ctx, illuminant, cv::Mat1b(),
-                                                        true));
+            sendTask<TaskDistAddArg>("dist.IMG", SourceDeclaration("image.IMG"),
+			                         ctx, illuminant, cv::Mat1b(), true);
         }
 
     }
@@ -152,15 +149,15 @@ ViewportCtx* DistModel::createInitialContext()
 void DistModel::subImage(int version)
 {
 	if (DataRegister::isInitialized("dist.IMG")) {
-        sendTask(std::make_shared<TaskDistSub>("dist.img.IMG",
-                                                SourceDeclaration("image.IMG", version),
-                                                SourceDeclaration("dist.IMG", AccessType::FORCED),
-                                                illuminant, cv::Mat1b(), false));
+        sendTask<TaskDistSub>("dist.img.IMG",
+		                      SourceDeclaration("image.IMG", version),
+		                      SourceDeclaration("dist.IMG", AccessType::FORCED),
+		                      illuminant, cv::Mat1b(), false);
     } else {
         ViewportCtx* ctx = createInitialContext();
-        sendTask(std::make_shared<TaskDistSubArg>("dist.tmp.IMG",
-                                                    SourceDeclaration("image.IMG", version),
-                                                    ctx, illuminant, cv::Mat1b(),
-                                                    false));
+		sendTask<TaskDistSubArg>("dist.tmp.IMG",
+		                         SourceDeclaration("image.IMG", version),
+		                         ctx, illuminant, cv::Mat1b(),
+		                         false);
     }
 }

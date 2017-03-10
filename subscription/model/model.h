@@ -25,7 +25,15 @@ public slots:
 protected:
     void registerData(QString dataId, std::vector<QString> dependencies);
     bool isTaskCurrent(QString id);
-    void sendTask(std::shared_ptr<Task> t);
+
+	// send a prepared task
+	void sendTask(std::shared_ptr<Task> t);
+
+	// construct task of type T and send it right away
+	template<typename T, typename... A>
+	void sendTask(A&&... args) {
+		sendTask(std::make_shared<T>(std::forward<A>(args)...));
+	}
 
 private:
     TaskScheduler* scheduler;

@@ -16,6 +16,6 @@ ModelD::ModelD(int d, TaskScheduler* scheduler,
 void ModelD::delegateTask(QString id, QString parentId)
 {
     if (id == "DATA_D") {
-        sendTask(std::make_shared<TaskD>(d));
+        sendTask<TaskD>(d);
     }
 }
