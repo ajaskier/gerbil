@@ -11,15 +11,13 @@ class TaskDistAdd : public TaskDistviewBinsTbb
 
 public:
     explicit TaskDistAdd(QString destId, SourceDeclaration sourceImgId,
-                         std::vector<multi_img::Value> &illuminant,
-                         const cv::Mat1b &mask, bool apply);
+                         std::vector<multi_img::Value> &illuminant, bool apply);
 
                         // const cv::Mat1b &mask = cv::Mat1b(), bool apply = true);
 
     explicit TaskDistAdd(QString destId,
                          SourceDeclaration sourceImgId, SourceDeclaration sourceTempId,
-                         std::vector<multi_img_base::Value> &illuminant,
-                         const cv::Mat1b &mask, bool apply);
+                         std::vector<multi_img_base::Value> &illuminant, bool apply);
                          //const cv::Mat1b &mask, bool apply = true);
 
     virtual ~TaskDistAdd();
@@ -29,7 +27,7 @@ public:
 protected:
 
     std::vector<BinSet> coreExecution(ViewportCtx* args, cv::Mat1s &labels,
-                                      QVector<QColor> &colors);
+                                      QVector<QColor> &colors, cv::Mat1b &mask);
     //virtual bool isCancelled() { return stopper.is_group_execution_cancelled(); }
 
     bool apply;

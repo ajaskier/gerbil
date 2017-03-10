@@ -341,7 +341,7 @@ void MainWindow::on_roi_checkbox_toggled(bool checked)
 {
     if (checked) {
         roiDock = new RoiDock(this);
-        addDockWidget(Qt::RightDockWidgetArea, roiDock);
+        addDockWidget(Qt::TopDockWidgetArea, roiDock);
 
         connect(roiDock, &RoiDock::roiRequested,
                 imageModel, &ImgModel::setROI);

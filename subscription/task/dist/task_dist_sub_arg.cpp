@@ -16,8 +16,8 @@
 #define REUSE_THRESHOLD 0.1
 
 TaskDistSubArg::TaskDistSubArg(QString destId, SourceDeclaration sourceId, ViewportCtx *args,
-                         std::vector<multi_img::Value> &illuminant, const cv::Mat1b &mask, bool apply)
-    : TaskDistSub(destId, sourceId, {""}, illuminant, mask, apply), args(args)
+                         std::vector<multi_img::Value> &illuminant, bool apply)
+    : TaskDistSub(destId, sourceId, {"dist.IMG"}, illuminant, /*mask,*/ apply), args(args)
 //    : TaskDistviewBinsTbb("taskSubArg", destId, {{"source", sourceId}, {"ROI", {"ROI"}}},
 //                      illuminant, mask), args(args), apply(apply)
 {
@@ -34,10 +34,11 @@ bool TaskDistSubArg::run()
 
     Subscription::Lock<std::vector<BinSet>, ViewportCtx> dest_lock(*sub("dest"));
 
-    Subscription::Lock<Labels> labels_lock(*sub("labels"));
+    Subscription::Lock<Labels, LabelsMeta> labels_lock(*sub("labels"));
     Labels l = *labels_lock();
+    cv::Mat1b mask = cv::Mat1b();
 
-    std::vector<BinSet> result = coreExecution(args, l.scopedlabels, l.colors);
+    std::vector<BinSet> result = coreExecution(args, l.scopedlabels, l.colors, mask);
 
     if (isCancelled() || result.empty()) {
         return false;

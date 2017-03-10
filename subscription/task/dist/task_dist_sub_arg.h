@@ -16,7 +16,7 @@ public:
     explicit TaskDistSubArg(QString destId, SourceDeclaration sourceId,
                          ViewportCtx *args,
                          std::vector<multi_img::Value> &illuminant,
-                         const cv::Mat1b &mask = cv::Mat1b(), bool apply = true);
+                        /* const cv::Mat1b &mask = cv::Mat1b(),*/ bool apply = true);
     virtual ~TaskDistSubArg();
 
     virtual bool run() override;

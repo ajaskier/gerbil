@@ -22,6 +22,15 @@ public:
     QVector<QColor> colors;
 };
 
+class LabelsMeta
+{
+public:
+    LabelsMeta() {}
+
+    cv::Mat1s oldLabels;
+    cv::Mat1b mask;
+};
+
 class LabelsModel : public Model
 {
     Q_OBJECT

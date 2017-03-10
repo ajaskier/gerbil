@@ -19,8 +19,10 @@ TaskMergeLabels::TaskMergeLabels(const QVector<int> mlabels)
 
 bool TaskMergeLabels::run()
 {
-    Subscription::Lock<Labels> dest_lock(*sub("dest"));
+    Subscription::Lock<Labels, LabelsMeta> dest_lock(*sub("dest"));
     Labels l = *dest_lock();
+    LabelsMeta lMeta;
+    lMeta.oldLabels = l.scopedlabels.clone();
 
     // sort the labels to merge by id
     qSort(mlabels);
@@ -41,6 +43,9 @@ bool TaskMergeLabels::run()
     l.fullLabels.setTo(target, mask);
 
     dest_lock.swap(l);
+
+    lMeta.mask = cv::Mat1b();
+    dest_lock.swapMeta(lMeta);
 
     return true;
 

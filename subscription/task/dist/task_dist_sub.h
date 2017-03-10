@@ -15,7 +15,7 @@ public:
     //the same with illuminant
     explicit TaskDistSub(QString destId, SourceDeclaration sourceId, SourceDeclaration sourceDistId,
                          std::vector<multi_img::Value> &illuminant,
-                         const cv::Mat1b &mask = cv::Mat1b(), bool apply = true);
+                         /*const cv::Mat1b &mask = cv::Mat1b(),*/ bool apply = true);
     virtual ~TaskDistSub();
 
     virtual bool run() override;
@@ -23,7 +23,7 @@ public:
 protected:
 
     std::vector<BinSet> coreExecution(ViewportCtx* args, cv::Mat1s &labels,
-                                      QVector<QColor> &colors);
+                                      QVector<QColor> &colors, cv::Mat1b &mask);
     //virtual bool isCancelled() { return stopper.is_group_execution_cancelled(); }
 
     bool apply;

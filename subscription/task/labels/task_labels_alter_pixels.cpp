@@ -20,12 +20,17 @@ TaskLabelsAlterPixels::TaskLabelsAlterPixels(const cv::Mat1s &newLabels, const c
 
 bool TaskLabelsAlterPixels::run()
 {
-    Subscription::Lock<Labels> dest_lock(*sub("dest"));
+    Subscription::Lock<Labels, LabelsMeta> dest_lock(*sub("dest"));
     Labels l = *dest_lock();
+
+    LabelsMeta lMeta;
+    lMeta.oldLabels = l.scopedlabels.clone();
+    lMeta.mask = mask.clone();
 
     newLabels.copyTo(l.scopedlabels, mask);
 
     dest_lock.swap(l);
+    dest_lock.swapMeta(lMeta);
 
     Subscription::Lock<cv::Rect> roi_lock(*sub("ROI"));
     dest_lock.setVersion(roi_lock.version());

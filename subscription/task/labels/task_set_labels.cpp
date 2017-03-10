@@ -24,8 +24,12 @@ bool TaskSetLabels::run()
 {
     Labels l = getLabels(labeling());
 
-    Subscription::Lock<Labels> dest_lock(*sub("dest"));
+    Subscription::Lock<Labels, LabelsMeta> dest_lock(*sub("dest"));
     dest_lock.swap(l);
+
+    LabelsMeta lMeta;
+    lMeta.mask = cv::Mat1b();
+    dest_lock.swapMeta(lMeta);
 
     Subscription::Lock<cv::Rect> roi_lock(*sub("ROI"));
     dest_lock.setVersion(roi_lock.version());

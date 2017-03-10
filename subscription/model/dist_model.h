@@ -33,13 +33,17 @@ public slots:
 private:
 
     void imageIMGUpdated();
-   // void labelsUpdated();
+    void fromLabelsUpdate();
+
+    void labelsPartialUpdate();
+    void fromROIUpdate();
+    void directUpdate();
 
     ViewportCtx* createInitialContext();
 
     std::unique_ptr<Subscription> imgSub;
     std::unique_ptr<Subscription> distTmpSub;
-   // std::unique_ptr<Subscription> labelsSub;
+    std::unique_ptr<Subscription> labelsSub;
 
     representation::t type;
     cv::Mat1s labels;
@@ -52,6 +56,7 @@ private:
 
 
     bool directRequest = false;
+    bool labelsUpdateScheduled = false;
 };
 
 #endif // DIST_MODEL_H

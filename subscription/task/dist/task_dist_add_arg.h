@@ -14,14 +14,14 @@ public:
     explicit TaskDistAddArg(QString destId, SourceDeclaration sourceImgId,
                          ViewportCtx *args,
                          std::vector<multi_img::Value> &illuminant,
-                         const cv::Mat1b &mask = cv::Mat1b(), bool apply = true);
+                        /* const cv::Mat1b &mask = cv::Mat1b(),*/ bool apply = true);
 
     explicit TaskDistAddArg(QString destId,
                          SourceDeclaration sourceImgId,
                          SourceDeclaration sourceTempId,
                          ViewportCtx *args,
                          std::vector<multi_img_base::Value> &illuminant,
-                         const cv::Mat1b &mask, bool apply = true);
+                        /* const cv::Mat1b &mask,*/ bool apply = true);
 
     virtual ~TaskDistAddArg();
 

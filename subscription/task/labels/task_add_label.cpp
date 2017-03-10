@@ -19,8 +19,11 @@ TaskAddLabel::TaskAddLabel()
 
 bool TaskAddLabel::run()
 {
-    Subscription::Lock<Labels> dest_lock(*sub("dest"));
+    Subscription::Lock<Labels, LabelsMeta> dest_lock(*sub("dest"));
     Labels l = *dest_lock();
+
+    LabelsMeta lMeta;
+    lMeta.oldLabels = l.scopedlabels.clone();
 
     int labelcount = std::max(l.colors.count(), 1);
     labelcount++;
@@ -28,6 +31,10 @@ bool TaskAddLabel::run()
     setColors(Labeling::colors(labelcount, true), l);
 
     dest_lock.swap(l);
+
+    lMeta.mask = cv::Mat1b();
+    dest_lock.swapMeta(lMeta);
+
     Subscription::Lock<cv::Rect> roi_lock(*sub("ROI"));
     dest_lock.setVersion(roi_lock.version());
 

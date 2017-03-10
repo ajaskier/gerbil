@@ -84,7 +84,7 @@ void SubscriptionManager::unsubscribe(QString dataId, SubscriptionType sub,
         dataPool[dataId].willWrite = false;
 
         qDebug() << "WRITE OF DATA" << dataId << "ENDED. CURRENT VERSION: "
-                 << dataPool[dataId].majorVersion;
+                 << dataPool[dataId].majorVersion << "." << dataPool[dataId].minorVersion;
 
         if (consumed && !dataPool[dataId].data_handle->empty()) {
             sendUpdate(dataId);
@@ -145,7 +145,10 @@ void SubscriptionManager::setMajorVersion(QString id, int version)
     std::unique_lock<std::recursive_mutex> lock(mu);
 
     qDebug() << "setting major version of " << id << "to " << version;
-    if (dataPool[id].getMajorVersion() < version) dataPool[id].minorVersion = 0;
+    if (dataPool[id].getMajorVersion() < version) {
+        dataPool[id].minorVersion = 0;
+        qDebug() << "minor version gets zeroed";
+    }
     dataPool[id].getMajorVersion() = version;
 }
 
@@ -169,6 +172,7 @@ void SubscriptionManager::endDoWriteSubscription(QString id)
     dataPool[id].upToDate = true;
     dataPool[id].initialized = true;
     dataPool[id].minorVersion++;
+    qDebug() << id << "minor version incremented to" << dataPool[id].minorVersion;
     dataPool[id].endWrite();
 
 }

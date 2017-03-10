@@ -12,21 +12,22 @@
 #include "qtopencv.h"
 
 #include "model/labels_model.h"
+#include "data_condition_informer.h"
 
 #define REUSE_THRESHOLD 0.1
 
 TaskDistAdd::TaskDistAdd(QString destId, SourceDeclaration sourceImgId,
-                         std::vector<multi_img::Value> &illuminant, const cv::Mat1b &mask, bool apply)
+                         std::vector<multi_img::Value> &illuminant, /*const cv::Mat1b &mask,*/ bool apply)
     : TaskDistviewBinsTbb("taskAdd", destId, {{"source", sourceImgId}, {"labels", {"labels"}}, {"ROI", {"ROI"}}},
-                      illuminant, mask), apply(apply)
+                      illuminant/*, mask*/), apply(apply)
 {
 }
 
 TaskDistAdd::TaskDistAdd(QString destId, SourceDeclaration sourceImgId, SourceDeclaration sourceTempId,
-                         std::vector<multi_img::Value> &illuminant, const cv::Mat1b &mask, bool apply)
+                         std::vector<multi_img::Value> &illuminant, /*const cv::Mat1b &mask,*/ bool apply)
     : TaskDistviewBinsTbb("taskAdd", destId,
                     {{"source", sourceImgId}, {"temp", sourceTempId}, {"labels", {"labels"}}, {"ROI", {"ROI"}}},
-                      illuminant, mask), apply(apply)
+                      illuminant/*, mask*/), apply(apply)
 {
 }
 
@@ -36,7 +37,7 @@ TaskDistAdd::~TaskDistAdd()
 }
 
 std::vector<BinSet> TaskDistAdd::coreExecution(ViewportCtx *args, cv::Mat1s& labels,
-                                               QVector<QColor>& colors)
+                                               QVector<QColor>& colors, cv::Mat1b& mask)
 {
     Subscription::Lock<multi_img> source_lock(*sub("source"));
     multi_img* source = source_lock();
@@ -84,9 +85,16 @@ std::vector<BinSet> TaskDistAdd::coreExecution(ViewportCtx *args, cv::Mat1s& lab
     createBinSets(*source, colors, result);
 
     //if (!keepOldContext)
-        updateContext(*source, args);
+    updateContext(*source, args);
 
-    expression(false, roidiff.second, *source, result, labels, args);
+    std::vector<cv::Rect> diff;
+    if (DataConditionInformer::minorVersion("labels") > 1) {
+        diff.push_back(cv::Rect(0,0,mask.cols,mask.rows));
+    } else {
+        diff = roidiff.second;
+    }
+
+    expression(false, diff, *source, result, labels, mask, args);
 
     return result;
 }
@@ -101,8 +109,11 @@ bool TaskDistAdd::run()
 
     Subscription::Lock<Labels> labels_lock(*sub("labels"));
     Labels l = *labels_lock();
+    cv::Mat1b mask = cv::Mat1b();
 
-    std::vector<BinSet> result = coreExecution(args, l.scopedlabels, l.colors);
+
+
+    std::vector<BinSet> result = coreExecution(args, l.scopedlabels, l.colors, mask);
 
 
     if (isCancelled()) {

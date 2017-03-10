@@ -47,7 +47,7 @@ void Accumulate2::operator()(const tbb::blocked_range2d<int> &r) const
                 continue;
 
             int label = (ignoreLabels ? 0 : lr[x]);
-            label = (label >= (int)sets.size()) ? 0 : label;
+            label = (label >= (int)sets.size() || label < 0) ? 0 : label;
             const multi_img::Pixel& pixel = multi(y, x);
             BinSet &s = sets[label];
 
@@ -83,12 +83,14 @@ void Accumulate2::operator()(const tbb::blocked_range2d<int> &r) const
 TaskDistviewBinsTbb::TaskDistviewBinsTbb(QString id, QString target, std::map<QString, SourceDeclaration> sources,
 //                         const cv::Mat1s &labels,
 //                         QVector<QColor> &colors,
-                         std::vector<multi_img::Value> &illuminant,
+                         std::vector<multi_img::Value> &illuminant
+                         //,
                          //ViewportCtx &args,
-                         const cv::Mat1b &mask)//,
+                         //const cv::Mat1b &mask
+                         )//,
                          //bool inplace, bool apply)
-    : Task(id, target, sources), /*labels(labels), colors(colors),*/ illuminant(illuminant),
-      mask(mask)//, inplace(inplace), apply(apply)
+    : Task(id, target, sources), /*labels(labels), colors(colors),*/ illuminant(illuminant)//,
+      //mask(mask)//, inplace(inplace), apply(apply)
 {
 
 }
@@ -106,6 +108,7 @@ bool TaskDistviewBinsTbb::run()
 void TaskDistviewBinsTbb::expression(bool subtract, std::vector<cv::Rect> &collection,
                                      multi_img &multi, std::vector<BinSet> &sets,
                                      cv::Mat1s& labels,
+                                     cv::Mat1b& mask,
                                      const ViewportCtx *args)
 {
 
@@ -118,7 +121,6 @@ void TaskDistviewBinsTbb::expression(bool subtract, std::vector<cv::Rect> &colle
                                               it->x, it->x + it->width),
                     expr, tbb::auto_partitioner(), stopper);
     }
-
 }
 
 void TaskDistviewBinsTbb::createBinSets(multi_img &multi,

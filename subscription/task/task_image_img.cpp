@@ -27,6 +27,12 @@ bool TaskImageIMG::run()
     auto destId = sub("dest")->getDependency().dataId;
     auto roiId = sub("ROI")->getDependency().dataId;
 
+    {
+        Subscription::Lock<multi_img> dest_lock(*sub("dest"));
+        Subscription::Lock<cv::Rect> roi_lock(*sub("ROI"));
+        dest_lock.setVersion(roi_lock.version());
+    }
+
     TaskScopeImage scopeImage;
     scopeImage.setSubscription(sourceId, sub("source"));
     scopeImage.setSubscription(destId, sub("dest"));
@@ -47,12 +53,7 @@ bool TaskImageIMG::run()
     normRangeTbb.setSubscription(destId, sub("dest"));
     success = normRangeTbb.start();
 
-    Subscription::Lock<multi_img> source_lock(*sub("source"));
-    Subscription::Lock<multi_img> dest_lock(*sub("dest"));
-    Subscription::Lock<cv::Rect> roi_lock(*sub("ROI"));
-   // dest_lock.setVersion(dest_lock.version()+1);
 
-    dest_lock.setVersion(roi_lock.version());
 
     return success;
 }
