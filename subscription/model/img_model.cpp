@@ -39,11 +39,11 @@ ImgModel::ImgModel(bool limitedMode,
 
 void ImgModel::setBandsCount(size_t bands)
 {
-    QVector<QString> vec = {"IMG", "NORM", "GRAD", "IMGPCA", "GRADPCA"};
-    for (QString repr : vec) {
+    for (auto repr : representation::all()) {
+		auto r = representation::str(repr);
         for(size_t i = 0; i < bands; i++) {
-            registerData("bands."+repr+"."+QString::number(i),
-            {"image."+repr});
+			registerData("bands." + r + "." + QString::number(i),
+			             {"image." + r});
         }
     }
 }
