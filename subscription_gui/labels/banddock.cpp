@@ -47,8 +47,9 @@ BandDock::BandDock(cv::Rect fullImgSize, QWidget *parent)
 
 BandDock::~BandDock()
 {
-    delete bandSub;
-    delete labelsSub;
+    bandSub->deleteLater();
+    labelsSub->deleteLater();
+
 }
 
 void BandDock::bandUpdated()

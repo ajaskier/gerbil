@@ -284,7 +284,7 @@ void MainWindow::on_labels_checkbox_toggled(bool checked)
 {
     if (checked) {
         bandDock = new BandDock(originalRoi, this);
-        addDockWidget(Qt::BottomDockWidgetArea, bandDock);
+        addDockWidget(Qt::TopDockWidgetArea, bandDock);
 
         connect(bandDock, &BandDock::newLabelRequested,
                 labelsModel, &LabelsModel::addLabel);
@@ -308,8 +308,7 @@ void MainWindow::on_labels_icons_checkbox_toggled(bool checked)
         labelDock = new LabelDock(this);
         labelDock->setImageSize(cv::Size(originalRoi.width,
                                          originalRoi.height));
-        addDockWidget(Qt::BottomDockWidgetArea, labelDock);
-//        addDockWidget(Qt::RightDockWidgetArea, labelDock);
+        addDockWidget(Qt::TopDockWidgetArea, labelDock);
 
         connect(labelDock, &LabelDock::applyROIChanged,
                 labelsModel, &LabelsModel::setApplyROI);

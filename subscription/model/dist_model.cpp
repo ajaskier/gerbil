@@ -9,11 +9,6 @@
 
 #include "task/dist/task_dist_add.h"
 #include "task/dist/task_dist_sub.h"
-#include "task/dist/task_dist_add_arg.h"
-#include "task/dist/task_dist_sub_arg.h"
-
-#include "task/dist/task_dist_add_labels_partial.h"
-#include "task/dist/task_dist_sub_labels_partial.h"
 
 //#include "labeling.h"
 #include "qtopencv.h"
@@ -78,14 +73,14 @@ void DistModel::directUpdate()
 
 void DistModel::labelsPartialUpdate()
 {
-    sendTask<TaskDistSubLabelsPartial>("dist.tmp.IMG",
+    sendTask<TaskDistSub>("dist.tmp.IMG",
                 SourceDeclaration("image.IMG"),
                 SourceDeclaration("dist.IMG",
                 DataRegister::majorVersion("dist.IMG")),
-                illuminant, false);
+                illuminant, false, true);
 
-    sendTask<TaskDistAddLabelsPartial>("dist.IMG", SourceDeclaration("image.IMG"),
-                SourceDeclaration("dist.tmp.IMG"), illuminant, true);
+    sendTask<TaskDistAdd>("dist.IMG", SourceDeclaration("image.IMG"),
+                SourceDeclaration("dist.tmp.IMG"), illuminant, true, true);
 
 }
 
@@ -149,12 +144,12 @@ void DistModel::addImage(bool withTemp)
         ViewportCtx* ctx = createInitialContext();
 
         if (withTemp) {
-            sendTask<TaskDistAddArg>("dist.IMG", SourceDeclaration("image.IMG"),
-                                        SourceDeclaration("dist.tmp.IMG"), ctx,
-                                        illuminant, true);
+            sendTask<TaskDistAdd>("dist.IMG", SourceDeclaration("image.IMG"),
+                                        SourceDeclaration("dist.tmp.IMG"),
+                                        illuminant, true, false, ctx);
         } else {
-            sendTask<TaskDistAddArg>("dist.IMG", SourceDeclaration("image.IMG"),
-                                        ctx, illuminant, true);
+            sendTask<TaskDistAdd>("dist.IMG", SourceDeclaration("image.IMG"),
+                                        illuminant, true, false, ctx);
 
         }
 
@@ -184,9 +179,9 @@ void DistModel::subImage(int version)
                               illuminant, false);
     } else {
         ViewportCtx* ctx = createInitialContext();
-		sendTask<TaskDistSubArg>("dist.tmp.IMG",
-		                         SourceDeclaration("image.IMG", version),
-                                 ctx, illuminant,
-		                         false);
+        sendTask<TaskDistSub>("dist.tmp.IMG",
+                                SourceDeclaration("image.IMG", version),
+                                illuminant,
+                                false, false, ctx);
     }
 }

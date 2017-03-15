@@ -17,45 +17,55 @@
 #define REUSE_THRESHOLD 0.1
 
 TaskDistSub::TaskDistSub(QString destId, SourceDeclaration sourceId, SourceDeclaration sourceDistId,
-                         std::vector<multi_img::Value> &illuminant, bool apply)
-    : TaskDistviewBinsTbb("taskSubDest", destId,
-                        {{"source", sourceId}, {"sourceDist", sourceDistId}, {"labels", {"labels"}}, {"ROI", {"ROI"}}},
-                        illuminant/*, mask*/), apply(apply)
+                         std::vector<multi_img::Value> &illuminant, bool apply, bool partialLabelsUpdate,
+                         ViewportCtx *args)
+    : TaskDistviewBinsTbb("taskSubDest", destId, {{"source", sourceId},
+                            {"sourceDist", sourceDistId}, {"labels", {"labels"}},
+                            {"ROI", {"ROI"}}}, illuminant), apply(apply),
+                            partialLabelsUpdate(partialLabelsUpdate), args(args)
+{
+}
+
+TaskDistSub::TaskDistSub(QString destId, SourceDeclaration sourceId,
+                        std::vector<multi_img::Value> &illuminant,
+                        bool apply, bool partialLabelsUpdate,
+                        ViewportCtx* args)
+    : TaskDistviewBinsTbb("taskSubDest", destId, {{"source", sourceId},
+                            {"labels", {"labels"}}, {"ROI", {"ROI"}}}, illuminant),
+                            apply(apply), partialLabelsUpdate(partialLabelsUpdate), args(args)
 {
 }
 
 TaskDistSub::~TaskDistSub()
-{
+{}
 
-}
-
-std::vector<BinSet> TaskDistSub::coreExecution(ViewportCtx* args, cv::Mat1s& labels,
-                                               QVector<QColor>& colors, cv::Mat1b& mask)
+std::vector<cv::Rect> TaskDistSub::getDiff(cv::Mat1b& mask)
 {
     Subscription::Lock<
             cv::Rect,
             std::pair<std::vector<cv::Rect>, std::vector<cv::Rect>>
             > roi_lock(*sub("ROI"));
     std::pair<std::vector<cv::Rect>, std::vector<cv::Rect>>* roidiff = roi_lock.meta();
-    if (roidiff->first.empty()) {
-        Subscription::Lock<std::vector<BinSet>, ViewportCtx> dest_lock(*sub("dest"));
-        std::vector<BinSet> fakeResult;
-        dest_lock.swap(fakeResult);
 
-        return std::vector<BinSet>();
+    std::vector<cv::Rect> diff;
+    if (partialLabelsUpdate) {
+        diff.push_back(cv::Rect(0, 0, mask.cols, mask.rows));
+    } else {
+        diff = roidiff->first;
     }
+
+    return diff;
+}
+
+std::vector<BinSet> TaskDistSub::coreExecution(ViewportCtx* args, cv::Mat1s& labels,
+                                               QVector<QColor>& colors, cv::Mat1b& mask)
+{
+    auto diff = getDiff(mask);
 
     Subscription::Lock<multi_img> source_lock(*sub("source"));
     multi_img* source = source_lock();
 
-//    /* ------ TEMP */
-//    labels = cv::Mat1s(source->height, source->width, (short)0);
-//    QVector<QColor> col = Vec2QColor(Labeling::colors(2, true));
-//    col[0] = Qt::white;
-//    colors.swap(col);
-//    /* TEMP ------ */
-
-    bool reuse = !roidiff->first.empty();
+    bool reuse = !diff.empty() || partialLabelsUpdate;
     bool keepOldContext = false;
 
     if (reuse) {
@@ -66,8 +76,12 @@ std::vector<BinSet> TaskDistSub::coreExecution(ViewportCtx* args, cv::Mat1s& lab
 
         if (!keepOldContext) {
             reuse = false;
-            roidiff->first.clear();
+            if (!partialLabelsUpdate) diff.clear();//roidiff->first.clear();
         }
+    }
+
+    if (diff.empty()) {
+        return std::vector<BinSet>();
     }
 
     std::vector<BinSet> result;
@@ -82,13 +96,6 @@ std::vector<BinSet> TaskDistSub::coreExecution(ViewportCtx* args, cv::Mat1s& lab
     if (!keepOldContext)
         updateContext(*source, args);
 
-    std::vector<cv::Rect> diff;
-    if (DataRegister::minorVersion("labels") > 1) {
-        diff.push_back(cv::Rect(0,0,mask.cols,mask.rows));
-    } else {
-        diff = roidiff->first;
-    }
-
     expression(true, diff, *source, result, labels, mask, args);
 
     return result;
@@ -98,16 +105,28 @@ bool TaskDistSub::run()
 {
     qDebug() << "task dist sub running";
 
-    Subscription::Lock<std::vector<BinSet>, ViewportCtx> sourceDist_lock(*sub("sourceDist"));
-    ViewportCtx* args = sourceDist_lock.meta();
+    if (!args && subExists("sourceDist")) {
+        Subscription::Lock<std::vector<BinSet>, ViewportCtx> sourceDist_lock(*sub("sourceDist"));
+        args = sourceDist_lock.meta();
+    }
 
     Subscription::Lock<std::vector<BinSet>, ViewportCtx> dest_lock(*sub("dest"));
 
     Subscription::Lock<Labels, LabelsMeta> labels_lock(*sub("labels"));
     Labels l = *labels_lock();
-    cv::Mat1b mask = cv::Mat1b();
 
-    std::vector<BinSet> result = coreExecution(args, l.scopedlabels, l.colors, mask);
+    cv::Mat1b mask;
+    cv::Mat1s labels;
+    if (partialLabelsUpdate) {
+        LabelsMeta lMeta = *labels_lock.meta();
+        mask = lMeta.mask;
+        labels = lMeta.oldLabels;
+    } else {
+        mask = cv::Mat1b();
+        labels = l.scopedlabels;
+    }
+
+    std::vector<BinSet> result = coreExecution(args, labels, l.colors, mask);
 
 
     if (isCancelled() || result.empty()) {

@@ -39,8 +39,10 @@ RoiDock::RoiDock(QWidget *parent) :
 
 RoiDock::~RoiDock()
 {
-    delete imageSub;
-    delete roiSub;
+    //delete imageSub;
+    //delete roiSub;
+    imageSub->deleteLater();
+    roiSub->deleteLater();
 }
 
 void RoiDock::imageUpdated()

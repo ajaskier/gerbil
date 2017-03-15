@@ -10,23 +10,34 @@ class TaskDistSub : public TaskDistviewBinsTbb
 {
 
 public:
-    //labels seems to be redundant!!!
-    //the same with colors
-    //the same with illuminant
-    explicit TaskDistSub(QString destId, SourceDeclaration sourceId, SourceDeclaration sourceDistId,
-                         std::vector<multi_img::Value> &illuminant,
-                         /*const cv::Mat1b &mask = cv::Mat1b(),*/ bool apply = true);
-    virtual ~TaskDistSub();
+    explicit TaskDistSub(QString destId, SourceDeclaration sourceId,
+                            SourceDeclaration sourceDistId,
+                            std::vector<multi_img::Value> &illuminant,
+                            bool apply = true, bool partialLabelsUpdate = false,
+                            ViewportCtx* args = nullptr);
 
+
+    explicit TaskDistSub(QString destId, SourceDeclaration sourceId,
+                            std::vector<multi_img::Value> &illuminant,
+                            bool apply = true, bool partialLabelsUpdate = false,
+                            ViewportCtx* args = nullptr);
+
+    virtual ~TaskDistSub();
     virtual bool run() override;
 
 protected:
 
     std::vector<BinSet> coreExecution(ViewportCtx* args, cv::Mat1s &labels,
                                       QVector<QColor> &colors, cv::Mat1b &mask);
-    //virtual bool isCancelled() { return stopper.is_group_execution_cancelled(); }
+
+
+
+    std::vector<cv::Rect> getDiff(cv::Mat1b &mask);
 
     bool apply;
+    bool partialLabelsUpdate;
+
+    ViewportCtx* args;
 
 
 };

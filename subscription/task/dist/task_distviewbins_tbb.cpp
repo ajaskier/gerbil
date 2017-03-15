@@ -40,6 +40,7 @@ protected:
 void Accumulate2::operator()(const tbb::blocked_range2d<int> &r) const
 {
     for (int y = r.rows().begin(); y != r.rows().end(); ++y) {
+
         const short *lr = labels[y];
         const uchar *mr = (mask.empty() ? 0 : mask[y]);
         for (int x = r.cols().begin(); x != r.cols().end(); ++x) {
