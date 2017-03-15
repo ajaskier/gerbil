@@ -3,10 +3,9 @@
 #include "task_scheduler.h"
 #include "task/task.h"
 
-#include "subscription_factory.h"
+#include "data_register.h"
 #include "data.h"
 #include "lock.h"
-#include "data_condition_informer.h"
 
 #include "task/dist/task_dist_add.h"
 #include "task/dist/task_dist_sub.h"
@@ -21,9 +20,8 @@
 
 #include <QVector>
 
-DistModel::DistModel(SubscriptionManager &sm,
-                       TaskScheduler *scheduler, QObject *parent)
-    : Model(sm, scheduler, parent)
+DistModel::DistModel(TaskScheduler *scheduler, QObject *parent)
+    : Model(scheduler, parent)
 {
     registerData("dist.tmp.IMG", {"image.IMG", "labels", "ROI"});
     registerData("dist.IMG", {"image.IMG", "labels", "ROI"}); // it needs dist.tmp.IMG too!
@@ -31,8 +29,12 @@ DistModel::DistModel(SubscriptionManager &sm,
 
 void DistModel::imageIMGUpdated()
 {
-    int imageMinorVersion = DataConditionInformer::minorVersion("image.IMG");
-    int labelsMinorVersion = DataConditionInformer::minorVersion("labels");
+
+    qDebug() << "inside distModel on image.IMG updated";
+
+	int imageMinorVersion = DataRegister::minorVersion("image.IMG");
+	int labelsMinorVersion = DataRegister::minorVersion("labels");
+
     qDebug() << "image minor version" << imageMinorVersion;
     if (imageMinorVersion > 0 || labelsMinorVersion > 0 || directRequest) {
         qDebug() << "non-ROI update";
@@ -45,12 +47,12 @@ void DistModel::imageIMGUpdated()
 
 void DistModel::fromLabelsUpdate()
 {
-    bool roiUpdate = !DataConditionInformer::isUpToDate("ROI");
+    bool roiUpdate = !DataRegister::isUpToDate("ROI");
     //if it's the ROI update don't run partial labels update
     //but regular dist calculation
     if (roiUpdate) return;
 
-    if (!DataConditionInformer::isInitialized("dist.IMG")) return;
+    if (!DataRegister::isInitialized("dist.IMG")) return;
     qDebug() << "labels partial update!!!";
     labelsUpdateScheduled = true;
     labelsPartialUpdate();
@@ -58,7 +60,7 @@ void DistModel::fromLabelsUpdate()
 
 void DistModel::fromROIUpdate()
 {
-    int imageVersion = DataConditionInformer::majorVersion("image.IMG");
+    int imageVersion = DataRegister::majorVersion("image.IMG");
     qDebug() << "roi wants me, scheduling subImage";
 
     subImage(imageVersion);
@@ -68,21 +70,22 @@ void DistModel::directUpdate()
 {
     directRequest = true;
 
-    if (DataConditionInformer::isUpToDate("image.IMG") && !labelsUpdateScheduled) {
+    if (DataRegister::isUpToDate("image.IMG") && !labelsUpdateScheduled) {
         imageIMGUpdated();
     }
 }
 
+
 void DistModel::labelsPartialUpdate()
 {
-    sendTask(std::make_shared<TaskDistSubLabelsPartial>("dist.tmp.IMG",
+    sendTask<TaskDistSubLabelsPartial>("dist.tmp.IMG",
                 SourceDeclaration("image.IMG"),
                 SourceDeclaration("dist.IMG",
-                DataConditionInformer::majorVersion("dist.IMG")),
-                illuminant, false));
+                DataRegister::majorVersion("dist.IMG")),
+                illuminant, false);
 
-    sendTask(std::make_shared<TaskDistAddLabelsPartial>("dist.IMG", SourceDeclaration("image.IMG"),
-                SourceDeclaration("dist.tmp.IMG"), illuminant, true));
+    sendTask<TaskDistAddLabelsPartial>("dist.IMG", SourceDeclaration("image.IMG"),
+                SourceDeclaration("dist.tmp.IMG"), illuminant, true);
 
 }
 
@@ -100,14 +103,14 @@ void DistModel::delegateTask(QString id, QString parentId)
     }
 
     if (!imgSub) {
-        imgSub = std::unique_ptr<Subscription>(SubscriptionFactory::create(Dependency("image.IMG", SubscriptionType::READ,
-                                                                                      AccessType::DEFERRED), this,
+        imgSub = std::unique_ptr<Subscription>(DataRegister::subscribe(Dependency("image.IMG",
+                                                SubscriptionType::READ, AccessType::DEFERRED), this,
                                                 std::bind(&DistModel::imageIMGUpdated, this)));
     }
 
     if (!distTmpSub) {
-        distTmpSub = std::unique_ptr<Subscription>(SubscriptionFactory::create(Dependency("dist.tmp.IMG", SubscriptionType::READ,
-                                                                               AccessType::DIRECT)));
+        distTmpSub = std::unique_ptr<Subscription>(DataRegister::subscribe(Dependency("dist.tmp.IMG",
+                                                    SubscriptionType::READ, AccessType::DIRECT)));
     }
 
 }
@@ -130,27 +133,29 @@ void DistModel::taskFinished(QString id, bool success)
 
 void DistModel::addImage(bool withTemp)
 {
-    if (DataConditionInformer::isInitialized("dist.IMG")) {
+	if (DataRegister::isInitialized("dist.IMG")) {
 
         if (withTemp) {
-            sendTask(std::make_shared<TaskDistAdd>("dist.IMG", SourceDeclaration("image.IMG"),
-                                                    SourceDeclaration("dist.tmp.IMG"), illuminant, true));
+            sendTask<TaskDistAdd>("dist.IMG", SourceDeclaration("image.IMG"),
+                                    SourceDeclaration("dist.tmp.IMG"), illuminant, true);
 
-        } else {                            
-            sendTask(std::make_shared<TaskDistAdd>("dist.IMG", SourceDeclaration("image.IMG"),
-                                                    illuminant, true));
+        } else {
+
+            sendTask<TaskDistAdd>("dist.IMG", SourceDeclaration("image.IMG"),
+                                  illuminant, true);
         }
 
     } else {
         ViewportCtx* ctx = createInitialContext();
 
         if (withTemp) {
-            sendTask(std::make_shared<TaskDistAddArg>("dist.IMG", SourceDeclaration("image.IMG"),
-                                                        SourceDeclaration("dist.tmp.IMG"), ctx,
-                                                        illuminant, true));
+            sendTask<TaskDistAddArg>("dist.IMG", SourceDeclaration("image.IMG"),
+                                        SourceDeclaration("dist.tmp.IMG"), ctx,
+                                        illuminant, true);
         } else {
-            sendTask(std::make_shared<TaskDistAddArg>("dist.IMG", SourceDeclaration("image.IMG"),
-                                                        ctx, illuminant, true));
+            sendTask<TaskDistAddArg>("dist.IMG", SourceDeclaration("image.IMG"),
+                                        ctx, illuminant, true);
+
         }
 
     }
@@ -171,16 +176,17 @@ ViewportCtx* DistModel::createInitialContext()
 
 void DistModel::subImage(int version)
 {
-    if (DataConditionInformer::isInitialized("dist.IMG")) {
-        sendTask(std::make_shared<TaskDistSub>("dist.tmp.IMG",
-                                                SourceDeclaration("image.IMG", version),
-                                                SourceDeclaration("dist.IMG",
-                                                DataConditionInformer::majorVersion("dist.IMG")),
-                                                illuminant, false));
+	if (DataRegister::isInitialized("dist.IMG")) {
+        sendTask<TaskDistSub>("dist.tmp.IMG",
+		                      SourceDeclaration("image.IMG", version),
+                              SourceDeclaration("dist.IMG",
+                              DataRegister::majorVersion("dist.IMG")),
+                              illuminant, false);
     } else {
         ViewportCtx* ctx = createInitialContext();
-        sendTask(std::make_shared<TaskDistSubArg>("dist.tmp.IMG",
-                                                    SourceDeclaration("image.IMG", version),
-                                                    ctx, illuminant, false));
+		sendTask<TaskDistSubArg>("dist.tmp.IMG",
+		                         SourceDeclaration("image.IMG", version),
+                                 ctx, illuminant,
+		                         false);
     }
 }

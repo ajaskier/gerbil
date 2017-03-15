@@ -14,7 +14,7 @@ struct Data {
        // qDebug() << "copied";
     }
 
-    ~Data()   {
+    ~Data() {
        // qDebug() << "data destroyed with" << num;
     }
 

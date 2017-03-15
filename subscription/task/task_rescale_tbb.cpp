@@ -13,7 +13,8 @@
 
 TaskRescaleTbb::TaskRescaleTbb(size_t bands, size_t roiBands,
                                bool includecache)
-    : Task("image.IMG", {{"source", {"image"}}}), bands(bands), roiBands(roiBands),
+    : Task("image.IMG", {{"source", {"image"}}}),
+      bands(bands), roiBands(roiBands),
       includecache(includecache)
 {
 }
@@ -24,23 +25,24 @@ TaskRescaleTbb::~TaskRescaleTbb()
 bool TaskRescaleTbb::run()
 {
     qDebug() << "rescale started";
+
+	/* sanitize number of bands */
+	size_t maxBands;
     {
         Subscription::Lock<multi_img_base> source(*sub("source"));
         multi_img_base* img = source();
-        int numBandsFull = img->size();
-
-        if ((bands < 1 && roiBands < 1)
-                || bands > numBandsFull) {
-            newsize = numBandsFull;
-        } else if (bands < 1 ) {
-            newsize = roiBands;
-        } else if (bands <= 2) {
-            newsize = 3;
-        }
-    }
+        maxBands = img->size();
+	}
+	if ((bands < 1 && roiBands < 1)
+			|| bands > maxBands) {
+		newsize = maxBands;
+	} else if (bands < 1) {
+		newsize = roiBands;
+	} else if (bands <= 2) {
+		newsize = 3;
+	}
 
     Subscription::Lock<multi_img> dest(*sub("dest"));
-    multi_img* destptr = dest();
 
     multi_img* temp = new multi_img(*dest(), cv::Rect(0,0, dest()->width,
                                                       dest()->height));

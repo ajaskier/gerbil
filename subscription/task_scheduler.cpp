@@ -4,7 +4,7 @@
 #include "task/task.h"
 #include "worker_thread.h"
 #include "subscription.h"
-#include "subscription_factory.h"
+#include "data_register.h"
 #include <QDebug>
 
 TaskScheduler::TaskScheduler(SubscriptionManager &sm) : QObject(), sm(sm) {}
@@ -26,12 +26,9 @@ void TaskScheduler::printPool()
 
 void TaskScheduler::createSubscriptions(std::shared_ptr<Task> task)
 {
-    auto dependencies = task->getDependencies();
-    for(auto& dependency : dependencies) {
-
-        std::shared_ptr<Subscription> s(
-                    SubscriptionFactory::create(dependency));
-        task->setSubscription(dependency.dataId, std::move(s));
+	for (auto& dependency : task->getDependencies()) {
+		std::shared_ptr<Subscription> s(DataRegister::subscribe(dependency));
+		task->importSubscription(std::move(s));
     }
 }
 

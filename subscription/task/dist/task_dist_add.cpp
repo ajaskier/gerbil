@@ -12,7 +12,7 @@
 #include "qtopencv.h"
 
 #include "model/labels_model.h"
-#include "data_condition_informer.h"
+#include "data_register.h"
 
 #define REUSE_THRESHOLD 0.1
 
@@ -88,7 +88,7 @@ std::vector<BinSet> TaskDistAdd::coreExecution(ViewportCtx *args, cv::Mat1s& lab
     updateContext(*source, args);
 
     std::vector<cv::Rect> diff;
-    if (DataConditionInformer::minorVersion("labels") > 1) {
+    if (DataRegister::minorVersion("labels") > 1) {
         diff.push_back(cv::Rect(0,0,mask.cols,mask.rows));
     } else {
         diff = roidiff.second;

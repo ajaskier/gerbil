@@ -8,9 +8,9 @@
 #include <subscription_manager.h>
 #include <task_scheduler.h>
 
-ModelB::ModelB(int b, int c, SubscriptionManager &sm, TaskScheduler* scheduler,
+ModelB::ModelB(int b, int c, TaskScheduler* scheduler,
                QObject *parent)
-    : Model(sm, scheduler, parent), b(b), c(c)
+    : Model(scheduler, parent), b(b), c(c)
 {
     registerData("DATA_B", {"DATA_A"});
     registerData("DATA_C", {"DATA_B", "DATA_A"});
@@ -20,8 +20,8 @@ void ModelB::delegateTask(QString id, QString parentId)
 {
     std::shared_ptr<Task> task;
     if (id == "DATA_B") {
-        sendTask(std::make_shared<TaskB>(b));
+        sendTask<TaskB>(b);
     } else if (id == "DATA_C") {
-        sendTask(std::make_shared<TaskC>(c));
+        sendTask<TaskC>(c);
     }
 }

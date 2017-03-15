@@ -2,7 +2,7 @@
 
 #include "subscription.h"
 #include "lock.h"
-#include "data_condition_informer.h"
+#include "data_register.h"
 
 #include "data.h"
 #include "QDebug"
@@ -41,7 +41,7 @@ bool TaskSetLabels::run()
 Labels TaskSetLabels::getLabels(cv::Mat1s m)
 {
     Labels l;
-    if (DataConditionInformer::isInitialized("labels")) {
+	if (DataRegister::isInitialized("labels")) {
         Subscription::Lock<Labels> dest_lock(*sub("dest"));
         l = *dest_lock();
 

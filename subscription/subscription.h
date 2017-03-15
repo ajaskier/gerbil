@@ -19,11 +19,12 @@ enum class AccessType {
 class Subscription : public QObject
 {
     Q_OBJECT
-public:
 
+public:
     virtual ~Subscription() override;
     void returnData();
     void forceUnsubscribe();
+
     int getId() { return id; }
     AccessType getAccessType() { return dependency.accessType; }
     Dependency getDependency() { return dependency; }
@@ -36,11 +37,9 @@ signals:
 
 private:
     explicit Subscription(Dependency dependency, /*AccessType accessType,*/
-                          int id, SubscriptionManager& sm);
-
-    explicit Subscription(Dependency dependency, /*AccessType accessType,*/
-                          int id, SubscriptionManager& sm, QObject* requester,
-                          std::function<void(void)> updateSlot);
+                          int id, SubscriptionManager& sm,
+	                      QObject* requester = {},
+	                      std::function<void(void)> updateSlot = {});
     handle_pair leaseData();
     int version();
     void setVersion(int version);
@@ -54,7 +53,7 @@ private:
     static int destroyCounter;
 
     bool forcedDelete = false;
-    friend class SubscriptionFactory;
+	friend class DataRegister;
 };
 
 #endif // SUBSCRIPTION_H

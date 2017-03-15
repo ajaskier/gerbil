@@ -12,7 +12,7 @@
 #include "qtopencv.h"
 
 #include "model/labels_model.h"
-#include "data_condition_informer.h"
+#include "data_register.h"
 
 #define REUSE_THRESHOLD 0.1
 

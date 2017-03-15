@@ -31,7 +31,7 @@
 #include "subscription.h"
 #include "dependency.h"
 #include "lock.h"
-#include "subscription_factory.h"
+#include "data_register.h"
 
 
 Viewport2::Viewport2(representation::t type, QGLWidget *target)
@@ -58,7 +58,7 @@ Viewport2::Viewport2(representation::t type, QGLWidget *target)
 	connect(QApplication::instance(), SIGNAL(lastWindowClosed()),
 	        this, SLOT(saveState()));
 
-    sub = SubscriptionFactory::create(Dependency("dist.IMG", SubscriptionType::READ,
+    sub = DataRegister::subscribe(Dependency("dist.IMG", SubscriptionType::READ,
                                                  AccessType::DEFERRED), this,
                                                  std::bind(&Viewport2::rebuild, this));
 }

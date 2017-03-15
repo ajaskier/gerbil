@@ -5,13 +5,10 @@
 #include <data.h>
 #include "lock.h"
 
-#include "subscription_factory.h"
-#include "subscription.h"
-
 #include <QDebug>
 
-ModelA::ModelA(int a, SubscriptionManager& sm, TaskScheduler *scheduler, QObject *parent)
-    : Model(sm, scheduler, parent), a(a)
+ModelA::ModelA(int a, TaskScheduler *scheduler, QObject *parent)
+    : Model(scheduler, parent), a(a)
 {
     registerData("DATA_A", {});
 }
@@ -19,6 +16,6 @@ ModelA::ModelA(int a, SubscriptionManager& sm, TaskScheduler *scheduler, QObject
 void ModelA::delegateTask(QString id, QString parentId)
 {
     if (id == "DATA_A") {
-        sendTask(std::make_shared<TaskA>(a));
+        sendTask<TaskA>(a);
     }
 }

@@ -8,7 +8,7 @@
 #include "subscription.h"
 #include "dependency.h"
 #include "lock.h"
-#include "subscription_factory.h"
+#include "data_register.h"
 
 
 bool Viewport2::updateXY(int sel, int bin)

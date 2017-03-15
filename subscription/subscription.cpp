@@ -4,31 +4,17 @@
 int Subscription::spawnCounter = 0;
 int Subscription::destroyCounter = 0;
 
-Subscription::Subscription(Dependency dependency, int id, SubscriptionManager& sm) :
-    QObject(), dependency(dependency), /*accessType(accessType),*/
-    sm(sm), id(id)
-{
-    {
-        spawnCounter++;
-        //qDebug() << "created" << spawnCounter << "subs";
-    }
-
-
-    sm.subscribe(dependency.dataId, dependency.subscription, dependency.version, this);
-}
-
 Subscription::Subscription(Dependency dependency,
                            int id, SubscriptionManager &sm, QObject *requester,
                            std::function<void ()> updateSlot)
     : QObject(), dependency(dependency), /*accessType(accessType),*/
       sm(sm), id(id)
 {
-    {
-        spawnCounter++;
-        //qDebug() << "created" << spawnCounter << "subs";
-    }
+    spawnCounter++;
+    //qDebug() << "created" << spawnCounter << "subs";
 
-    connect(this, &Subscription::update, requester, updateSlot,
+	if (requester && updateSlot)
+		connect(this, &Subscription::update, requester, updateSlot,
             Qt::QueuedConnection);
     sm.subscribe(dependency.dataId, dependency.subscription, dependency.version, this);
 }

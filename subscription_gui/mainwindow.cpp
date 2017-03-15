@@ -8,8 +8,7 @@
 #include "task_scheduler.h"
 #include "dependency.h"
 #include "lock.h"
-#include "subscription_factory.h"
-#include "data_condition_informer.h"
+#include "data_register.h"
 #include "multi_img.h"
 
 #include "model/img_model.h"
@@ -35,19 +34,15 @@ MainWindow::MainWindow(QWidget *parent) :
 void MainWindow::initCrucials()
 {
     scheduler = new TaskScheduler(sm);
-    SubscriptionFactory::init(&sm);
-    DataConditionInformer::init(&sm);
+	DataRegister::init(&sm);
 
-    imageModel = new ImgModel(false, sm, scheduler, this);
-    labelsModel = new LabelsModel(sm, scheduler, this);
-    distModel = new DistModel(sm, scheduler, this);
-   // distModel = new DistModel(sm, scheduler, this);
+	imageModel = new ImgModel(false, scheduler, this);
+	labelsModel = new LabelsModel(scheduler, this);
+	distModel = new DistModel(scheduler, this);
     imageModel->setFilename("/home/ocieslak/gerbil_data/fake_and_real_food.txt");
-    imgSub = std::unique_ptr<Subscription>(SubscriptionFactory::create(Dependency("image", SubscriptionType::READ,
+	imgSub = std::unique_ptr<Subscription>(DataRegister::subscribe(Dependency("image", SubscriptionType::READ,
                                          AccessType::DEFERRED), this,
                                          std::bind(&MainWindow::imgUpdated, this)));
-
-
 }
 
 void MainWindow::initRest()
@@ -64,9 +59,9 @@ void MainWindow::initRest()
     addDockWidget(Qt::RightDockWidgetArea, normDock);
 
 
-    modelA = new ModelA(1, sm, scheduler, this);
-    modelD = new ModelD(1, sm, scheduler, this);
-    modelB = new ModelB(2, 3, sm, scheduler, this);
+	modelA = new ModelA(1, scheduler, this);
+	modelD = new ModelD(1, scheduler, this);
+	modelB = new ModelB(2, 3, scheduler, this);
 
 }
 
@@ -104,7 +99,7 @@ void MainWindow::displayROI()
 
 void MainWindow::imgUpdated()
 {
-    roiSub = std::unique_ptr<Subscription>(SubscriptionFactory::create(Dependency("ROI", SubscriptionType::READ,
+	roiSub = std::unique_ptr<Subscription>(DataRegister::subscribe(Dependency("ROI", SubscriptionType::READ,
                                                AccessType::DEFERRED), this,
                                                std::bind(&MainWindow::displayROI, this)));
 

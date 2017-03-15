@@ -22,19 +22,17 @@ bool TaskBand::run()
     {
         Subscription::Lock<multi_img> source_lock(*sub("source"));
         multi_img* source = source_lock();
-
-        int size = source->size();
-        if (dim >= size)
+        if (dim >= source->size())
             dim = 0;
 
     }
 
     auto sourceId = sub("source")->getDependency().dataId;
     auto destId = sub("dest")->getDependency().dataId;
-
     TaskBand2QImageTbb taskConvert(sourceId, destId, dim);
-    taskConvert.setSubscription(sourceId, sub("source"));
-    taskConvert.setSubscription(destId, sub("dest"));
+
+	taskConvert.importSubscription(sub("source"));
+	taskConvert.importSubscription(sub("dest"));
     auto success = taskConvert.start();
 
     if(success) {

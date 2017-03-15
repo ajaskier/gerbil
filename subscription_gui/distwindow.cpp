@@ -7,7 +7,7 @@
 #include "subscription.h"
 #include "dependency.h"
 #include "lock.h"
-#include "subscription_factory.h"
+#include "data_register.h"
 
 #include "distviewcompute_utils.h"
 
@@ -18,7 +18,7 @@ DistWindow::DistWindow(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    distSub = SubscriptionFactory::create(Dependency("dist.IMG", SubscriptionType::READ,
+    distSub = DataRegister::subscribe(Dependency("dist.IMG", SubscriptionType::READ,
                                            AccessType::DEFERRED), this,
                                            std::bind(&DistWindow::displayDist, this));
 

@@ -4,7 +4,6 @@
 #include <QObject>
 #include <utility>
 #include <memory>
-#include "subscription_manager.h"
 #include "task/task.h"
 
 class TaskScheduler;
@@ -13,8 +12,9 @@ enum class SubscriptionType;
 class Model : public QObject
 {
     Q_OBJECT
+
 public:
-    explicit Model(SubscriptionManager& sm, TaskScheduler* scheduler,
+	explicit Model(TaskScheduler* scheduler,
                    QObject *parent = 0);
     virtual ~Model();
 
@@ -25,15 +25,19 @@ public slots:
 protected:
     void registerData(QString dataId, std::vector<QString> dependencies);
     bool isTaskCurrent(QString id);
-    void sendTask(std::shared_ptr<Task> t);
+
+	// send a prepared task
+	void sendTask(std::shared_ptr<Task> t);
+
+	// construct task of type T and send it right away
+	template<typename T, typename... A>
+	void sendTask(A&&... args) {
+		sendTask(std::make_shared<T>(std::forward<A>(args)...));
+	}
 
 private:
-
-    SubscriptionManager& sm;
     TaskScheduler* scheduler;
-
     std::map<QString, std::shared_ptr<Task>> tasks;
-
 };
 
 #endif // MODEL_H

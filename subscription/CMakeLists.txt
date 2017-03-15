@@ -11,12 +11,11 @@ vole_compile_library(
 	dependency
 	lock
 	subscription
-	subscription_factory
+	data_register
 	subscription_manager
 	subscription_type
 	task_scheduler
 	worker_thread
-    data_condition_informer
     source_declaration
 
 	model/model

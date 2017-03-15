@@ -6,9 +6,9 @@
 #include <subscription_manager.h>
 #include <task_scheduler.h>
 
-ModelD::ModelD(int d, SubscriptionManager &sm, TaskScheduler* scheduler,
+ModelD::ModelD(int d, TaskScheduler* scheduler,
                QObject *parent)
-    : Model(sm, scheduler, parent), d(d)
+    : Model(scheduler, parent), d(d)
 {
     registerData("DATA_D", {"DATA_A"});
 }
@@ -16,6 +16,6 @@ ModelD::ModelD(int d, SubscriptionManager &sm, TaskScheduler* scheduler,
 void ModelD::delegateTask(QString id, QString parentId)
 {
     if (id == "DATA_D") {
-        sendTask(std::make_shared<TaskD>(d));
+        sendTask<TaskD>(d);
     }
 }

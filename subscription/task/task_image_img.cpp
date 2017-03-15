@@ -23,9 +23,6 @@ TaskImageIMG::~TaskImageIMG()
 
 bool TaskImageIMG::run()
 {
-    auto sourceId = sub("source")->getDependency().dataId;
-    auto destId = sub("dest")->getDependency().dataId;
-    auto roiId = sub("ROI")->getDependency().dataId;
 
     {
         Subscription::Lock<multi_img> dest_lock(*sub("dest"));
@@ -34,26 +31,24 @@ bool TaskImageIMG::run()
     }
 
     TaskScopeImage scopeImage;
-    scopeImage.setSubscription(sourceId, sub("source"));
-    scopeImage.setSubscription(destId, sub("dest"));
-    scopeImage.setSubscription(roiId, sub("ROI"));
+	scopeImage.importSubscription(sub("source"));
+	scopeImage.importSubscription(sub("dest"));
+	scopeImage.importSubscription(sub("ROI"));
     auto success = scopeImage.start();
     if(!success) return success;
 
     qDebug() << "halfway there";
 
     TaskRescaleTbb rescaleTbb(bands, roiBands, includecache);
-    rescaleTbb.setSubscription(sourceId, sub("source"));
-    rescaleTbb.setSubscription(destId, sub("dest"));
+	rescaleTbb.importSubscription(sub("source"));
+	rescaleTbb.importSubscription(sub("dest"));
     success = rescaleTbb.start();
     if(!success) return success;
 
     TaskNormRangeTbb normRangeTbb("image.IMG", normMode, normRange.min,
                                   normRange.max, type, update);
-    normRangeTbb.setSubscription(destId, sub("dest"));
+	normRangeTbb.importSubscription(sub("dest"));
     success = normRangeTbb.start();
-
-
 
     return success;
 }
