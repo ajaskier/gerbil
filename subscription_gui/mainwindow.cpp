@@ -74,9 +74,7 @@ void MainWindow::displayROI()
 {
 
     Subscription::Lock<
-            cv::Rect,
-            std::pair<std::vector<cv::Rect>, std::vector<cv::Rect>>
-            > lock(*roiSub);
+            cv::Rect, ROIMeta> lock(*roiSub);
 
 
     int startX = lock()->x;
@@ -84,8 +82,8 @@ void MainWindow::displayROI()
     int width = lock()->width;
     int height = lock()->height;
 
-    int subSize = lock.meta()->first.size();
-    int addSize = lock.meta()->second.size();
+    int subSize = lock.meta()->sub.size();
+    int addSize = lock.meta()->add.size();
 
     ui->startX_input->setText(QString::number(startX));
     ui->startY_input->setText(QString::number(startY));

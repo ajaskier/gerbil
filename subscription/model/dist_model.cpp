@@ -10,7 +10,6 @@
 #include "task/dist/task_dist_add.h"
 #include "task/dist/task_dist_sub.h"
 
-//#include "labeling.h"
 #include "qtopencv.h"
 
 #include <QVector>
@@ -24,18 +23,13 @@ DistModel::DistModel(TaskScheduler *scheduler, QObject *parent)
 
 void DistModel::imageIMGUpdated()
 {
-
-    qDebug() << "inside distModel on image.IMG updated";
-
-	int imageMinorVersion = DataRegister::minorVersion("image.IMG");
-	int labelsMinorVersion = DataRegister::minorVersion("labels");
-
-    qDebug() << "image minor version" << imageMinorVersion;
-    if (imageMinorVersion > 0 || labelsMinorVersion > 0 || directRequest) {
-        qDebug() << "non-ROI update";
+    int imageMinorVersion = DataRegister::minorVersion("image.IMG");
+    //qDebug() << "image minor version" << imageMinorVersion;
+    if (imageMinorVersion > 0 || directRequest) {
+        //qDebug() << "non-ROI update";
         addImage(false);
     } else {
-        qDebug() << "ROI update";
+        //qDebug() << "ROI update";
         addImage(true);
     }
 }
@@ -56,7 +50,7 @@ void DistModel::fromLabelsUpdate()
 void DistModel::fromROIUpdate()
 {
     int imageVersion = DataRegister::majorVersion("image.IMG");
-    qDebug() << "roi wants me, scheduling subImage";
+    //qDebug() << "roi wants me, scheduling subImage";
 
     subImage(imageVersion);
 }
@@ -73,15 +67,8 @@ void DistModel::directUpdate()
 
 void DistModel::labelsPartialUpdate()
 {
-    sendTask<TaskDistSub>("dist.tmp.IMG",
-                SourceDeclaration("image.IMG"),
-                SourceDeclaration("dist.IMG",
-                DataRegister::majorVersion("dist.IMG")),
-                illuminant, false, true);
-
-    sendTask<TaskDistAdd>("dist.IMG", SourceDeclaration("image.IMG"),
-                SourceDeclaration("dist.tmp.IMG"), illuminant, true, true);
-
+    subImage(-1, true);
+    addImage(true, true);
 }
 
 void DistModel::delegateTask(QString id, QString parentId)
@@ -118,7 +105,7 @@ void DistModel::taskFinished(QString id, bool success)
         labelsUpdateScheduled = false;
     }
 
-    if (id == "taskAdd" || id == "taskAddArg") {
+    if (id == "taskAdd") {
         distTmpSub.reset(nullptr);
         imgSub.reset(nullptr);
     }
@@ -126,33 +113,20 @@ void DistModel::taskFinished(QString id, bool success)
 
 }
 
-void DistModel::addImage(bool withTemp)
+void DistModel::addImage(bool withTemp, bool partialLabelsUpdate)
 {
-	if (DataRegister::isInitialized("dist.IMG")) {
+    ViewportCtx* ctx = nullptr;
+    if (!DataRegister::isInitialized("dist.IMG")) {
+        ctx = createInitialContext();
+    }
 
-        if (withTemp) {
-            sendTask<TaskDistAdd>("dist.IMG", SourceDeclaration("image.IMG"),
-                                    SourceDeclaration("dist.tmp.IMG"), illuminant, true);
-
-        } else {
-
-            sendTask<TaskDistAdd>("dist.IMG", SourceDeclaration("image.IMG"),
-                                  illuminant, true);
-        }
-
+    if (withTemp) {
+        sendTask<TaskDistAdd>("dist.IMG", SourceDeclaration("image.IMG"),
+                                SourceDeclaration("dist.tmp.IMG"),
+                                illuminant, true, partialLabelsUpdate, ctx);
     } else {
-        ViewportCtx* ctx = createInitialContext();
-
-        if (withTemp) {
-            sendTask<TaskDistAdd>("dist.IMG", SourceDeclaration("image.IMG"),
-                                        SourceDeclaration("dist.tmp.IMG"),
-                                        illuminant, true, false, ctx);
-        } else {
-            sendTask<TaskDistAdd>("dist.IMG", SourceDeclaration("image.IMG"),
-                                        illuminant, true, false, ctx);
-
-        }
-
+        sendTask<TaskDistAdd>("dist.IMG", SourceDeclaration("image.IMG"),
+                                illuminant, true, partialLabelsUpdate, ctx);
     }
 }
 
@@ -169,19 +143,20 @@ ViewportCtx* DistModel::createInitialContext()
     return ctx;
 }
 
-void DistModel::subImage(int version)
+void DistModel::subImage(int version, bool partialLabelsUpdate)
 {
-	if (DataRegister::isInitialized("dist.IMG")) {
+
+    if (DataRegister::isInitialized("dist.IMG")) {
         sendTask<TaskDistSub>("dist.tmp.IMG",
-		                      SourceDeclaration("image.IMG", version),
+                              SourceDeclaration("image.IMG", version),
                               SourceDeclaration("dist.IMG",
                               DataRegister::majorVersion("dist.IMG")),
-                              illuminant, false);
+                              illuminant, false, partialLabelsUpdate);
     } else {
         ViewportCtx* ctx = createInitialContext();
         sendTask<TaskDistSub>("dist.tmp.IMG",
                                 SourceDeclaration("image.IMG", version),
                                 illuminant,
-                                false, false, ctx);
+                                false, partialLabelsUpdate, ctx);
     }
 }

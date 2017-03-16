@@ -27,7 +27,9 @@ public:
 protected:
 
     std::vector<BinSet> coreExecution(ViewportCtx* args, cv::Mat1s &labels,
-                                      QVector<QColor> &colors, cv::Mat1b &mask);
+                                      QVector<QColor> &colors, cv::Mat1b &mask, multi_img &img, std::vector<BinSet> *reuseDist);
+
+    std::vector<cv::Rect> getDiff(const cv::Mat1b &mask, const multi_img &img);
 
     bool apply;
     bool partialLabelsUpdate;

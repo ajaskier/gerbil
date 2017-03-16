@@ -12,6 +12,7 @@
 #include "qtopencv.h"
 
 #include "model/labels_model.h"
+#include "model/img_model.h"
 #include "data_register.h"
 
 #define REUSE_THRESHOLD 0.1
@@ -19,7 +20,7 @@
 TaskDistSub::TaskDistSub(QString destId, SourceDeclaration sourceId, SourceDeclaration sourceDistId,
                          std::vector<multi_img::Value> &illuminant, bool apply, bool partialLabelsUpdate,
                          ViewportCtx *args)
-    : TaskDistviewBinsTbb("taskSubDest", destId, {{"source", sourceId},
+    : TaskDistviewBinsTbb("taskSub", destId, {{"source", sourceId},
                             {"sourceDist", sourceDistId}, {"labels", {"labels"}},
                             {"ROI", {"ROI"}}}, illuminant), apply(apply),
                             partialLabelsUpdate(partialLabelsUpdate), args(args)
@@ -30,7 +31,7 @@ TaskDistSub::TaskDistSub(QString destId, SourceDeclaration sourceId,
                         std::vector<multi_img::Value> &illuminant,
                         bool apply, bool partialLabelsUpdate,
                         ViewportCtx* args)
-    : TaskDistviewBinsTbb("taskSubDest", destId, {{"source", sourceId},
+    : TaskDistviewBinsTbb("taskSub", destId, {{"source", sourceId},
                             {"labels", {"labels"}}, {"ROI", {"ROI"}}}, illuminant),
                             apply(apply), partialLabelsUpdate(partialLabelsUpdate), args(args)
 {
@@ -41,42 +42,36 @@ TaskDistSub::~TaskDistSub()
 
 std::vector<cv::Rect> TaskDistSub::getDiff(cv::Mat1b& mask)
 {
-    Subscription::Lock<
-            cv::Rect,
-            std::pair<std::vector<cv::Rect>, std::vector<cv::Rect>>
-            > roi_lock(*sub("ROI"));
-    std::pair<std::vector<cv::Rect>, std::vector<cv::Rect>>* roidiff = roi_lock.meta();
+    Subscription::Lock<cv::Rect, ROIMeta> roi_lock(*sub("ROI"));
+    ROIMeta roimeta = *(roi_lock.meta());
 
     std::vector<cv::Rect> diff;
     if (partialLabelsUpdate) {
         diff.push_back(cv::Rect(0, 0, mask.cols, mask.rows));
-    } else {
-        diff = roidiff->first;
+    } else if(roimeta.profitable) {
+        diff = roimeta.sub;
     }
 
     return diff;
 }
 
 std::vector<BinSet> TaskDistSub::coreExecution(ViewportCtx* args, cv::Mat1s& labels,
-                                               QVector<QColor>& colors, cv::Mat1b& mask)
+                                               QVector<QColor>& colors, cv::Mat1b& mask,
+                                               multi_img& img, std::vector<BinSet>* reuseDist)
 {
     auto diff = getDiff(mask);
 
-    Subscription::Lock<multi_img> source_lock(*sub("source"));
-    multi_img* source = source_lock();
-
-    bool reuse = !diff.empty() || partialLabelsUpdate;
+    bool reuse = !diff.empty();
     bool keepOldContext = false;
 
     if (reuse) {
         keepOldContext = ((fabs(args->minval) * REUSE_THRESHOLD) >=
-                          (fabs(args->minval - source->minval))) &&
+                          (fabs(args->minval - img.minval))) &&
             ((fabs(args->maxval) * REUSE_THRESHOLD) >=
-             (fabs(args->maxval - source->maxval)));
+             (fabs(args->maxval - img.maxval)));
 
         if (!keepOldContext) {
             reuse = false;
-            if (!partialLabelsUpdate) diff.clear();//roidiff->first.clear();
         }
     }
 
@@ -85,30 +80,35 @@ std::vector<BinSet> TaskDistSub::coreExecution(ViewportCtx* args, cv::Mat1s& lab
     }
 
     std::vector<BinSet> result;
-
-    if (reuse) {
-        Subscription::Lock<std::vector<BinSet>, ViewportCtx> dist_lock(*sub("sourceDist"));
-        if(dist_lock()) result = *dist_lock();
+    if (reuse && reuseDist) {
+        result = *reuseDist;
     }
 
-    createBinSets(*source, colors, result);
+    createBinSets(img, colors, result);
 
     if (!keepOldContext)
-        updateContext(*source, args);
+        updateContext(img, args);
 
-    expression(true, diff, *source, result, labels, mask, args);
+    expression(true, diff, img, result, labels, mask, args);
 
     return result;
 }
 
 bool TaskDistSub::run()
 {
-    qDebug() << "task dist sub running";
 
-    if (!args && subExists("sourceDist")) {
+    std::vector<BinSet> *reuseDist = nullptr;
+    if (subExists("sourceDist")) {
         Subscription::Lock<std::vector<BinSet>, ViewportCtx> sourceDist_lock(*sub("sourceDist"));
-        args = sourceDist_lock.meta();
+        if(sourceDist_lock()) reuseDist = sourceDist_lock();
+
+        if(!args) {
+            args = sourceDist_lock.meta();
+        }
     }
+
+    Subscription::Lock<multi_img> source_lock(*sub("source"));
+    multi_img* source = source_lock();
 
     Subscription::Lock<std::vector<BinSet>, ViewportCtx> dest_lock(*sub("dest"));
 
@@ -126,7 +126,8 @@ bool TaskDistSub::run()
         labels = l.scopedlabels;
     }
 
-    std::vector<BinSet> result = coreExecution(args, labels, l.colors, mask);
+    std::vector<BinSet> result = coreExecution(args, labels, l.colors,
+                                                mask, *source, reuseDist);
 
 
     if (isCancelled() || result.empty()) {

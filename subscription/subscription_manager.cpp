@@ -144,10 +144,10 @@ void SubscriptionManager::setMajorVersion(QString id, int version)
 {
     std::unique_lock<std::recursive_mutex> lock(mu);
 
-    qDebug() << "setting major version of " << id << "to " << version;
+    //qDebug() << "setting major version of " << id << "to " << version;
     if (dataPool[id].getMajorVersion() < version) {
         dataPool[id].minorVersion = 0;
-        qDebug() << "minor version gets zeroed";
+        //qDebug() << "minor version gets zeroed";
     }
     dataPool[id].getMajorVersion() = version;
 }
@@ -172,7 +172,7 @@ void SubscriptionManager::endDoWriteSubscription(QString id)
     dataPool[id].upToDate = true;
     dataPool[id].initialized = true;
     dataPool[id].minorVersion++;
-    qDebug() << id << "minor version incremented to" << dataPool[id].minorVersion;
+    //qDebug() << id << "minor version incremented to" << dataPool[id].minorVersion;
     dataPool[id].endWrite();
 
 }
@@ -211,7 +211,7 @@ bool SubscriptionManager::isUpToDate(QString dataId)
 
 void SubscriptionManager::sendUpdate(QString id)
 {
-    qDebug() << "update signal of" << id << "on unsubscribe";
+    //qDebug() << "update signal of" << id << "on unsubscribe";
     auto subs = dataPool[id].currentSubs;
     for(auto sub : subs) {
         sub.second->update();
@@ -220,7 +220,7 @@ void SubscriptionManager::sendUpdate(QString id)
 
 void SubscriptionManager::sendUpdate(QString id, int subscriberId)
 {
-    qDebug() << "direct update signal of" << id;
+    //qDebug() << "direct update signal of" << id;
     auto sub = dataPool[id].currentSubs[subscriberId];
     sub->update();
 }
@@ -239,7 +239,7 @@ bool SubscriptionManager::hasWillReadsRecursive(QString id) {
 
 void SubscriptionManager::askModelForTask(QString requestedId, QString beingComputedId)
 {
-    qDebug() << "asking for" << requestedId << "from" << beingComputedId;
+    //qDebug() << "asking for" << requestedId << "from" << beingComputedId;
     dataPool[requestedId].creator->delegateTask(requestedId, beingComputedId);
 }
 

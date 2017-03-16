@@ -23,8 +23,8 @@ public:
 
     virtual void delegateTask(QString id, QString parentId = "") override;
 
-    void addImage(bool withTemp = false);
-    void subImage(int version);
+    void addImage(bool withTemp = false, bool partialLabelsUpdate = false);
+    void subImage(int version, bool partialLabelsUpdate = false);
 
 public slots:
     void taskFinished(QString id, bool success);

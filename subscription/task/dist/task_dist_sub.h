@@ -28,7 +28,7 @@ public:
 protected:
 
     std::vector<BinSet> coreExecution(ViewportCtx* args, cv::Mat1s &labels,
-                                      QVector<QColor> &colors, cv::Mat1b &mask);
+                                      QVector<QColor> &colors, cv::Mat1b &mask, multi_img &img, std::vector<BinSet> *reuseDist);
 
 
 

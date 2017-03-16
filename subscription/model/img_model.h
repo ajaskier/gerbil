@@ -8,6 +8,18 @@
 
 #include "multi_img.h"
 
+
+class ROIMeta
+{
+public:
+    ROIMeta() {}
+
+    std::vector<cv::Rect> sub;
+    std::vector<cv::Rect> add;
+    bool profitable;
+
+};
+
 class ImgModel : public Model
 {
     Q_OBJECT

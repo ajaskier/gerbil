@@ -18,7 +18,7 @@ Task::Task(QString id, QString target, std::map<QString, SourceDeclaration> sour
 
 Task::~Task()
 {
-    qDebug() << "deleting task" << id;
+    //qDebug() << "deleting task" << id;
 }
 
 void Task::setDependencies(QString target)

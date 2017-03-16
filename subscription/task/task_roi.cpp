@@ -5,6 +5,8 @@
 
 #include <rectangles.h>
 
+#include "model/img_model.h"
+
 #define REUSE_THRESHOLD 0.1
 
 TaskRoi::TaskRoi(cv::Rect oldRoi, cv::Rect newRoi)
@@ -23,15 +25,13 @@ bool TaskRoi::run()
 {
 
     qDebug() << "about to set roi width:" << newRoi.width << "height:" << newRoi.height;
+    ROIMeta meta;
 
-    std::pair<std::vector<cv::Rect>, std::vector<cv::Rect>> roidiff;
+    meta.profitable = rectTransform(oldRoi, newRoi, meta.sub, meta.add);
 
-    rectTransform(oldRoi, newRoi, roidiff.first, roidiff.second);
-
-    Subscription::Lock<cv::Rect, std::pair<std::vector<cv::Rect>,
-            std::vector<cv::Rect>>> lock(*sub("dest"));
+    Subscription::Lock<cv::Rect, ROIMeta> lock(*sub("dest"));
     lock.swap(newRoi);
-    lock.swapMeta(roidiff);
+    lock.swapMeta(meta);
     lock.setVersion(lock.version()+1);
 
     return true;
