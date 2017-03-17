@@ -40,12 +40,12 @@ public:
 	/** Set the size of the multi_img. */
 	void setImageSize(cv::Size imgSize);
 	void restoreState();
-	
+
 public slots:
 
-	void setLabeling(const cv::Mat1s &labels,
+	void setLabeling(const cv::Mat1s &      labels,
 	                 const QVector<QColor>& colors,
-	                 bool colorsChanged);
+	                 bool                   colorsChanged);
 
 	void processPartialLabelUpdate(const cv::Mat1s &, const cv::Mat1b &);
 
@@ -59,10 +59,10 @@ public slots:
 signals:
 
 	/** The user has selected labels and wants them to be merged. */
-    void mergeLabelsRequested(const QVector<int> labels);
+	void mergeLabelsRequested(const QVector<int> labels);
 
 	/** The user has selected labels and wants them to be deleted. */
-    void deleteLabelsRequested(const QVector<int> labels);
+	void deleteLabelsRequested(const QVector<int> labels);
 
 	/** The user pressed the clean-up button */
 	void consolidateLabelsRequested();
@@ -105,7 +105,7 @@ private slots:
 	void processLabelItemSelectionChanged(QModelIndex midx);
 
 	void processApplyROIToggled(bool checked);
-	
+
 	// from ImageModel
 	void processRoiRectChanged(cv::Rect newRoi);
 
@@ -126,15 +126,15 @@ private:
 	enum { LabelIndexRole = Qt::UserRole };
 
 	void init();
-    void iconsUpdated();
+	void iconsUpdated();
 
 	// UI with autohide widgets.
 	// The view and scene for this widget.
-	AutohideView   *ahview;
+	AutohideView *ahview;
 	QGraphicsScene *ahscene;
 	// The Qt Designer generated UI of the dockwidget. The top and bottom autohide
 	// widgets are contained here-in but are reparented in init().
-	Ui::LabelDock  *ui;
+	Ui::LabelDock *ui;
 	// Widget in ahscene for main Ui (i.e. labelView).
 	QGraphicsProxyWidget *mainUiWidget;
 	AutohideWidget *ahwidgetTop;
@@ -159,7 +159,7 @@ private:
 	// The current ROI.
 	cv::Rect roi;
 
-    Subscription* iconsSub;
+	Subscription* iconsSub;
 };
 
 #endif // LABELDOCK_H

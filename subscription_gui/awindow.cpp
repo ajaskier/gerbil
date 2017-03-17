@@ -14,39 +14,38 @@
 
 
 AWindow::AWindow(QWidget *parent) :
-    QWidget(parent),
-    ui(new Ui::AWindow)
+	QWidget(parent),
+	ui(new Ui::AWindow)
 {
-    ui->setupUi(this);
+	ui->setupUi(this);
 
 
-    qDebug() << "displayA";
-    dataASub = DataRegister::subscribe(Dependency("DATA_A", SubscriptionType::READ,
-                                           AccessType::DEFERRED), this,
-                                           std::bind(&AWindow::displayA, this));
-
+	qDebug() << "displayA";
+	dataASub = DataRegister::subscribe(Dependency("DATA_A", SubscriptionType::READ,
+	                                              AccessType::DEFERRED), this,
+	                                   std::bind(&AWindow::displayA, this));
 }
 
 void AWindow::displayA()
 {
-    Subscription::Lock<Data> lock(*dataASub);
-    int num = lock()->num;
+	Subscription::Lock<Data> lock(*dataASub);
+	int num = lock()->num;
 
-    ui->outputA->setText(QString::number(num));
+	ui->outputA->setText(QString::number(num));
 }
 
 AWindow::~AWindow()
 {
-    delete dataASub;
+	delete dataASub;
 }
 
 void AWindow::on_computeAButton_clicked()
 {
-    emit buttonAClicked();
+	emit buttonAClicked();
 }
 
 void AWindow::on_inputA_textChanged(const QString &arg1)
 {
-    int num = arg1.toInt();
-    emit inputAChanged(num);
+	int  num = arg1.toInt();
+	emit inputAChanged(num);
 }

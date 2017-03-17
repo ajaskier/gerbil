@@ -1,11 +1,11 @@
-/*	
-	Copyright(c) 2010 Johannes Jordan <johannes.jordan@cs.fau.de>.
-	Copyright(c) 2012 Petr Koupy <petr.koupy@gmail.com>
+/*
+    Copyright(c) 2010 Johannes Jordan <johannes.jordan@cs.fau.de>.
+    Copyright(c) 2012 Petr Koupy <petr.koupy@gmail.com>
 
-	This file may be licensed under the terms of of the GNU General Public
-	License, version 3, as published by the Free Software Foundation. You can
-	find it here: http://www.gnu.org/licenses/gpl.html
-*/
+    This file may be licensed under the terms of of the GNU General Public
+    License, version 3, as published by the Free Software Foundation. You can
+    find it here: http://www.gnu.org/licenses/gpl.html
+ */
 
 #ifndef BANDVIEW_H
 #define BANDVIEW_H
@@ -26,22 +26,19 @@ class BandView : public ScaledView
 	Q_OBJECT
 public:
 
-	enum CursorSize
-	{
+	enum CursorSize {
 		Small,
 		Medium,
 		Big,
 		Huge
 	};
 
-	enum class CursorMode
-	{
+	enum class CursorMode {
 		Marker,
 		Rubber
 	};
 
-	enum class OverrideMode
-	{
+	enum class OverrideMode {
 		On,
 		Off
 	};
@@ -69,9 +66,9 @@ public slots:
 
 	void setCurrentLabel(int label);
 	/* update either labeling colors, or both them and pixel labels */
-	void updateLabeling(const cv::Mat1s &labels,
-						const QVector<QColor> &colors = QVector<QColor>(),
-						bool colorsChanged = false);
+	void updateLabeling(const cv::Mat1s &      labels,
+	                    const QVector<QColor> &colors = QVector<QColor>(),
+	                    bool                   colorsChanged = false);
 	void updateLabeling(const cv::Mat1s &labels, const cv::Mat1b &mask);
 	void applyLabelAlpha(int alpha);
 	void toggleShowLabels(bool disabled);
@@ -98,7 +95,7 @@ signals:
 	void labelSelected(int label);
 
 	// user changed some labels
-    void alteredLabels(const cv::Mat1s &labels, const cv::Mat1b &mask);
+	void alteredLabels(const cv::Mat1s &labels, const cv::Mat1b &mask);
 
 	// user wants full labeling update
 	void newLabeling(const cv::Mat1s &labels);
@@ -156,7 +153,7 @@ private:
 
 	/// input mode to return to after seeding
 	InputMode lastMode;
-	
+
 	// local copy of label colors
 	QVector<QColor> labelColors;
 	/// user-selected alpha
@@ -169,17 +166,17 @@ private:
 	cv::Mat1s seedMap; // mat1s to be consistent with labels matrix
 	cv::Mat1b curMask; // in single label mode contains curlabel members
 
-	CursorMode cursorMode = CursorMode::Marker;
-	CursorSize cursorSize = CursorSize::Medium;
+	CursorMode cursorMode     = CursorMode::Marker;
+	CursorSize cursorSize     = CursorSize::Medium;
 	OverrideMode overrideMode = OverrideMode::On;
 
 	// point sets, stored as polygon for translate(), and hulls for drawing
 	std::unordered_map<CursorSize, std::pair<QPolygonF, QPolygonF>,
-	std::hash<int>> cursors;
+	                   std::hash<int> > cursors;
 
-	QAction* zoomAction = nullptr;
+	QAction* zoomAction  = nullptr;
 	QAction* labelAction = nullptr;
-	QAction* pickAction = nullptr;
+	QAction* pickAction  = nullptr;
 };
 
 #endif // BANDVIEW_H

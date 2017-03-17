@@ -14,63 +14,62 @@
 
 
 BWindow::BWindow(QWidget *parent) :
-    QWidget(parent),
-    ui(new Ui::BWindow)
+	QWidget(parent),
+	ui(new Ui::BWindow)
 {
-    ui->setupUi(this);
+	ui->setupUi(this);
 
 
-    qDebug() << "displayB";
-    dataBSub = DataRegister::subscribe(Dependency("DATA_B", SubscriptionType::READ,
-                                           AccessType::DEFERRED), this,
-                                           std::bind(&BWindow::displayB, this));
-    dataDSub = DataRegister::subscribe(Dependency("DATA_D", SubscriptionType::READ,
-                                           AccessType::DEFERRED), this,
-                                           std::bind(&BWindow::displayD, this));
-
+	qDebug() << "displayB";
+	dataBSub = DataRegister::subscribe(Dependency("DATA_B", SubscriptionType::READ,
+	                                              AccessType::DEFERRED), this,
+	                                   std::bind(&BWindow::displayB, this));
+	dataDSub = DataRegister::subscribe(Dependency("DATA_D", SubscriptionType::READ,
+	                                              AccessType::DEFERRED), this,
+	                                   std::bind(&BWindow::displayD, this));
 }
 
 void BWindow::displayB()
 {
-    Subscription::Lock<Data> lock(*dataBSub);
-    int num = lock()->num;
+	Subscription::Lock<Data> lock(*dataBSub);
+	int num = lock()->num;
 
-    ui->outputB->setText(QString::number(num));
+	ui->outputB->setText(QString::number(num));
 }
 
 void BWindow::displayD()
 {
-    qDebug() << "displayD";
-    Subscription::Lock<Data> lock(*dataDSub);
-    int num = lock()->num;
+	qDebug() << "displayD";
+	Subscription::Lock<Data> lock(*dataDSub);
+	int num = lock()->num;
 
-    ui->outputD->setText(QString::number(num));
+	ui->outputD->setText(QString::number(num));
 }
 
 BWindow::~BWindow()
 {
-    delete dataBSub;
-    delete dataDSub;
+	delete dataBSub;
+	delete dataDSub;
 }
 
 void BWindow::on_computeBButton_clicked()
 {
-    emit buttonBClicked();
+	emit buttonBClicked();
 }
 
 void BWindow::on_computeDButton_clicked()
 {
-    emit buttonDClicked();
+	emit buttonDClicked();
 }
 
 void BWindow::on_inputD_textChanged(const QString &arg1)
 {
-    int num = arg1.toInt();
-    emit inputDChanged(num);
+	int  num = arg1.toInt();
+	emit inputDChanged(num);
 }
 
 void BWindow::on_inputB_textChanged(const QString &arg1)
 {
-    int num = arg1.toInt();
-    emit inputBChanged(num);
+	int  num = arg1.toInt();
+	emit inputBChanged(num);
 }

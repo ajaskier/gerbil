@@ -13,9 +13,7 @@ ModeWidget::ModeWidget(AutohideView *view) :
 }
 
 ModeWidget::~ModeWidget()
-{
-
-}
+{}
 
 void ModeWidget::initUi()
 {

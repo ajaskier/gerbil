@@ -34,88 +34,88 @@ class MainWindow;
 
 class MainWindow : public QMainWindow
 {
-    Q_OBJECT
+	Q_OBJECT
 
 public:
-    explicit MainWindow(QWidget *parent = 0);
-    ~MainWindow();
+	explicit MainWindow(QWidget *parent = 0);
+	~MainWindow();
 
 private:
-    Ui::MainWindow *ui;
+	Ui::MainWindow *ui;
 
-    AWindow* aWindow;
-    BWindow* bWindow;
-    CWindow* cWindow;
-    ImgWindow* imgWindow;
-    BandsWindow* bandsWindow;
-    DistWindow* distWindow;
+	AWindow* aWindow;
+	BWindow* bWindow;
+	CWindow* cWindow;
+	ImgWindow* imgWindow;
+	BandsWindow* bandsWindow;
+	DistWindow* distWindow;
 
-    ModelA* modelA;
-    ModelB* modelB;
-    ModelD* modelD;
-    ImgModel* imageModel;
-    DistModel* distModel;
-    LabelsModel* labelsModel;
+	ModelA* modelA;
+	ModelB* modelB;
+	ModelD* modelD;
+	ImgModel* imageModel;
+	DistModel* distModel;
+	LabelsModel* labelsModel;
 
-    SubscriptionManager sm;
-    TaskScheduler* scheduler;
+	SubscriptionManager sm;
+	TaskScheduler* scheduler;
 
-    std::unique_ptr<Subscription> imgSub;
-    std::unique_ptr<Subscription> roiSub;
+	std::unique_ptr<Subscription> imgSub;
+	std::unique_ptr<Subscription> roiSub;
 
 
-    QString representation = "IMG";
-    int currentBand = 0;
-    size_t maxBands = 0;
+	QString representation = "IMG";
+	int currentBand        = 0;
+	size_t maxBands        = 0;
 
-    NormDock* normDock;
-    BandDock* bandDock;
-    LabelDock* labelDock;
-    RoiDock* roiDock;
+	NormDock* normDock;
+	BandDock* bandDock;
+	LabelDock* labelDock;
+	RoiDock* roiDock;
 
-    cv::Rect originalRoi;
+	cv::Rect originalRoi;
 
 
 signals:
-    void normalizationParametersChanged(
-            representation::t type,
-            multi_img::NormMode normMode,
-            multi_img::Range targetRange
-            );
+	void normalizationParametersChanged(
+		representation::t   type,
+		multi_img::NormMode normMode,
+		multi_img::Range    targetRange
+		);
 
 private slots:
 
-    void initCrucials();
-    void initRest();
+	void initCrucials();
+	void initRest();
 
-    cv::Rect getDimensions();
+	cv::Rect getDimensions();
 
-    void displayROI();
-    void imgUpdated();
+	void displayROI();
+	void imgUpdated();
 
-    void on_checkBoxA_toggled(bool visible);
-    void on_checkBoxB_toggled(bool visible);
-    void on_checkBoxC_toggled(bool visible);
-    void on_computeAButton_clicked();
-    void on_computeBButton_clicked();
-    void on_computeCButton_clicked();
-    void on_computeDButton_clicked();
-    void onDistIMGRequest();
-    void onImageIMGRequest();
+	void on_checkBoxA_toggled(bool visible);
+	void on_checkBoxB_toggled(bool visible);
+	void on_checkBoxC_toggled(bool visible);
+	void on_computeAButton_clicked();
+	void on_computeBButton_clicked();
+	void on_computeCButton_clicked();
+	void on_computeDButton_clicked();
+	void onDistIMGRequest();
+	void onImageIMGRequest();
 
-    void onNormalizationParametersChanged(
-            representation::t type,
-            multi_img::NormMode normMode,
-            multi_img::Range targetRange
-            );
+	void onNormalizationParametersChanged(
+		representation::t   type,
+		multi_img::NormMode normMode,
+		multi_img::Range    targetRange
+		);
 
-    void on_roiButton_clicked();
-    void on_bands_checkbox_toggled(bool visible);
-    void on_img_checkbox_toggled(bool visible);
-    void on_dist_checkbox_toggled(bool visible);
-    void on_labels_checkbox_toggled(bool checked);
-    void on_labels_icons_checkbox_toggled(bool checked);
-    void on_roi_checkbox_toggled(bool checked);
+	void on_roiButton_clicked();
+	void on_bands_checkbox_toggled(bool visible);
+	void on_img_checkbox_toggled(bool visible);
+	void on_dist_checkbox_toggled(bool visible);
+	void on_labels_checkbox_toggled(bool checked);
+	void on_labels_icons_checkbox_toggled(bool checked);
+	void on_roi_checkbox_toggled(bool checked);
 };
 
 #endif // MAINWINDOW_H

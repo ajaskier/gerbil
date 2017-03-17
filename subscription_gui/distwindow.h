@@ -12,26 +12,26 @@ class DistWindow;
 
 class DistWindow : public QWidget
 {
-    Q_OBJECT
+	Q_OBJECT
 
 public:
-    explicit DistWindow(QWidget *parent = 0);
-    ~DistWindow();
+	explicit DistWindow(QWidget *parent = 0);
+	~DistWindow();
 
 private:
-    Ui::DistWindow *ui;
-    Subscription* distSub;
+	Ui::DistWindow *ui;
+	Subscription* distSub;
 
-    DistViewGUI2 *gui;
+	DistViewGUI2 *gui;
 
-    bool guiCreated = false;
+	bool guiCreated = false;
 
 signals:
-    void calculateRequest();
+	void calculateRequest();
 
 private slots:
-    void displayDist();
-    void on_pushButton_clicked();
+	void displayDist();
+	void on_pushButton_clicked();
 };
 
 #endif // DISTWINDOW_H

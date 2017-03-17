@@ -26,11 +26,11 @@
 class NormDock : public QDockWidget, protected Ui::NormDock
 {
 	Q_OBJECT
-	
+
 public:
 	explicit NormDock(QWidget *parent = 0);
 	~NormDock();
-	
+
 	void setLimitedMode(bool limited);
 public slots:
 	void setNormRange(representation::t type, const multi_img::Range& range);
@@ -50,10 +50,10 @@ signals:
 	// Request actual data ranges from model, see setNormRange()
 	void computeDataRangeRequested(representation::t type);
 	void normalizationParametersChanged(
-			representation::t type,
-			multi_img::NormMode normMode,
-			multi_img::Range targetRange
-			);
+		representation::t   type,
+		multi_img::NormMode normMode,
+		multi_img::Range    targetRange
+		);
 	void applyNormalizationRequested();
 	void applyClampDataRequested();
 

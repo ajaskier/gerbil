@@ -1,11 +1,11 @@
 /*
-	Copyright(c) 2010 Johannes Jordan <johannes.jordan@cs.fau.de>.
-	Copyright(c) 2012 Petr Koupy <petr.koupy@gmail.com>
+    Copyright(c) 2010 Johannes Jordan <johannes.jordan@cs.fau.de>.
+    Copyright(c) 2012 Petr Koupy <petr.koupy@gmail.com>
 
-	This file may be licensed under the terms of of the GNU General Public
-	License, version 3, as published by the Free Software Foundation. You can
-	find it here: http://www.gnu.org/licenses/gpl.html
-*/
+    This file may be licensed under the terms of of the GNU General Public
+    License, version 3, as published by the Free Software Foundation. You can
+    find it here: http://www.gnu.org/licenses/gpl.html
+ */
 
 #ifndef VIEWPORT2_H
 #define VIEWPORT2_H
@@ -26,8 +26,8 @@ class Viewport2 : public QGraphicsScene
 {
 	Q_OBJECT
 public:
-    Viewport2(representation::t type, QGLWidget *target);
-    ~Viewport2();
+	Viewport2(representation::t type, QGLWidget *target);
+	~Viewport2();
 
 	void prepareLines();
 	void setLimiters(int label);
@@ -39,18 +39,18 @@ public:
 	};
 
 	enum class BufferFormat : GLenum {
-		RGBA8 = GL_RGBA8,//0x8058,  // GL_RGBA8, constants not defined on windows
-		RGBA16F = GL_RGBA16F,//0x881A,// GL_RGBA16F
-		RGBA32F = GL_RGBA32F//0x8814 // GL_RGBA32F
+		RGBA8   = GL_RGBA8,   //0x8058,  // GL_RGBA8, constants not defined on windows
+		RGBA16F = GL_RGBA16F, //0x881A,// GL_RGBA16F
+		RGBA32F = GL_RGBA32F  //0x8814 // GL_RGBA32F
 	};
 
 	BufferFormat format() { return bufferFormat; }
 
 	/* TODO: make non-public. I am just too tired right now. */
 	// viewport context
-    //vpctx_ptr ctx;
+	//vpctx_ptr ctx;
 	// histograms (binsets)
-    //sets_ptr sets;
+	//sets_ptr sets;
 	bool active;
 
 public slots:
@@ -125,7 +125,7 @@ signals:
 	void addSelectionRequested();
 	void remSelectionRequested();
 
-    void bufferFormatToggled(Viewport2::BufferFormat format);
+	void bufferFormatToggled(Viewport2::BufferFormat format);
 
 protected:
 	void initTimers();
@@ -180,14 +180,15 @@ protected:
 private:
 
 
-    Subscription* sub;
+	Subscription* sub;
 
 	representation::t type;
 	int width, height;
 
-	struct renderbuffer {
+	struct renderbuffer
+	{
 		renderbuffer() : fbo(0), blit(0), dirty(true),
-		    renderStep(10000), renderedLines(0) {}
+			renderStep(10000), renderedLines(0) {}
 
 		// buffer to render to
 		QGLFramebufferObject *fbo;
@@ -196,9 +197,9 @@ private:
 		// true: fbo is not initialized, or was not drawn-to yet.
 		bool dirty;
 		// how many elements to render per step
-		const unsigned int renderStep;
+		const unsigned int   renderStep;
 		// how many elements were already rendered
-		unsigned int renderedLines;
+		unsigned int         renderedLines;
 		// timer for incremental rendering
 		QTimer renderTimer;
 	};
@@ -267,11 +268,12 @@ private:
 	// vector containing highlighted labels
 	QVector<int> highlightLabels;
 
-	struct {
-		int hp = 20; //horizontal padding
-		int vp = 12; //vertical padding
+	struct
+	{
+		int hp  = 20; //horizontal padding
+		int vp  = 12; //vertical padding
 		int vtp = 22; // lower padding for text (legend)
-		int htp; // left padding for text (legend)
+		int htp;      // left padding for text (legend)
 	} boundaries;
 };
 

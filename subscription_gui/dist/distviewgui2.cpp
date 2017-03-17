@@ -9,21 +9,21 @@
 
 DistViewGUI2::DistViewGUI2(representation::t type)
 	: type(type)
-{	
+{
 	// setup frame and its UI
-    frame = new QWidget(this);
-	frame->setSizePolicy(QSizePolicy::Preferred, // hor
-						 QSizePolicy::Expanding); // ver
-    ui = new Ui::DistViewGUI2();
+	frame = new QWidget(this);
+	frame->setSizePolicy(QSizePolicy::Preferred,  // hor
+	                     QSizePolicy::Expanding); // ver
+	ui = new Ui::DistViewGUI2();
 	ui->setupUi(frame);
 
 	connect(QApplication::instance(), SIGNAL(lastWindowClosed()),
 	        this, SLOT(saveState()));
 
 	// create viewport
-    qDebug() << "about to create viewport";
+	qDebug() << "about to create viewport";
 	initVP();
-    qDebug() << "viewport created";
+	qDebug() << "viewport created";
 
 	// create controller widget that will reside inside viewport
 	initVC(type);
@@ -36,7 +36,7 @@ DistViewGUI2::DistViewGUI2(representation::t type)
 
 DistViewGUI2::~DistViewGUI2()
 {
-    vp->deleteLater();
+	vp->deleteLater();
 }
 
 void DistViewGUI2::initVP()
@@ -45,7 +45,7 @@ void DistViewGUI2::initVP()
 	QGLWidget *target = ui->gv->init();
 
 	// create viewport. The viewport is a GraphicsScene
-    vp = new Viewport2(type, target);
+	vp = new Viewport2(type, target);
 	ui->gv->setScene(vp);
 }
 
@@ -67,8 +67,8 @@ void DistViewGUI2::initVPActions()
 
 	ui->gv->addAction(uivc->actionBuff);
 	connect(uivc->actionBuff, SIGNAL(triggered()), vp, SLOT(toggleBufferFormat()));
-    connect(vp, SIGNAL(bufferFormatToggled(Viewport2::BufferFormat)),
-            this, SLOT(updateBufferFormat(Viewport2::BufferFormat)));
+	connect(vp, SIGNAL(bufferFormatToggled(Viewport2::BufferFormat)),
+	        this, SLOT(updateBufferFormat(Viewport2::BufferFormat)));
 
 	ui->gv->addAction(uivc->actionRgb);
 	uivc->rgbButton->setAction(uivc->actionRgb);
@@ -83,7 +83,7 @@ void DistViewGUI2::initVPActions()
 void DistViewGUI2::initVC(representation::t type)
 {
 	/* create VC, apply UI to it, then add to GV */
-	vc = new AutohideWidget();
+	vc   = new AutohideWidget();
 	uivc = new Ui::ViewportControl();
 	uivc->setupUi(vc);
 	ui->gv->addWidget(AutohideWidget::LEFT, vc);
@@ -152,8 +152,8 @@ void DistViewGUI2::initSignals(QObject *dvctrl)
 	        vp, SLOT(toggleLabelHighlight(int)));
 
 	// signals to controller
-	connect(this, SIGNAL(requestBinCount(representation::t, int)),
-	        dvctrl, SLOT(changeBinCount(representation::t, int)));
+	connect(this, SIGNAL(requestBinCount(representation::t,int)),
+	        dvctrl, SLOT(changeBinCount(representation::t,int)));
 
 
 	//   viewport action
@@ -219,7 +219,6 @@ void DistViewGUI2::fold(bool folded)
 		//viewport->shuffleIdx.clear();
 		//viewport->vb.destroy();
 		emit foldingStateChanged(type, true);
-
 	} else { // unfold
 //		GGDBGM(type << " unfolding" << endl);
 
@@ -252,7 +251,7 @@ void DistViewGUI2::setTitle(representation::t type)
 }
 
 void DistViewGUI2::setTitle(representation::t type,
-                           multi_img::Value min, multi_img::Value max)
+                            multi_img::Value min, multi_img::Value max)
 {
 	QString title = QString("<b>%1</b>").arg(representation::prettyString(type));
 	title = title.append(" [%1..%2]")
@@ -262,7 +261,7 @@ void DistViewGUI2::setTitle(representation::t type,
 
 void DistViewGUI2::setAlpha(int alpha)
 {
-	float realalpha = (float)alpha/100.f;
+	float realalpha = (float)alpha / 100.f;
 	uivc->alphaLabel->setText(QString::fromUtf8("α: %1")
 	                          .arg(realalpha, 0, 'f', 2));
 
@@ -325,9 +324,9 @@ void DistViewGUI2::showLimiterMenu()
 	int choice = a->data().toInt(); assert(choice < labelColors.size());
 	vp->setLimiters(choice);
 	if (!uivc->limiterButton->isChecked()) {
-		uivc->limiterButton->toggle();	// changes button state AND viewport
+		uivc->limiterButton->toggle(); // changes button state AND viewport
 	} else {
-		vp->setLimitersMode(true);	// only viewport
+		vp->setLimitersMode(true);     // only viewport
 	}
 }
 
@@ -339,17 +338,17 @@ void DistViewGUI2::createFrameBufferMenu()
 	QAction* tmp;
 	tmp = frameBufferMenu.addAction("RGBA8");
 	tmp->setCheckable(true);
-    tmp->setData(QVariant::fromValue(Viewport2::BufferFormat::RGBA8));
+	tmp->setData(QVariant::fromValue(Viewport2::BufferFormat::RGBA8));
 	actionGroup->addAction(tmp);
 
 	tmp = frameBufferMenu.addAction("RGBA16F");
 	tmp->setCheckable(true);
-    tmp->setData(QVariant::fromValue(Viewport2::BufferFormat::RGBA16F));
+	tmp->setData(QVariant::fromValue(Viewport2::BufferFormat::RGBA16F));
 	actionGroup->addAction(tmp);
 
 	tmp = frameBufferMenu.addAction("RGBA32F");
 	tmp->setCheckable(true);
-    tmp->setData(QVariant::fromValue(Viewport2::BufferFormat::RGBA32F));
+	tmp->setData(QVariant::fromValue(Viewport2::BufferFormat::RGBA32F));
 	actionGroup->addAction(tmp);
 }
 
@@ -369,7 +368,7 @@ void DistViewGUI2::showFrameBufferMenu()
 	if (!a)
 		return;
 
-    Viewport2::BufferFormat choice = a->data().value<Viewport2::BufferFormat>();
+	Viewport2::BufferFormat choice = a->data().value<Viewport2::BufferFormat>();
 	vp->setBufferFormat(choice);
 }
 
@@ -395,7 +394,7 @@ void DistViewGUI2::updateBufferFormat(Viewport2::BufferFormat format)
 {
 	QList<QAction*> list = frameBufferMenu.actions();
 	for (QAction* act : list) {
-        if (act->data().value<Viewport2::BufferFormat>() == format) {
+		if (act->data().value<Viewport2::BufferFormat>() == format) {
 			act->setChecked(true);
 			return;
 		}
@@ -407,7 +406,7 @@ void DistViewGUI2::saveState()
 	QSettings settings;
 	settings.beginGroup("DistView_" + representation::str(type));
 	settings.setValue("HQDrawing", uivc->actionHq->isChecked());
-	settings.setValue("LogDrawing",uivc->actionLog->isChecked());
+	settings.setValue("LogDrawing", uivc->actionLog->isChecked());
 	settings.setValue("alphaModifier", uivc->alphaSlider->value());
 	settings.setValue("NBins", uivc->binSlider->value());
 	settings.endGroup();
@@ -418,8 +417,8 @@ void DistViewGUI2::restoreState()
 	QSettings settings;
 
 	settings.beginGroup("DistView_" + representation::str(type));
-	auto hq = settings.value("HQDrawing", true);
-	auto log = settings.value("LogDrawing", false);
+	auto hq    = settings.value("HQDrawing", true);
+	auto log   = settings.value("LogDrawing", false);
 	auto alpha = settings.value("alphaModifier", 50);
 	auto nbins = settings.value("NBins", 64);
 	settings.endGroup();

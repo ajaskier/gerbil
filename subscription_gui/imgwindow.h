@@ -10,22 +10,22 @@ class ImgWindow;
 
 class ImgWindow : public QWidget
 {
-    Q_OBJECT
+	Q_OBJECT
 
 public:
-    explicit ImgWindow(QWidget *parent = 0);
-    ~ImgWindow();
+	explicit ImgWindow(QWidget *parent = 0);
+	~ImgWindow();
 
 private:
-    Ui::ImgWindow *ui;
-    Subscription* sub;
+	Ui::ImgWindow *ui;
+	Subscription* sub;
 
 signals:
-    void calculateRequest();
+	void calculateRequest();
 
 private slots:
-    void display();
-    void on_pushButton_clicked();
+	void display();
+	void on_pushButton_clicked();
 };
 
 #endif // IMGWINDOW_H

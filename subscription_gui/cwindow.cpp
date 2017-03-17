@@ -14,39 +14,38 @@
 
 
 CWindow::CWindow(QWidget *parent) :
-    QWidget(parent),
-    ui(new Ui::CWindow)
+	QWidget(parent),
+	ui(new Ui::CWindow)
 {
-    ui->setupUi(this);
+	ui->setupUi(this);
 
 
-    qDebug() << "displayC";
-    dataCSub = DataRegister::subscribe(Dependency("DATA_C", SubscriptionType::READ,
-                                           AccessType::DEFERRED), this,
-                                           std::bind(&CWindow::displayC, this));
-
+	qDebug() << "displayC";
+	dataCSub = DataRegister::subscribe(Dependency("DATA_C", SubscriptionType::READ,
+	                                              AccessType::DEFERRED), this,
+	                                   std::bind(&CWindow::displayC, this));
 }
 
 void CWindow::displayC()
 {
-    Subscription::Lock<Data> lock(*dataCSub);
-    int num = lock()->num;
+	Subscription::Lock<Data> lock(*dataCSub);
+	int num = lock()->num;
 
-    ui->outputC->setText(QString::number(num));
+	ui->outputC->setText(QString::number(num));
 }
 
 CWindow::~CWindow()
 {
-    delete dataCSub;
+	delete dataCSub;
 }
 
 void CWindow::on_computeCButton_clicked()
 {
-    emit buttonCClicked();
+	emit buttonCClicked();
 }
 
 void CWindow::on_inputC_textChanged(const QString &arg1)
 {
-    int num = arg1.toInt();
-    emit inputCChanged(num);
+	int  num = arg1.toInt();
+	emit inputCChanged(num);
 }

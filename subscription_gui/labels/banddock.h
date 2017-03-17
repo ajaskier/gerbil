@@ -15,10 +15,10 @@ class QAction;
 class BandDock : public QDockWidget, private Ui::BandDock
 {
 	Q_OBJECT
-	
+
 public:
 	explicit BandDock(cv::Rect fullImgSize, QWidget *parent = 0);
-    virtual ~BandDock();
+	virtual ~BandDock();
 	/** Returns the BandView. */
 	// It is OK for the controller to access BandView directly. It is a
 	// separate entity and not just a GUI element. This is cleaner than
@@ -29,7 +29,7 @@ public:
 	// get bandId of currently shown band
 	representation::t getCurRepresentation() { return curRepr; }
 	// get representation of currently shown band
-	int getCurBandId() {return curBandId;}
+	int getCurBandId() { return curBandId; }
 
 signals:
 	// image band (un-)subscription -> Controller
@@ -60,9 +60,9 @@ public slots:
 	void processBandSelected(representation::t repr, int bandId);
 
 	// TODO label subscriptions
-	void processLabelingChange(const cv::Mat1s &labels,
+	void processLabelingChange(const cv::Mat1s &      labels,
 	                           const QVector<QColor> &colors,
-	                           bool colorsChanged);
+	                           bool                   colorsChanged);
 	void processLabelingChange(const cv::Mat1s &labels,
 	                           const cv::Mat1b &mask);
 
@@ -79,8 +79,8 @@ protected:
 
 	void initUi();
 	void initActions();
-    void bandUpdated();
-    void labelsUpdated();
+	void bandUpdated();
+	void labelsUpdated();
 
 	// local copies
 	QVector<QColor> labelColors;
@@ -93,11 +93,11 @@ protected:
 	// our band view
 	BandView *bv;
 	// our widget for graph segmentation controls
-    //GraphSegWidget *gs;
+	//GraphSegWidget *gs;
 	ModeWidget *mw;
 
-    Subscription* bandSub;
-    Subscription* labelsSub;
+	Subscription* bandSub;
+	Subscription* labelsSub;
 };
 
 #endif // BANDDOCK_H

@@ -11,11 +11,13 @@
 
 #include "model/img_model.h"
 
-static cv::Rect QRect2CVRect(const QRect &r) {
+static cv::Rect QRect2CVRect(const QRect &r)
+{
 	return cv::Rect(r.x(), r.y(), r.width(), r.height());
 }
 
-static QRect CVRect2QRect(const cv::Rect &r) {
+static QRect CVRect2QRect(const cv::Rect &r)
+{
 	return QRect(r.x, r.y, r.width, r.height);
 }
 
@@ -26,38 +28,38 @@ RoiDock::RoiDock(QWidget *parent) :
 	setupUi(this);
 	initUi();
 
-    imageSub = DataRegister::subscribe(Dependency("image.rgb",
-                                                     SubscriptionType::READ,
-                                                     AccessType::DEFERRED), this,
-                                          std::bind(&RoiDock::imageUpdated, this));
+	imageSub = DataRegister::subscribe(Dependency("image.rgb",
+	                                              SubscriptionType::READ,
+	                                              AccessType::DEFERRED), this,
+	                                   std::bind(&RoiDock::imageUpdated, this));
 
-    roiSub = DataRegister::subscribe(Dependency("ROI",
-                                                    SubscriptionType::READ,
-                                                    AccessType::DEFERRED), this,
-                                            std::bind(&RoiDock::roiUpdated, this));
+	roiSub = DataRegister::subscribe(Dependency("ROI",
+	                                            SubscriptionType::READ,
+	                                            AccessType::DEFERRED), this,
+	                                 std::bind(&RoiDock::roiUpdated, this));
 }
 
 RoiDock::~RoiDock()
 {
-    //delete imageSub;
-    //delete roiSub;
-    imageSub->deleteLater();
-    roiSub->deleteLater();
+	//delete imageSub;
+	//delete roiSub;
+	imageSub->deleteLater();
+	roiSub->deleteLater();
 }
 
 void RoiDock::imageUpdated()
 {
-    Subscription::Lock<QImage> lock(*imageSub);
-    QImage img = *lock();
+	Subscription::Lock<QImage> lock(*imageSub);
+	QImage img = *lock();
 
-    updatePixmap(QPixmap::fromImage(img));
+	updatePixmap(QPixmap::fromImage(img));
 }
 
 void RoiDock::roiUpdated()
 {
-    Subscription::Lock<cv::Rect> lock(*roiSub);
-    cv::Rect roi = *lock();
-    setRoi(roi);
+	Subscription::Lock<cv::Rect> lock(*roiSub);
+	cv::Rect roi = *lock();
+	setRoi(roi);
 }
 
 QRect RoiDock::getRoi() const
@@ -67,7 +69,7 @@ QRect RoiDock::getRoi() const
 
 void RoiDock::setRoi(const cv::Rect &roi)
 {
-	if(roi == QRect2CVRect(curRoi)) {
+	if (roi == QRect2CVRect(curRoi)) {
 		// GUI already up-to-date, prevent loop
 		return;
 	}
@@ -95,10 +97,10 @@ void RoiDock::initUi()
 	roiView = new ROIView();
 	view->setScene(roiView);
 	connect(roiView, SIGNAL(newContentRect(QRect)),
-			view, SLOT(fitContentRect(QRect)));
+	        view, SLOT(fitContentRect(QRect)));
 
 	// initialize button row
-	btn = new AutohideWidget();
+	btn   = new AutohideWidget();
 	uibtn = new Ui::RoiDockButtonUI();
 	uibtn->setupUi(btn);
 	roiView->offBottom = AutohideWidget::OutOffset;
@@ -106,15 +108,15 @@ void RoiDock::initUi()
 
 	/* init signals */
 	connect(roiView, SIGNAL(newSizeHint(QSize)),
-			view, SLOT(updateSizeHint(QSize)));
+	        view, SLOT(updateSizeHint(QSize)));
 	connect(roiView, SIGNAL(updateScrolling(bool)),
 	        view, SLOT(suppressScrolling(bool)));
 	connect(roiView, SIGNAL(newSelection(const QRect&)),
-			this, SLOT(processNewSelection(const QRect&)));
+	        this, SLOT(processNewSelection(const QRect&)));
 	connect(bandsSlider, SIGNAL(valueChanged(int)),
-			this, SLOT(processBandsSliderChange(int)));
+	        this, SLOT(processBandsSliderChange(int)));
 	connect(bandsSlider, SIGNAL(sliderMoved(int)),
-			this, SLOT(processBandsSliderChange(int)));
+	        this, SLOT(processBandsSliderChange(int)));
 
 	uibtn->applyButton->setAction(uibtn->actionApply);
 	roiView->setApplyAction(uibtn->actionApply);
@@ -147,7 +149,7 @@ void RoiDock::processNewSelection(const QRect &roi, bool internal)
 
 	QString title("<b>ROI:</b> %1, %2 - %3, %4 (%5x%6)");
 	title = title.arg(roi.x()).arg(roi.y()).arg(roi.right()).arg(roi.bottom())
-			.arg(roi.width()).arg(roi.height());
+	        .arg(roi.width()).arg(roi.height());
 	roiTitle->setText(title);
 }
 
@@ -155,7 +157,7 @@ void RoiDock::applyRoi()
 {
 	enableActions(false);
 	cv::Rect roi = QRect2CVRect(curRoi);
-	emit roiRequested(roi);
+	emit     roiRequested(roi);
 
 	// reset will go back to current state
 	oldRoi = curRoi;

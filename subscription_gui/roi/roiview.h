@@ -65,7 +65,7 @@ struct BoundedRectResizer : public SizeGripItem::Resizer
 {
 	virtual void operator()(QGraphicsItem* item, const QRectF& rect)
 	{
-		BoundedRect* rectItem =	dynamic_cast<BoundedRect*>(item);
+		BoundedRect* rectItem = dynamic_cast<BoundedRect*>(item);
 		if (rectItem)
 			rectItem->adjustTo(rect, false);
 	}

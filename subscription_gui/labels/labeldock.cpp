@@ -27,11 +27,11 @@
 
 
 LabelDock::LabelDock(QWidget *parent) :
-    QDockWidget(parent),
-    ui(new Ui::LabelDock),
-    labelModel(new QStandardItemModel),
-    hovering(false),
-    hoverLabel(-1)
+	QDockWidget(parent),
+	ui(new Ui::LabelDock),
+	labelModel(new QStandardItemModel),
+	hovering(false),
+	hoverLabel(-1)
 {
 	setObjectName("LabelDock");
 	connect(QApplication::instance(), SIGNAL(lastWindowClosed()),
@@ -39,19 +39,17 @@ LabelDock::LabelDock(QWidget *parent) :
 	init();
 	restoreState();
 
-    iconsSub = DataRegister::subscribe(Dependency("labels.icons",
-                                                       SubscriptionType::READ,
-                                                       AccessType::DEFERRED), this,
-                                            std::bind(&LabelDock::iconsUpdated, this));
-
+	iconsSub = DataRegister::subscribe(Dependency("labels.icons",
+	                                              SubscriptionType::READ,
+	                                              AccessType::DEFERRED), this,
+	                                   std::bind(&LabelDock::iconsUpdated, this));
 }
 
 void LabelDock::iconsUpdated()
 {
-    Subscription::Lock<QVector<QImage>> lock(*iconsSub);
-    QVector<QImage> icons = *lock();
-    processMaskIconsComputed(icons);
-
+	Subscription::Lock<QVector<QImage> > lock(*iconsSub);
+	QVector<QImage> icons = *lock();
+	processMaskIconsComputed(icons);
 }
 
 void LabelDock::init()
@@ -98,8 +96,8 @@ void LabelDock::init()
 	        this, SLOT(resizeSceneContents()));
 
 	this->setWindowTitle("Labels");
-	QWidget *contents = new QWidget(this);
-	QVBoxLayout *layout = new QVBoxLayout(contents);
+	QWidget     *contents = new QWidget(this);
+	QVBoxLayout *layout   = new QVBoxLayout(contents);
 	ahview = new AutohideView(contents);
 	ahview->init();
 	ahview->setBaseSize(QSize(300, 245));
@@ -138,9 +136,9 @@ void LabelDock::init()
 	// debug cross-hair
 	if (false) {
 		const QPen pen(Qt::red);
-		const int llenh = 5;
-		ahscene->addLine(1,-llenh,1,llenh,pen);
-		ahscene->addLine(-llenh,1,llenh,1,pen);
+		const int  llenh = 5;
+		ahscene->addLine(1, -llenh, 1, llenh, pen);
+		ahscene->addLine(-llenh, 1, llenh, 1, pen);
 	}
 
 	this->setWidget(contents);
@@ -160,7 +158,7 @@ void LabelDock::updateLabelIcons()
 	}
 	if (ui->applyROI->isChecked() && roi != cv::Rect() && roi.width > 0) {
 		r = float(roi.height) / roi.width;
-    //	GGDBGM("ROI aspect ratio " << r << endl);
+		//	GGDBGM("ROI aspect ratio " << r << endl);
 	}
 
 	QSize iconSize(size, size);
@@ -186,9 +184,9 @@ void LabelDock::setImageSize(cv::Size imgSize)
 	this->imgSize = imgSize;
 }
 
-void LabelDock::setLabeling(const cv::Mat1s & labels,
+void LabelDock::setLabeling(const cv::Mat1s &      labels,
                             const QVector<QColor> &colors,
-                            bool colorsChanged)
+                            bool                   colorsChanged)
 {
 	//GGDBGM("colors.size()=" << colors.size()
 	//	   << "  colorsChanged=" << colorsChanged << endl;)
@@ -200,7 +198,7 @@ void LabelDock::setLabeling(const cv::Mat1s & labels,
 	// did the colors change?
 	// FIXME: It is probably uneccessary to compare the color vectors.
 	// Test after 1.0 release.
-	if (colorsChanged || (this->colors != colors) ) {
+	if (colorsChanged || (this->colors != colors)) {
 		this->colors = colors;
 	}
 
@@ -213,17 +211,17 @@ void LabelDock::setLabeling(const cv::Mat1s & labels,
 	deselectSelectedLabels();
 
 	//GGDBGM("requesting new label icons" << endl);
-    //emit labelMaskIconsRequested();
+	//emit labelMaskIconsRequested();
 }
 
 void LabelDock::processPartialLabelUpdate(const cv::Mat1s &, const cv::Mat1b &)
 {
-    //emit labelMaskIconsRequested();
+	//emit labelMaskIconsRequested();
 }
 
 void LabelDock::mergeOrDeleteSelected()
 {
-	QItemSelection selection = ui->labelView->selectionModel()->selection();
+	QItemSelection  selection = ui->labelView->selectionModel()->selection();
 	QModelIndexList modelIdxs = selection.indexes();
 
 	/* need at least two selected colors to merge, one color to delete */
@@ -241,18 +239,16 @@ void LabelDock::mergeOrDeleteSelected()
 	// Tell the LabelingModel:
 	if (sender() == ui->delBtn) {
 		emit deleteLabelsRequested(selectedLabels);
-	} else
-	{
+	} else{
 		emit mergeLabelsRequested(selectedLabels);
 	}
 
-    //emit labelMaskIconsRequested();
+	//emit labelMaskIconsRequested();
 }
 
 void LabelDock::deselectSelectedLabels()
 {
-	for(auto &idx : ui->labelView->selectionModel()->selectedIndexes())
-	{
+	for (auto &idx : ui->labelView->selectionModel()->selectedIndexes()) {
 		int id = idx.data(LabelIndexRole).value<int>();
 		toggleLabelSelection(id, true);
 	}
@@ -271,20 +267,19 @@ void LabelDock::processMaskIconsComputed(QVector<QImage> icons)
 		rebuild = true;
 	}
 
-	if (icons.size()>0) {
+	if (icons.size() > 0) {
 		ui->labelView->setIconSize(icons[0].size());
 	}
 
 	// no tree model -> just iterate flat over all items
 	for (int i = 0; i < icons.size(); i++) {
+		const QImage &image  = icons[i];
+		QPixmap       pixmap = QPixmap::fromImage(image);
+		QIcon         icon(pixmap);
 
-		const QImage &image = icons[i];
-		QPixmap pixmap = QPixmap::fromImage(image);
-		QIcon icon(pixmap);
-
-		if(rebuild) {
+		if (rebuild) {
 			// labelModel takes ownership of the item.
-			QStandardItem *itm =  new QStandardItem();
+			QStandardItem *itm = new QStandardItem();
 			//itm->setData(QIcon(),Qt::DecorationRole);
 			itm->setData(i, LabelIndexRole);
 			labelModel->appendRow(itm);
@@ -333,20 +328,21 @@ void LabelDock::processLabelItemSelectionChanged(QModelIndex midx)
 {
 	short label = midx.data(LabelIndexRole).value<int>();
 	//GGDBGM("hovering over " << label << endl);
-	hovering = true;
+	hovering   = true;
 	hoverLabel = label;
 	emit toggleLabelHighlightRequested(label);
 }
 
 void LabelDock::toggleLabelSelection(int label, bool innerSource)
 {
-	hovering = true;
+	hovering   = true;
 	hoverLabel = label;
 
-	if(!innerSource) this->blockSignals(true); //to prevent feedback
+	if (!innerSource)
+		this->blockSignals(true);              //to prevent feedback
 
 	QModelIndex index = ui->labelView->model()->index(label, 0);
-	if (index.isValid() ) {
+	if (index.isValid()) {
 		if (ui->labelView->selectionModel()->isSelected(index)) {
 			ui->labelView->selectionModel()->select(index, QItemSelectionModel::Deselect);
 		} else {
@@ -354,19 +350,20 @@ void LabelDock::toggleLabelSelection(int label, bool innerSource)
 		}
 	}
 
-	if(!innerSource) this->blockSignals(false);
+	if (!innerSource)
+		this->blockSignals(false);
 }
 
 void LabelDock::processApplyROIToggled(bool checked)
 {
 	const bool applyROI = checked;
-	emit applyROIChanged(applyROI);
+	emit       applyROIChanged(applyROI);
 	updateLabelIcons();
 }
 
 void LabelDock::processRoiRectChanged(cv::Rect newRoi)
 {
-    //GGDBG_CALL();
+	//GGDBG_CALL();
 	roi = newRoi;
 	updateLabelIcons();
 }
@@ -415,8 +412,8 @@ void LabelDock::saveState()
 void LabelDock::restoreState()
 {
 	QSettings settings;
-	auto roiChecked = settings.value("Labeling/applyROI", true);
-	auto size = settings.value("Labeling/iconsSize", 64);
+	auto      roiChecked = settings.value("Labeling/applyROI", true);
+	auto      size       = settings.value("Labeling/iconsSize", 64);
 
 	ui->sizeSlider->setValue(size.toInt());
 	ui->applyROI->setChecked(roiChecked.toBool());

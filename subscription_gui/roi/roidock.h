@@ -19,8 +19,8 @@ class RoiDock : public QDockWidget, private Ui::RoiDockUI
 	Q_OBJECT
 public:
 	explicit RoiDock(QWidget *parent = 0);
-    virtual ~RoiDock();
-	
+	virtual ~RoiDock();
+
 	QRect getRoi() const;
 
 
@@ -56,8 +56,8 @@ protected:
 private:
 	void initUi();
 
-    void roiUpdated();
-    void imageUpdated();
+	void roiUpdated();
+	void imageUpdated();
 
 	// The old ROI before apply (used for reset).
 	QRect oldRoi;
@@ -70,8 +70,8 @@ private:
 	Ui::RoiDockButtonUI *uibtn;
 	AutohideWidget *btn;
 
-    Subscription* roiSub;
-    Subscription* imageSub;
+	Subscription* roiSub;
+	Subscription* imageSub;
 };
 
 #endif // ROIDOCK_H

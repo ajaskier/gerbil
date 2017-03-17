@@ -1,10 +1,10 @@
 /*
-	Copyright(c) 2010 Johannes Jordan <johannes.jordan@cs.fau.de>.
+    Copyright(c) 2010 Johannes Jordan <johannes.jordan@cs.fau.de>.
 
-	This file may be licensed under the terms of of the GNU General Public
-	License, version 3, as published by the Free Software Foundation. You can
-	find it here: http://www.gnu.org/licenses/gpl.html
-*/
+    This file may be licensed under the terms of of the GNU General Public
+    License, version 3, as published by the Free Software Foundation. You can
+    find it here: http://www.gnu.org/licenses/gpl.html
+ */
 
 #include "widgets/roiview.h"
 #include "widgets/sizegripitem/sizegripitem.h"
@@ -38,13 +38,13 @@ ROIView::ROIView()
 
 	connect(rect, SIGNAL(newRect(QRectF)), grip, SLOT(setRect(QRectF)));
 	connect(rect, SIGNAL(newSelection(QRect)),
-			this, SIGNAL(newSelection(QRect)));
+	        this, SIGNAL(newSelection(QRect)));
 }
 
 void ROIView::setROI(QRect roi)
 {
-    if (this->pixmap.size() == QSize(0,0))
-        ScaledView::setPixmap(QPixmap(roi.width(), roi.height()));
+	if (this->pixmap.size() == QSize(0, 0))
+		ScaledView::setPixmap(QPixmap(roi.width(), roi.height()));
 	rect->adjustTo(roi, true);
 }
 
@@ -119,7 +119,7 @@ void BoundedRect::mouseMoveEvent(QGraphicsSceneMouseEvent *ev)
 
 	// nothing new after all..
 	if (cursor == lastcursor)
-	  return;
+		return;
 
 	/* translate into our coordinates. Note: the way we do it, mouse movement
 	 * and item movement are in perfect sync. if we would use Qt's functionality

@@ -26,48 +26,45 @@ static QIcon colorIcon(const QColor &color)
 }
 
 BandDock::BandDock(cv::Rect fullImgSize, QWidget *parent)
-    : QDockWidget(parent), fullImgSize(fullImgSize),
-      curRepr(representation::IMG), curBandId(0)
+	: QDockWidget(parent), fullImgSize(fullImgSize),
+	curRepr(representation::IMG), curBandId(0)
 {
 	setupUi(this);
 	initUi();
 
-    QString image = "bands.IMG.0"; //TODO: fix this!
-    bandSub = DataRegister::subscribe(Dependency(image,
-                                                     SubscriptionType::READ,
-                                                     AccessType::DEFERRED), this,
-                                          std::bind(&BandDock::bandUpdated, this));
+	QString image = "bands.IMG.0"; //TODO: fix this!
+	bandSub = DataRegister::subscribe(Dependency(image,
+	                                             SubscriptionType::READ,
+	                                             AccessType::DEFERRED), this,
+	                                  std::bind(&BandDock::bandUpdated, this));
 
-    labelsSub = DataRegister::subscribe(Dependency("labels",
-                                                       SubscriptionType::READ,
-                                                       AccessType::DEFERRED), this,
-                                            std::bind(&BandDock::labelsUpdated, this));
-
+	labelsSub = DataRegister::subscribe(Dependency("labels",
+	                                               SubscriptionType::READ,
+	                                               AccessType::DEFERRED), this,
+	                                    std::bind(&BandDock::labelsUpdated, this));
 }
 
 BandDock::~BandDock()
 {
-    bandSub->deleteLater();
-    labelsSub->deleteLater();
-
+	bandSub->deleteLater();
+	labelsSub->deleteLater();
 }
 
 void BandDock::bandUpdated()
 {
-    Subscription::Lock<std::pair<QImage, QString>> lock(*bandSub);
-    QImage img = lock()->first;
-    QString desc = lock()->second;
+	Subscription::Lock<std::pair<QImage, QString> > lock(*bandSub);
+	QImage  img  = lock()->first;
+	QString desc = lock()->second;
 
-    changeBand(representation::IMG, 0, QPixmap::fromImage(img), desc);
+	changeBand(representation::IMG, 0, QPixmap::fromImage(img), desc);
 }
 
 void BandDock::labelsUpdated()
 {
-    Subscription::Lock<Labels> dest_lock(*labelsSub);
-    Labels l = *dest_lock();
+	Subscription::Lock<Labels> dest_lock(*labelsSub);
+	Labels l = *dest_lock();
 
-    processLabelingChange(l.scopedlabels, l.colors, true);
-
+	processLabelingChange(l.scopedlabels, l.colors, true);
 }
 
 void BandDock::initUi()
@@ -81,23 +78,23 @@ void BandDock::initUi()
 	        view, SLOT(fitContentRect(QRect)));
 
 	// add graphseg control widget
-    //gs = new GraphSegWidget(view);
+	//gs = new GraphSegWidget(view);
 	bv->offBottom = AutohideWidget::OutOffset;
-    //view->addWidget(AutohideWidget::BOTTOM, gs);
+	//view->addWidget(AutohideWidget::BOTTOM, gs);
 
 	connect(bv, SIGNAL(newSizeHint(QSize)),
-			view, SLOT(updateSizeHint(QSize)));
+	        view, SLOT(updateSizeHint(QSize)));
 
 	connect(bv, SIGNAL(updateScrolling(bool)),
 	        view, SLOT(suppressScrolling(bool)));
 
 	connect(bv, SIGNAL(requestCursor(Qt::CursorShape)),
-			view, SLOT(applyCursor(Qt::CursorShape)));
+	        view, SLOT(applyCursor(Qt::CursorShape)));
 
-    //connect(gs, SIGNAL(requestLoadSeeds()),
-    //        this, SLOT(loadSeeds()));
-    //connect(gs, SIGNAL(requestClearSeeds()),
-    //        bv, SLOT(clearSeeds()));
+	//connect(gs, SIGNAL(requestLoadSeeds()),
+	//        this, SLOT(loadSeeds()));
+	//connect(gs, SIGNAL(requestClearSeeds()),
+	//        bv, SLOT(clearSeeds()));
 
 	connect(markerSelector, SIGNAL(currentIndexChanged(int)),
 	        this, SLOT(processMarkerSelectorIndexChanged(int)));
@@ -120,10 +117,10 @@ void BandDock::initUi()
 	// label update is triggered by timer. Hide it for now.
 	applyButton->setVisible(false);
 
-    //connect(gs, SIGNAL(requestToggleSeedMode(bool)),
-    //        this, SLOT(graphSegModeToggled(bool)));
-    //connect(gs, SIGNAL(requestToggleSeedMode(bool)),
-    //        bv, SLOT(toggleSeedMode(bool)));
+	//connect(gs, SIGNAL(requestToggleSeedMode(bool)),
+	//        this, SLOT(graphSegModeToggled(bool)));
+	//connect(gs, SIGNAL(requestToggleSeedMode(bool)),
+	//        bv, SLOT(toggleSeedMode(bool)));
 
 	connect(this, SIGNAL(currentLabelChanged(int)),
 	        bv, SLOT(setCurrentLabel(int)));
@@ -132,7 +129,7 @@ void BandDock::initUi()
 	        this, SLOT(processVisibilityChanged(bool)));
 
 	//add mode widget
-	mw = new ModeWidget(view);
+	mw         = new ModeWidget(view);
 	bv->offTop = AutohideWidget::OutOffset;
 	view->addWidget(AutohideWidget::TOP, mw);
 
@@ -188,13 +185,13 @@ void BandDock::changeBand(representation::t repr, int bandId,
                           QPixmap band, QString desc)
 {
 	//GGDBGM("received image band update " << repr << " " << bandId << endl);
-	if(curRepr != repr || curBandId != bandId) {
+	if (curRepr != repr || curBandId != bandId) {
 		//GGDBGM("we did not subscribe for (" << curRepr << " " << curBandId <<  ")"
 		//	   << std::endl);
 		return;
 	}
 
-    qDebug() << "band has width" << band.width() << "and height:" << band.height();
+	qDebug() << "band has width" << band.width() << "and height:" << band.height();
 	bv->setPixmap(band);
 	setWindowTitle(desc);
 }
@@ -204,13 +201,13 @@ void BandDock::processBandSelected(representation::t repr, int bandId)
 	if (repr == curRepr && bandId == curBandId) {
 		return;
 	}
-	if(isVisible()) {
+	if (isVisible()) {
 		//GGDBGM("UNsubscribing image band "<< curRepr << " " << curBandId << endl);
 		emit unsubscribeImageBand(this, curRepr, curBandId);
 	}
-	curRepr = repr;
+	curRepr   = repr;
 	curBandId = bandId;
-	if(isVisible()) {
+	if (isVisible()) {
 		//GGDBGM("subscribing image band "<< curRepr << " " << curBandId << endl);
 		emit subscribeImageBand(this, curRepr, curBandId);
 	}
@@ -224,22 +221,21 @@ void BandDock::clearLabel()
 
 void BandDock::processMarkerSelectorIndexChanged(int index)
 {
-	if (index < 0)	// empty selection, during initialization
+	if (index < 0)  // empty selection, during initialization
 		return;
 
 	index += 1; // we start with 1, combobox with 0
 
 	int nlabels = labelColors.count();
 
-	if (nlabels && index == nlabels) {	// new label requested
-
+	if (nlabels && index == nlabels) {  // new label requested
 		// commit uncommitted label changes in the bandview
 		bv->commitLabelChanges();
 		// issue creation of a new label
 		emit newLabelRequested();
 
 		// select that label, will return back here into the else() case
-		markerSelector->setCurrentIndex(index-1);
+		markerSelector->setCurrentIndex(index - 1);
 	} else {
 		// propagate label change
 		emit currentLabelChanged(index);
@@ -253,7 +249,6 @@ void BandDock::processVisibilityChanged(bool visible)
 	} else {
 		emit unsubscribeImageBand(this, curRepr, curBandId);
 	}
-
 }
 
 bool BandDock::eventFilter(QObject *obj, QEvent *event)
@@ -267,9 +262,9 @@ bool BandDock::eventFilter(QObject *obj, QEvent *event)
 	return QObject::eventFilter(obj, event);
 }
 
-void BandDock::processLabelingChange(const cv::Mat1s &labels,
+void BandDock::processLabelingChange(const cv::Mat1s &      labels,
                                      const QVector<QColor> &colors,
-                                     bool colorsChanged)
+                                     bool                   colorsChanged)
 {
 	if (!colors.empty()) {
 		// store a local copy of the color array
@@ -278,8 +273,7 @@ void BandDock::processLabelingChange(const cv::Mat1s &labels,
 		// block signals to not fire spurious label changed events
 		markerSelector->blockSignals(true);
 		markerSelector->clear();
-		for (int i = 1; i < colors.size(); ++i) // 0 is index for unlabeled
-		{
+		for (int i = 1; i < colors.size(); ++i) { // 0 is index for unlabeled
 			markerSelector->addItem(colorIcon(colors.at(i)), "");
 		}
 		markerSelector->addItem(QIcon::fromTheme("list-add"), "");
@@ -295,7 +289,7 @@ void BandDock::processLabelingChange(const cv::Mat1s &labels,
 	}
 
 	// tell bandview about the update as well
-    qDebug() << "label width" << labels.cols << "labels height" << labels.rows;
+	qDebug() << "label width" << labels.cols << "labels height" << labels.rows;
 	bv->updateLabeling(labels, colors, colorsChanged);
 }
 
@@ -306,8 +300,7 @@ void BandDock::processLabelingChange(const cv::Mat1s &labels,
 }
 
 void BandDock::graphSegModeToggled(bool)
-{
-}
+{}
 
 void BandDock::loadSeeds()
 {
@@ -324,8 +317,8 @@ void BandDock::loadSeeds()
 
 void BandDock::screenshot()
 {
-	QImage img = bv->getPixmap().toImage();
-	cv::Mat output = QImage2Mat(img);
+	QImage   img    = bv->getPixmap().toImage();
+	cv::Mat  output = QImage2Mat(img);
 	GerbilIO io(this, "Band Image File", "band image");
 	io.setFileSuffix(".png");
 	io.setFileCategory("Screenshot");

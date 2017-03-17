@@ -15,34 +15,34 @@
 #include "distviewcompute_utils.h"
 
 ImgWindow::ImgWindow(QWidget *parent) :
-    QWidget(parent),
-    ui(new Ui::ImgWindow)
+	QWidget(parent),
+	ui(new Ui::ImgWindow)
 {
-    ui->setupUi(this);
-    sub = DataRegister::subscribe(Dependency("image.IMG", SubscriptionType::READ,
-                                           AccessType::DEFERRED), this,
-                                           std::bind(&ImgWindow::display, this));
+	ui->setupUi(this);
+	sub = DataRegister::subscribe(Dependency("image.IMG", SubscriptionType::READ,
+	                                         AccessType::DEFERRED), this,
+	                              std::bind(&ImgWindow::display, this));
 }
 
 ImgWindow::~ImgWindow()
 {
-    delete sub;
+	delete sub;
 }
 
 void ImgWindow::display()
 {
-    Subscription::Lock<multi_img> lock(*sub);
-    multi_img* img = lock();
-    qDebug() << "height:" << img->height << "width:" << img->width;
+	Subscription::Lock<multi_img> lock(*sub);
+	multi_img* img = lock();
+	qDebug() << "height:" << img->height << "width:" << img->width;
 
-    QPixmap pix = QPixmap::fromImage(img->export_qt(1));
-    ui->label->setPixmap(pix);
-    ui->label->resize(pix.width(), pix.height());
-    int margin = 15;
-    this->resize(pix.width()+margin, pix.height()+margin);
+	QPixmap pix = QPixmap::fromImage(img->export_qt(1));
+	ui->label->setPixmap(pix);
+	ui->label->resize(pix.width(), pix.height());
+	int margin = 15;
+	this->resize(pix.width() + margin, pix.height() + margin);
 }
 
 void ImgWindow::on_pushButton_clicked()
 {
-    emit calculateRequest();
+	emit calculateRequest();
 }

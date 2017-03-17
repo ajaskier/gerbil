@@ -1,11 +1,11 @@
 /*
-	Copyright(c) 2010 Johannes Jordan <johannes.jordan@cs.fau.de>.
-	Copyright(c) 2012 Petr Koupy <petr.koupy@gmail.com>
+    Copyright(c) 2010 Johannes Jordan <johannes.jordan@cs.fau.de>.
+    Copyright(c) 2012 Petr Koupy <petr.koupy@gmail.com>
 
-	This file may be licensed under the terms of of the GNU General Public
-	License, version 3, as published by the Free Software Foundation. You can
-	find it here: http://www.gnu.org/licenses/gpl.html
-*/
+    This file may be licensed under the terms of of the GNU General Public
+    License, version 3, as published by the Free Software Foundation. You can
+    find it here: http://www.gnu.org/licenses/gpl.html
+ */
 
 #include "viewport2.h"
 #include <app/gerbilio.h>
@@ -35,22 +35,22 @@
 
 
 Viewport2::Viewport2(representation::t type, QGLWidget *target)
-    : type(type), target(target), width(0), height(0),
-      //ctx(new SharedData<ViewportCtx>(new ViewportCtx())),
-      //sets(new SharedData<std::vector<BinSet> >(new std::vector<BinSet>())),
-      selection(0), hover(-1), limiterMode(false),
-      active(false), useralpha(1.f),
-      showLabeled(true), showUnlabeled(true),
-      overlayMode(false),
-      illuminant_show(true),
-      zoom(1.), holdSelection(false), activeLimiter(0),
-      drawLog(nullptr), drawMeans(nullptr), drawRGB(nullptr), drawHQ(nullptr),
-      bufferFormat(BufferFormat::RGBA16F),
-      drawingState(HIGH_QUALITY), yaxisWidth(0), vb(QGLBuffer::VertexBuffer)
+	: type(type), target(target), width(0), height(0),
+	//ctx(new SharedData<ViewportCtx>(new ViewportCtx())),
+	//sets(new SharedData<std::vector<BinSet> >(new std::vector<BinSet>())),
+	selection(0), hover(-1), limiterMode(false),
+	active(false), useralpha(1.f),
+	showLabeled(true), showUnlabeled(true),
+	overlayMode(false),
+	illuminant_show(true),
+	zoom(1.), holdSelection(false), activeLimiter(0),
+	drawLog(nullptr), drawMeans(nullptr), drawRGB(nullptr), drawHQ(nullptr),
+	bufferFormat(BufferFormat::RGBA16F),
+	drawingState(HIGH_QUALITY), yaxisWidth(0), vb(QGLBuffer::VertexBuffer)
 {
-    //(*ctx)->wait = 1;
-    //(*ctx)->reset = 1;
-    //(*ctx)->ignoreLabels = false;
+	//(*ctx)->wait = 1;
+	//(*ctx)->reset = 1;
+	//(*ctx)->ignoreLabels = false;
 
 	restoreState();
 	initTimers();
@@ -58,9 +58,9 @@ Viewport2::Viewport2(representation::t type, QGLWidget *target)
 	connect(QApplication::instance(), SIGNAL(lastWindowClosed()),
 	        this, SLOT(saveState()));
 
-    sub = DataRegister::subscribe(Dependency("dist.IMG", SubscriptionType::READ,
-                                                 AccessType::DEFERRED), this,
-                                                 std::bind(&Viewport2::rebuild, this));
+	sub = DataRegister::subscribe(Dependency("dist.IMG", SubscriptionType::READ,
+	                                         AccessType::DEFERRED), this,
+	                              std::bind(&Viewport2::rebuild, this));
 }
 
 Viewport2::~Viewport2()
@@ -70,7 +70,7 @@ Viewport2::~Viewport2()
 		delete buffers[i].blit;
 	}
 
-    delete sub;
+	delete sub;
 }
 
 /********* I N I T **************/
@@ -105,13 +105,13 @@ void Viewport2::initBuffers()
 		/* debug output */
 		const char* bfs;
 		switch (bufferFormat) {
-		case BufferFormat::RGBA8  : bfs = "RGBA8"; break;
+		case BufferFormat::RGBA8: bfs   = "RGBA8"; break;
 		case BufferFormat::RGBA16F: bfs = "RGBA16F"; break;
 		case BufferFormat::RGBA32F: bfs = "RGBA32F"; break;
 		default:
 			bfs = "UNKNOWN_BUFFER_FORMAT"; break;
 		}
-        std::cerr << "Viewport2: Warning: Failed to init framebuffer "
+		std::cerr << "Viewport2: Warning: Failed to init framebuffer "
 		          << "with format " << bfs << ". "
 		          << "Falling back to RGBA8. Drawing quality reduced."
 		          << std::endl;
@@ -120,7 +120,7 @@ void Viewport2::initBuffers()
 		bufferFormat = BufferFormat::RGBA8;
 		// try again
 		if (!tryInitBuffers()) {
-            std::cerr << "Viewport2: Error: Failed to init framebuffer "
+			std::cerr << "Viewport2: Error: Failed to init framebuffer "
 			          << "with format RGBA8. Aborting."
 			          << std::endl;
 			std::abort();
@@ -148,15 +148,15 @@ bool Viewport2::tryInitBuffers()
 		// second: buffer
 		delete buffers[i].fbo;
 		buffers[i].fbo = new QGLFramebufferObject(width, height, format_buf);
-        if(!buffers[i].fbo->isValid()) {
+		if (!buffers[i].fbo->isValid()) {
 			return false;
 		}
-        buffers[i].dirty = true;
+		buffers[i].dirty = true;
 
 		// third: blit buffer
 		delete buffers[i].blit;
 		buffers[i].blit = new QGLFramebufferObject(width, height, format_blit);
-		if(!buffers[i].blit->isValid()) {
+		if (!buffers[i].blit->isValid()) {
 			return false;
 		}
 	}
@@ -168,12 +168,12 @@ bool Viewport2::tryInitBuffers()
 void Viewport2::drawBackground(QPainter *painter, const QRectF &rect)
 {
 	// update geometry
-	int nwidth = painter->device()->width();
+	int nwidth  = painter->device()->width();
 	int nheight = painter->device()->height();
 	if (nwidth != width || nheight != height) {
-		width = nwidth;
+		width  = nwidth;
 		height = nheight;
-		zoom = 1.f;
+		zoom   = 1.f;
 
 		updateYAxis();
 		// update transformation (needed already for legend, axes drawing)
@@ -201,7 +201,7 @@ void Viewport2::reset()
 {
 	// reset values that would become inappropr.
 	selection = 0;
-	hover = -1;
+	hover     = -1;
 
 	// reset limiters to most-lazy values
 	setLimiters(0);
@@ -219,7 +219,7 @@ void Viewport2::rebuild()
 //	SharedDataLock ctxlock(ctx->mutex);
 //	SharedDataLock setslock(sets->mutex);
 
-    qDebug() << "\nREBUILDDDDDDD\n";
+	qDebug() << "\nREBUILDDDDDDD\n";
 
 	prepareLines(); // will also call reset() if indicated by ctx
 	updateBuffers();
@@ -237,25 +237,24 @@ void Viewport2::prepareLines()
 //	}
 
 	// lock context and sets
-    //SharedDataLock ctxlock(ctx->mutex);
-    //SharedDataLock setslock(sets->mutex);
+	//SharedDataLock ctxlock(ctx->mutex);
+	//SharedDataLock setslock(sets->mutex);
 
-    Subscription::Lock<std::vector<BinSet>, ViewportCtx> lock(*sub);
-    std::vector<BinSet>* sets = lock();
-    ViewportCtx* ctx = lock.meta();
+	Subscription::Lock<std::vector<BinSet>, ViewportCtx> lock(*sub);
+	std::vector<BinSet>* sets = lock();
+	ViewportCtx        * ctx  = lock.meta();
 
-    ctx->wait.fetch_and_store(0); // set to zero: our data will be usable
-    if (ctx->reset.fetch_and_store(0)) // is true if it was 1 before
+	ctx->wait.fetch_and_store(0);      // set to zero: our data will be usable
+	if (ctx->reset.fetch_and_store(0)) // is true if it was 1 before
 		reset();
 
 	// first step (cpu only)
-    Compute::preparePolylines(*ctx, *sets, shuffleIdx);
+	Compute::preparePolylines(*ctx, *sets, shuffleIdx);
 
 	// second step (cpu -> gpu)
 	target->makeCurrent();
-    Compute::storeVertices(*ctx, *sets, shuffleIdx, vb,
+	Compute::storeVertices(*ctx, *sets, shuffleIdx, vb,
 	                       drawMeans->isChecked(), illuminantAppl);
-
 }
 
 void Viewport2::activate()
@@ -282,7 +281,7 @@ void Viewport2::removePixelOverlay()
 void Viewport2::insertPixelOverlay(const QPolygonF &points)
 {
 	overlayPoints = points;
-	overlayMode = true;
+	overlayMode   = true;
 	update();
 }
 
@@ -304,32 +303,32 @@ void Viewport2::setAppliedIlluminant(QVector<multi_img_base::Value> illum)
 	//bool change = (applied != illuminant_apply);
 	illuminantAppl = illum.toStdVector();
 	/*	if (change) TODO: I assume this is already triggered by invalidated ROI
-		rebuild();*/
+	    rebuild();*/
 }
 
 void Viewport2::setLimiters(int label)
 {
-    Subscription::Lock<std::vector<BinSet>, ViewportCtx> lock(*sub);
-    std::vector<BinSet>* sets = lock();
-    ViewportCtx* ctx = lock.meta();
+	Subscription::Lock<std::vector<BinSet>, ViewportCtx> lock(*sub);
+	std::vector<BinSet>* sets = lock();
+	ViewportCtx        * ctx  = lock.meta();
 
-	if (label < 1) {	// not label
-        //SharedDataLock ctxlock(ctx->mutex);
+	if (label < 1) {    // not label
+		//SharedDataLock ctxlock(ctx->mutex);
 
 
-        limiters.assign(ctx->dimensionality,
-                        std::make_pair(0, ctx->nbins-1));
-		if (label == -1 && hover >= 0) {	// use hover data
+		limiters.assign(ctx->dimensionality,
+		                std::make_pair(0, ctx->nbins - 1));
+		if (label == -1 && hover >= 0) {    // use hover data
 			int b = selection;
 			int h = hover;
 			limiters[b] = std::make_pair(h, h);
 		}
 	} else {            // label holds data
-        //SharedDataLock setslock(sets->mutex);
-        if ((int)sets->size() > label && (*sets)[label].totalweight > 0) {
+		//SharedDataLock setslock(sets->mutex);
+		if ((int)sets->size() > label && (*sets)[label].totalweight > 0) {
 			// use range from this label
 			const std::vector<std::pair<int, int> > &b =
-                    (*sets)[label].boundary;
+				(*sets)[label].boundary;
 			limiters.assign(b.begin(), b.end());
 		} else {
 			setLimiters(0);
@@ -342,25 +341,24 @@ void Viewport2::toggleLabelHighlight(int index)
 	if (highlightLabels.contains(index)) {
 		int pos = highlightLabels.indexOf(index);
 		highlightLabels.remove(pos, 1);
-	}
-	else {
+	}else  {
 		highlightLabels.push_back(index);
 	}
 
-    updateBuffers(Viewport2::RM_STEP,
-	              (!highlightLabels.empty() ? RM_SKIP: RM_STEP));
+	updateBuffers(Viewport2::RM_STEP,
+	              (!highlightLabels.empty() ? RM_SKIP : RM_STEP));
 }
 
 void Viewport2::setAlpha(float alpha)
 {
 	useralpha = alpha;
-    updateBuffers(Viewport2::RM_STEP, Viewport2::RM_SKIP);
+	updateBuffers(Viewport2::RM_STEP, Viewport2::RM_SKIP);
 }
 
 void Viewport2::setLimitersMode(bool enabled)
 {
 	limiterMode = enabled;
-    updateBuffers(Viewport2::RM_SKIP, Viewport2::RM_STEP);
+	updateBuffers(Viewport2::RM_SKIP, Viewport2::RM_STEP);
 	if (!active) {
 		activate(); // will call requestOverlay()
 	} else {
@@ -402,13 +400,13 @@ bool Viewport2::updateLimiter(int dim, int bin)
 	} else if (activeLimiter) {
 		target = activeLimiter;
 	} else { // choose closest between top and bottom
-		target = (std::abs(l.first-bin) < std::abs(l.second-bin) ?
-		              &l.first : &l.second);
+		target = (std::abs(l.first - bin) < std::abs(l.second - bin) ?
+		          &l.first : &l.second);
 	}
 	if (*target == bin) // no change
 		return false;
 
-	*target = bin;
+	*target       = bin;
 	activeLimiter = target;
 	return true;
 }
@@ -434,7 +432,7 @@ void Viewport2::screenshot()
 	// render into our buffer
 	QGLFramebufferObject b(width, height);
 	QPainter p(&b);
-	bool success = drawScene(&p, false);
+	bool     success = drawScene(&p, false);
 
 	// reset drawing state
 	endNoHQ();
@@ -445,7 +443,7 @@ void Viewport2::screenshot()
 	QImage img = b.toImage();
 
 	// write out
-	cv::Mat output = QImage2Mat(img);
+	cv::Mat  output = QImage2Mat(img);
 	GerbilIO io(target, "Screenshot File", "screenshot");
 	io.setFileSuffix(".png");
 	io.setFileCategory("Screenshot");
@@ -454,9 +452,9 @@ void Viewport2::screenshot()
 
 void Viewport2::adjustBoundaries()
 {
-    Subscription::Lock<std::vector<BinSet>, ViewportCtx> lock(*sub);
-    //std::vector<BinSet>* sets = lock();
-    ViewportCtx* ctx = lock.meta();
+	Subscription::Lock<std::vector<BinSet>, ViewportCtx> lock(*sub);
+	//std::vector<BinSet>* sets = lock();
+	ViewportCtx* ctx = lock.meta();
 
 	QPointF empty(0.f, 0.f);
 	empty = modelview.map(empty);
@@ -467,7 +465,7 @@ void Viewport2::adjustBoundaries()
 
 	QPointF rightbound = empty;
 //	SharedDataLock ctxlock(ctx->mutex);
-    rightbound.setX(ctx->dimensionality - 1);
+	rightbound.setX(ctx->dimensionality - 1);
 	QPointF rb = modelview.map(rightbound);
 
 	QPointF bottombound = empty;
@@ -475,7 +473,7 @@ void Viewport2::adjustBoundaries()
 	QPointF bb = modelview.map(bottombound);
 
 	QPointF topbound = empty;
-    topbound.setY((float)(ctx->nbins));
+	topbound.setY((float)(ctx->nbins));
 	QPointF tb = modelview.map(topbound);
 
 	qreal lbpos = yaxisWidth + 25;
@@ -501,26 +499,25 @@ void Viewport2::adjustBoundaries()
 		//qDebug() << "RIGHT BOUND IS VISIBLE!";
 		QPointF right(rbpos, 0.f);
 		right = modelviewI.map(right);
-		rb = modelviewI.map(rb);
+		rb    = modelviewI.map(rb);
 
-		xp = right.x()-rb.x();
+		xp = right.x() - rb.x();
 	}
 
 	if (bb.y() < bbpos) {
 		//qDebug() << "BOTTOM BOUND IS VISIBLE!";
 		QPointF bottom(0.f, bbpos);
 		bottom = modelviewI.map(bottom);
-		bb = modelviewI.map(bb);
+		bb     = modelviewI.map(bb);
 
-		yp = bottom.y()-bb.y();
-
+		yp = bottom.y() - bb.y();
 	} else if (tb.y() > tbpos) {
 		//qDebug() << "TOP BOUND IS VISIBLE!";
 		QPointF top(0, tbpos);
 		top = modelviewI.map(top);
-		tb = modelviewI.map(tb);
+		tb  = modelviewI.map(tb);
 
-		yp = top.y()-tb.y();
+		yp = top.y() - tb.y();
 	}
 
 	modelview.translate(xp, yp);

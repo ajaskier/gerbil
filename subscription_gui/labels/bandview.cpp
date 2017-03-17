@@ -1,11 +1,11 @@
-/*	
-	Copyright(c) 2010 Johannes Jordan <johannes.jordan@cs.fau.de>.
-	Copyright(c) 2012 Petr Koupy <petr.koupy@gmail.com>
+/*
+    Copyright(c) 2010 Johannes Jordan <johannes.jordan@cs.fau.de>.
+    Copyright(c) 2012 Petr Koupy <petr.koupy@gmail.com>
 
-	This file may be licensed under the terms of of the GNU General Public
-	License, version 3, as published by the Free Software Foundation. You can
-	find it here: http://www.gnu.org/licenses/gpl.html
-*/
+    This file may be licensed under the terms of of the GNU General Public
+    License, version 3, as published by the Free Software Foundation. You can
+    find it here: http://www.gnu.org/licenses/gpl.html
+ */
 
 #include "bandview.h"
 
@@ -29,12 +29,12 @@
 #include <QDebug>
 
 BandView::BandView()
-    : // note: start with invalid curLabel to trigger proper initialization!
-      cacheValid(false), cursor(-1, -1), lastcursor(-1, -1), curLabel(-1),
-      overlay(0), showLabels(true), selectedLabels(0),
-      ignoreUpdates(false), labelAlpha(63),
-      seedColors(std::make_pair(
-                     QColor(255, 0, 0, 255), QColor(255, 255, 0, 255)))
+	: // note: start with invalid curLabel to trigger proper initialization!
+	cacheValid(false), cursor(-1, -1), lastcursor(-1, -1), curLabel(-1),
+	overlay(0), showLabels(true), selectedLabels(0),
+	ignoreUpdates(false), labelAlpha(63),
+	seedColors(std::make_pair(
+				   QColor(255, 0, 0, 255), QColor(255, 255, 0, 255)))
 {
 	// the timer automatically sends an accumulated update request
 	labelTimer.setSingleShot(true);
@@ -57,13 +57,13 @@ void BandView::initUi()
 void BandView::toggleCursorMode()
 {
 	cursorMode = (cursorMode == CursorMode::Marker ? CursorMode::Rubber
-												   : CursorMode::Marker);
+				  : CursorMode::Marker);
 }
 
 void BandView::toggleOverrideMode()
 {
 	overrideMode = (overrideMode == OverrideMode::On ? OverrideMode::Off
-													 : OverrideMode::On);
+					: OverrideMode::On);
 }
 
 void BandView::updateCursorSize(CursorSize size)
@@ -77,8 +77,7 @@ void BandView::setPixmap(QPixmap p)
 
 	// adjust seed map if necessary
 	if (seedMap.empty()
-	    || seedMap.rows != pixmap.height() || seedMap.cols != pixmap.width())
-	{
+	    || seedMap.rows != pixmap.height() || seedMap.cols != pixmap.width()) {
 		seedMap = cv::Mat1s(pixmap.height(), pixmap.width(), (short)127);
 		// TODO: send signal to model, maybe move whole seed map to model
 	}
@@ -92,9 +91,9 @@ void BandView::refresh()
 	update();
 }
 
-void BandView::updateLabeling(const cv::Mat1s &newLabels,
+void BandView::updateLabeling(const cv::Mat1s &      newLabels,
                               const QVector<QColor> &colors,
-                              bool colorsChanged)
+                              bool                   colorsChanged)
 {
 	if (ignoreUpdates)
 		return;
@@ -106,8 +105,7 @@ void BandView::updateLabeling(const cv::Mat1s &newLabels,
 		// create alpha-modified label colors
 		labelColorsA.resize(colors.size());
 		labelColorsA[0] = QColor(0, 0, 0, 0);
-		for (int i = 1; i < labelColors.size(); ++i) // 0 is index for unlabeled
-		{
+		for (int i = 1; i < labelColors.size(); ++i) { // 0 is index for unlabeled
 			QColor col = labelColors[i];
 			col.setAlpha(labelAlpha);
 			labelColorsA[i] = col;
@@ -171,7 +169,6 @@ void BandView::paintEvent(QPainter *painter, const QRectF &rect)
 	if (curLabel < 1 || curLabel >= labelColors.count())
 		drawCursor = false;
 	if (drawCursor) {
-
 		QPen pen;
 		if (inputMode == InputMode::Seed) {
 			pen = QPen(Qt::yellow);
@@ -216,7 +213,7 @@ void BandView::paintEvent(QPainter *painter, const QRectF &rect)
 void BandView::updateCache()
 {
 	cachedPixmap = pixmap.copy();
-	cacheValid = true;
+	cacheValid   = true;
 	if (inputMode != InputMode::Seed && !showLabels) // there is no overlay, leave early
 		return;
 
@@ -226,23 +223,23 @@ void BandView::updateCache()
 	QImage dest(pixmap.width(), pixmap.height(), QImage::Format_ARGB32);
 
 	tbb::parallel_for(tbb::blocked_range2d<size_t>(
-	                      0, pixmap.height(), 0, pixmap.width()),
+						  0, pixmap.height(), 0, pixmap.width()),
 	                  [&](tbb::blocked_range2d<size_t> r) {
 		for (size_t y = r.rows().begin(); y != r.rows().end(); ++y) {
-			const short *lrow = labels[y], *srow = seedMap[y];
-			QRgb *destrow = (QRgb*)dest.scanLine(y);
-			for (size_t x = r.cols().begin(); x != r.cols().end(); ++x) {
-				short lval = lrow[x], sval = srow[x];
-				destrow[x] = qRgba(0, 0, 0, 0);
-				if (inputMode == InputMode::Seed) {
-					if (sval == 255)
+		    const short *lrow = labels[y], *srow = seedMap[y];
+		    QRgb *destrow = (QRgb*)dest.scanLine(y);
+		    for (size_t x = r.cols().begin(); x != r.cols().end(); ++x) {
+		        short lval = lrow[x], sval = srow[x];
+		        destrow[x] = qRgba(0, 0, 0, 0);
+		        if (inputMode == InputMode::Seed) {
+		            if (sval == 255)
 						destrow[x] = seedColors.first.rgba();
-					else if (sval == 0)
+		            else if (sval == 0)
 						destrow[x] = seedColors.second.rgba();
-					else if (lval > 0)
+		            else if (lval > 0)
 						destrow[x] = labelColorsA[lval].rgba();
 				} else if (lval > 0) {
-					destrow[x] = labelColorsA[lval].rgba();
+		            destrow[x] = labelColorsA[lval].rgba();
 				}
 			}
 		}
@@ -298,7 +295,7 @@ void BandView::updateCache(int y, int x, short label)
 
 	// if needed, color pixel
 	const QColor *col = 0;
-	short val = (inputMode == InputMode::Seed ? seedMap(y, x) : label);
+	short        val  = (inputMode == InputMode::Seed ? seedMap(y, x) : label);
 	if (inputMode == InputMode::Seed) {
 		if (val == 255)
 			col = &seedColors.first;
@@ -342,7 +339,7 @@ void BandView::cursorAction(QGraphicsSceneMouseEvent *ev, bool click)
 
 	// test for dimension match
 	if (!pixmap.rect().contains(cursor)) {
-		lastcursor = QPoint(-1,-1);
+		lastcursor = QPoint(-1, -1);
 		return;
 	}
 
@@ -381,11 +378,11 @@ void BandView::cursorAction(QGraphicsSceneMouseEvent *ev, bool click)
 		 * the idea is that due to lag we might not get a notification about
 		 * every pixel the mouse moved over. this is a good approximation. */
 		QLineF line(lastcursor, cursor);
-		qreal step = 1 / line.length();
+		qreal  step = 1 / line.length();
 		for (qreal t = 0.0; t <= 1.0; t += step) {
 			QPointF point = line.pointAt(t);
-			int x = point.x();
-			int y = point.y();
+			int     x     = point.x();
+			int     y     = point.y();
 
 			if (ev->buttons() & Qt::LeftButton) {
 				if (inputMode == InputMode::Seed) {
@@ -429,14 +426,14 @@ void BandView::updatePixel(int x, int y)
 
 	if (cursorMode == CursorMode::Marker) {
 		if (overrideMode == OverrideMode::On
-		    || (overrideMode == OverrideMode::Off && (labels(y,x) == 0))) {
+		    || (overrideMode == OverrideMode::Off && (labels(y, x) == 0))) {
 			uncommitedLabels(y, x) = 1;
 			labels(y, x) = curLabel;
 			updateCache(y, x, curLabel);
 		}
-	} else if (cursorMode == CursorMode::Rubber) {	
+	} else if (cursorMode == CursorMode::Rubber) {
 		if (overrideMode == OverrideMode::On
-		    || (overrideMode == OverrideMode::Off && (labels(y,x) == curLabel))) {
+		    || (overrideMode == OverrideMode::Off && (labels(y, x) == curLabel))) {
 			uncommitedLabels(y, x) = 1;
 			labels(y, x) = 0;
 			updateCache(y, x, 0);
@@ -451,12 +448,12 @@ void BandView::commitLabelChanges()
 
 	ignoreUpdates = true;
 
-    emit alteredLabels(labels, uncommitedLabels);
-    ignoreUpdates = false;
+	emit alteredLabels(labels, uncommitedLabels);
+	ignoreUpdates = false;
 
 	/* it is important to create new matrix. Otherwise changes would overwrite
 	 * the matrix we just sent out in a signal. OpenCV… */
-    uncommitedLabels = cv::Mat1b(labels.rows, labels.cols, (uchar)0);
+	uncommitedLabels = cv::Mat1b(labels.rows, labels.cols, (uchar)0);
 	labelTimer.stop();
 }
 
@@ -521,7 +518,7 @@ void BandView::setCurrentLabel(int label)
 void BandView::toggleSeedMode(bool enabled)
 {
 	if (enabled) {
-		lastMode = inputMode;
+		lastMode  = inputMode;
 		inputMode = InputMode::Seed;
 	} else {
 		inputMode = lastMode;
@@ -532,7 +529,7 @@ void BandView::toggleSeedMode(bool enabled)
 
 void BandView::toggleShowLabels(bool disabled)
 {
-	if (showLabels == disabled) {	// i.e. not the state we want
+	if (showLabels == disabled) {   // i.e. not the state we want
 		showLabels = !showLabels;
 		refresh();
 	}
@@ -565,7 +562,6 @@ void BandView::toggleLabelHighlight(short label)
 	}
 
 	drawOverlay(curMask);
-
 }
 
 void BandView::applyLabelAlpha(int alpha)
@@ -612,46 +608,46 @@ BandView::createCursor(const cv::Mat1b &mask, const QPoint &center)
 
 void BandView::initCursors()
 {
-	cv::Mat1b mask = (cv::Mat1b(1,1) << 1);
-	QPoint center(0,0);
+	cv::Mat1b mask = (cv::Mat1b(1, 1) << 1);
+	QPoint    center(0, 0);
 	cursors[CursorSize::Small] = createCursor(mask, center);
 
-	mask = (cv::Mat1b(4,4) <<
-	        0,1,1,0,
-	        1,1,1,1,
-	        1,1,1,1,
-	        0,1,1,0);
-	center = QPoint(1,1);
+	mask = (cv::Mat1b(4, 4) <<
+	        0, 1, 1, 0,
+	        1, 1, 1, 1,
+	        1, 1, 1, 1,
+	        0, 1, 1, 0);
+	center = QPoint(1, 1);
 	cursors[CursorSize::Medium] = createCursor(mask, center);
 
-	mask = (cv::Mat1b(7,7) <<
-	        0,0,1,1,1,0,0,
-	        0,1,1,1,1,1,0,
-	        1,1,1,1,1,1,1,
-	        1,1,1,1,1,1,1,
-	        1,1,1,1,1,1,1,
-	        0,1,1,1,1,1,0,
-	        0,0,1,1,1,0,0);
-	center = QPoint(3,3);
+	mask = (cv::Mat1b(7, 7) <<
+	        0, 0, 1, 1, 1, 0, 0,
+	        0, 1, 1, 1, 1, 1, 0,
+	        1, 1, 1, 1, 1, 1, 1,
+	        1, 1, 1, 1, 1, 1, 1,
+	        1, 1, 1, 1, 1, 1, 1,
+	        0, 1, 1, 1, 1, 1, 0,
+	        0, 0, 1, 1, 1, 0, 0);
+	center = QPoint(3, 3);
 	cursors[CursorSize::Big] = createCursor(mask, center);
 
-	mask = (cv::Mat1b(15,15) <<
-	        0,0,0,0,0,1,1,1,1,1,0,0,0,0,0,
-	        0,0,0,1,1,1,1,1,1,1,1,1,0,0,0,
-	        0,0,1,1,1,1,1,1,1,1,1,1,1,0,0,
-	        0,1,1,1,1,1,1,1,1,1,1,1,1,1,0,
-	        0,1,1,1,1,1,1,1,1,1,1,1,1,1,0,
-	        1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
-	        1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
-	        1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
-	        1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
-	        1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
-	        0,1,1,1,1,1,1,1,1,1,1,1,1,1,0,
-	        0,1,1,1,1,1,1,1,1,1,1,1,1,1,0,
-	        0,0,1,1,1,1,1,1,1,1,1,1,1,0,0,
-	        0,0,0,1,1,1,1,1,1,1,1,1,0,0,0,
-	        0,0,0,0,0,1,1,1,1,1,0,0,0,0,0);
-	center = QPoint(7,7);
+	mask = (cv::Mat1b(15, 15) <<
+	        0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0,
+	        0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0,
+	        0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0,
+	        0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0,
+	        0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0,
+	        1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+	        1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+	        1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+	        1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+	        1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+	        0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0,
+	        0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0,
+	        0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0,
+	        0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0,
+	        0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0);
+	center = QPoint(7, 7);
 	cursors[CursorSize::Huge] = createCursor(mask, center);
 }
 
@@ -696,6 +692,6 @@ void BandView::saveState()
 void BandView::restoreState()
 {
 	QSettings settings;
-	auto alphaValue = settings.value("BandView/alphaValue", 63);
-	emit setAlphaValue(alphaValue.toInt());
+	auto      alphaValue = settings.value("BandView/alphaValue", 63);
+	emit      setAlphaValue(alphaValue.toInt());
 }

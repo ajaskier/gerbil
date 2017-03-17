@@ -11,8 +11,8 @@ class DistViewGUI2 : public QWidget
 {
 	Q_OBJECT
 public:
-    explicit DistViewGUI2(representation::t type);
-    virtual ~DistViewGUI2();
+	explicit DistViewGUI2(representation::t type);
+	virtual ~DistViewGUI2();
 	void initSignals(QObject *dvctrl);
 	void initSubscriptions();
 
@@ -25,7 +25,7 @@ public:
 
 	void setTitle(representation::t type);
 	void setTitle(representation::t type,
-				  multi_img::Value min, multi_img::Value max);
+	              multi_img::Value min, multi_img::Value max);
 
 	// not a signal as needs to be directly called for each GUI component
 	void insertPixelOverlay(const QPolygonF &points);
@@ -36,10 +36,10 @@ public:
 	bool isVisible();
 
 public slots:
-	void setActive()	{ vp->activate(); vp->update(); }
-	void setInactive()	{ vp->active = false; vp->update(); }
+	void setActive()    { vp->activate(); vp->update(); }
+	void setInactive()  { vp->active = false; vp->update(); }
 	void setEnabled(bool enabled);
-	void rebuild()		{ vp->rebuild(); }
+	void rebuild()      { vp->rebuild(); }
 
 	// fold in or out
 	void fold(bool folded);
@@ -55,7 +55,7 @@ public slots:
 	void showLimiterMenu();
 	void showFrameBufferMenu();
 
-    void updateBufferFormat(Viewport2::BufferFormat format);
+	void updateBufferFormat(Viewport2::BufferFormat format);
 
 signals:
 	// from GUI elements to controller
@@ -63,7 +63,7 @@ signals:
 	void bandSelected(int dim);
 	void requestOverlay(int dim, int bin);
 	void requestOverlay(const std::vector<std::pair<int, int> >& limiters,
-						int dim);
+	                    int dim);
 
 	void requestBinCount(representation::t type, int bins);
 
@@ -103,9 +103,9 @@ protected:
 	representation::t type;
 
 	QWidget *frame;
-    Ui::DistViewGUI2 *ui;
+	Ui::DistViewGUI2 *ui;
 	Ui::ViewportControl *uivc;
-    Viewport2 *vp;
+	Viewport2 *vp;
 	AutohideWidget *vc;
 
 	QVector<QColor> labelColors;

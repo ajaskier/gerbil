@@ -5,7 +5,7 @@
 FoldingBar::FoldingBar(QWidget *parent) :
 	QWidget(parent), folded(false)
 {
-    setupUi(this);
+	setupUi(this);
 	// 0: folded (disabled)
 	arrows.push_back(QPixmap(":/basic/arrow-right"));
 	// 1: unfolded (enabled)
@@ -19,11 +19,11 @@ FoldingBar::FoldingBar(QWidget *parent) :
 	palettes.push_back(palette());
 	palettes.push_back(palette());
 	palettes[1].setColor(QPalette::Window,
-						 palette().color(QPalette::Highlight));
+	                     palette().color(QPalette::Highlight));
 	palettes[1].setColor(QPalette::WindowText,
-						 palette().color(QPalette::HighlightedText));
+	                     palette().color(QPalette::HighlightedText));
 	palettes[1].setColor(QPalette::Text,
-						 palette().color(QPalette::HighlightedText));
+	                     palette().color(QPalette::HighlightedText));
 
 	// child widgets should pass-through click events to us
 	arrowLabel->setAttribute(Qt::WA_TransparentForMouseEvents);
@@ -51,7 +51,8 @@ void FoldingBar::enterEvent(QEvent *)
 	setPalette(palettes[1]);
 }
 
-void FoldingBar::leaveEvent(QEvent *){
+void FoldingBar::leaveEvent(QEvent *)
+{
 	arrowLabel->setPixmap(arrows[(folded ? 0 : 1)]);
 	titleLabel->setPalette(palettes[0]);
 	setPalette(palettes[0]);
@@ -64,14 +65,14 @@ void FoldingBar::mouseReleaseEvent(QMouseEvent *ev)
 
 void FoldingBar::changeEvent(QEvent *e)
 {
-    QWidget::changeEvent(e);
+	QWidget::changeEvent(e);
 	switch (e->type()) {
-    case QEvent::LanguageChange:
+	case QEvent::LanguageChange:
 		/* strange behavior: when a dialog is opened, this is performed, and
 		 * it will reset the text we customly set in the titleLabel! */
 		// retranslateUi(this);
-        break;
-    default:
-        break;
+		break;
+	default:
+		break;
 	}
 }

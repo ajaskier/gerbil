@@ -16,16 +16,16 @@
 
 bool Viewport2::drawScene(QPainter *painter, bool withDynamics)
 {
-    Subscription::Lock<std::vector<BinSet>, ViewportCtx> lock(*sub);
-    std::vector<BinSet>* sets = lock();
-    //ViewportCtx* ctx = lock.meta();
+	Subscription::Lock<std::vector<BinSet>, ViewportCtx> lock(*sub);
+	std::vector<BinSet>* sets = lock();
+	//ViewportCtx* ctx = lock.meta();
 
 	bool disabled = false;
 	{
 		/* TODO: disabled member state instead? */
-        //SharedDataLock ctxlock(ctx->mutex);
-        //SharedDataLock setslock(sets->mutex);
-        if (sets->empty())// || ctx->wait)
+		//SharedDataLock ctxlock(ctx->mutex);
+		//SharedDataLock setslock(sets->mutex);
+		if (sets->empty()) // || ctx->wait)
 			disabled = true;
 	}
 
@@ -41,7 +41,7 @@ bool Viewport2::drawScene(QPainter *painter, bool withDynamics)
 	painter->setRenderHint(QPainter::Antialiasing);
 
 	if (disabled) {
-        qDebug() << "its disabled ;c";
+		qDebug() << "its disabled ;c";
 		drawWaitMessage(painter);
 		return false;
 	}
@@ -62,10 +62,9 @@ bool Viewport2::drawScene(QPainter *painter, bool withDynamics)
 	drawHighlight = drawHighlight && (highlightLabels.empty());
 
 	for (int i = 0; i < (drawHighlight ? 2 : 1); ++i) {
-
 		renderbuffer &b = buffers[i];
 		if (b.dirty) {
-            qDebug() << "its dirty ;c";
+			qDebug() << "its dirty ;c";
 			drawWaitMessage(painter);
 			// nothing to draw yet, don't even bother with other buffer,
 			disabled = true;
@@ -103,14 +102,14 @@ void Viewport2::updateBuffers(RenderMode spectrum, RenderMode highlight)
 	if (!buffers[0].fbo || !buffers[1].fbo)
 		return;
 
-    Subscription::Lock<std::vector<BinSet>, ViewportCtx> lock(*sub);
-    std::vector<BinSet>* sets = lock();
-    ViewportCtx* ctx = lock.meta();
+	Subscription::Lock<std::vector<BinSet>, ViewportCtx> lock(*sub);
+	std::vector<BinSet>* sets = lock();
+	ViewportCtx        * ctx  = lock.meta();
 
 	{
-        //SharedDataLock ctxlock(ctx->mutex);
-        //SharedDataLock setslock(sets->mutex);
-        if (sets->empty() || ctx->wait)
+		//SharedDataLock ctxlock(ctx->mutex);
+		//SharedDataLock setslock(sets->mutex);
+		if (sets->empty() || ctx->wait)
 			return;
 	}
 
@@ -120,7 +119,7 @@ void Viewport2::updateBuffers(RenderMode spectrum, RenderMode highlight)
 
 	// array for convenience
 	RenderMode mode[2] = { spectrum, highlight };
-	QRect rect(0, 0, width, height);
+	QRect      rect(0, 0, width, height);
 
 	for (int i = 0; i < 2; ++i) {
 		renderbuffer &b = buffers[i];
@@ -133,8 +132,8 @@ void Viewport2::updateBuffers(RenderMode spectrum, RenderMode highlight)
 
 		if (!(b.fbo->isValid() && b.blit->isValid())) {
 			GerbilApplication::internalError(
-                        "Framebuffer not valid in Viewport2 updateBuffers().",
-			            false);
+				"Framebuffer not valid in Viewport2 updateBuffers().",
+				false);
 			return;
 		}
 
@@ -153,7 +152,7 @@ void Viewport2::updateBuffers(RenderMode spectrum, RenderMode highlight)
 		painter.setWorldTransform(modelview);
 		drawBins(painter, b.renderTimer, b.renderedLines,
 		         (mode[i] == RM_FULL) ? std::numeric_limits<int>::max()
-		                              : b.renderStep, (i == 1));
+				 : b.renderStep, (i == 1));
 		painter.restore();
 		b.dirty = false;
 	}
@@ -170,25 +169,25 @@ void Viewport2::updateYAxis(bool yAxisChanged)
 	std::vector<float> ycoord(amount);
 	float maximum = 0.f;
 
-    Subscription::Lock<std::vector<BinSet>, ViewportCtx> lock(*sub);
-    //std::vector<BinSet>* sets = lock();
-    ViewportCtx* ctx = lock.meta();
+	Subscription::Lock<std::vector<BinSet>, ViewportCtx> lock(*sub);
+	//std::vector<BinSet>* sets = lock();
+	ViewportCtx* ctx = lock.meta();
 
-    //SharedDataLock ctxlock(ctx->mutex);
-    float plotmaxval = ctx->maxval;
-    float plotminval = ctx->minval;
-    float binscount = (qreal)(ctx->nbins);
-    //ctxlock.unlock();
+	//SharedDataLock ctxlock(ctx->mutex);
+	float plotmaxval = ctx->maxval;
+	float plotminval = ctx->minval;
+	float binscount  = (qreal)(ctx->nbins);
+	//ctxlock.unlock();
 
 	float maxvalue;
-	float range = 1/zoom;
+	float range = 1 / zoom;
 	if (yAxisChanged) {
 		QPointF bottom(0.f, boundaries.vp);
 		bottom = modelviewI.map(bottom);
 
-		qreal ratio = bottom.y()/binscount;
+		qreal ratio = bottom.y() / binscount;
 
-		maxvalue = plotmaxval - (1.f-ratio) * (plotmaxval - plotminval);
+		maxvalue = plotmaxval - (1.f - ratio) * (plotmaxval - plotminval);
 		if (maxvalue > plotmaxval)
 			maxvalue = plotmaxval;
 	} else {
@@ -196,7 +195,7 @@ void Viewport2::updateYAxis(bool yAxisChanged)
 	}
 
 	for (int i = 0; i < amount; ++i) {
-		ycoord[i] = maxvalue - i*(1.f/(amount-1))*range*(plotmaxval - plotminval);
+		ycoord[i] = maxvalue - i * (1.f / (amount - 1)) * range * (plotmaxval - plotminval);
 		ycoord[i] = std::max(ycoord[i], plotminval);
 
 		maximum = std::max(maximum, std::abs(ycoord[i]));
@@ -216,7 +215,8 @@ void Viewport2::updateYAxis(bool yAxisChanged)
 		while (maximum < 1.f) {
 			maximum *= 10.f;
 			roundAt *= 0.1f;
-		};
+		}
+		;
 	}
 
 	/* set y-axis strings and find width of y-axis legend */
@@ -224,19 +224,19 @@ void Viewport2::updateYAxis(bool yAxisChanged)
 	yaxisWidth = 0;
 	QFontMetrics fm(font());
 	for (int i = 0; i < amount; ++i) {
-		float value = roundAt * std::floor(ycoord[i]/roundAt + 0.5f);
-		yaxis[i] = QString().setNum(value, 'g', 3);
+		float value = roundAt * std::floor(ycoord[i] / roundAt + 0.5f);
+		yaxis[i]   = QString().setNum(value, 'g', 3);
 		yaxisWidth = std::max(yaxisWidth, fm.width(yaxis[i]));
 	}
 }
 
 void Viewport2::updateModelview(bool newBinning)
 {
-    //SharedDataLock ctxlock(ctx->mutex);
+	//SharedDataLock ctxlock(ctx->mutex);
 
-    Subscription::Lock<std::vector<BinSet>, ViewportCtx> lock(*sub);
-    //std::vector<BinSet>* sets = lock();
-    ViewportCtx* ctx = lock.meta();
+	Subscription::Lock<std::vector<BinSet>, ViewportCtx> lock(*sub);
+	//std::vector<BinSet>* sets = lock();
+	ViewportCtx* ctx = lock.meta();
 
 	QPointF zero;
 	if (newBinning) {
@@ -244,20 +244,20 @@ void Viewport2::updateModelview(bool newBinning)
 	}
 
 	boundaries.htp = yaxisWidth + 14;
-	displayHeight = height - 2*boundaries.vp - boundaries.vtp;
+	displayHeight  = height - 2 * boundaries.vp - boundaries.vtp;
 
 	// if gradient, we discard one unit space intentionally for centering
-    size_t d = ctx->dimensionality
-            - (ctx->type == representation::GRAD ? 0 : 1);
-	qreal w = (width  - 2*boundaries.hp - boundaries.htp)/(qreal)(d); // width of one unit
-    qreal h = displayHeight/(qreal)(ctx->nbins); // height of one unit
-    int t = (ctx->type == representation::GRAD ? w/2 : 0); // moving half a unit for centering
+	size_t d = ctx->dimensionality
+	           - (ctx->type == representation::GRAD ? 0 : 1);
+	qreal w = (width - 2 * boundaries.hp - boundaries.htp) / (qreal)(d); // width of one unit
+	qreal h = displayHeight / (qreal)(ctx->nbins);                       // height of one unit
+	int   t = (ctx->type == representation::GRAD ? w / 2 : 0);           // moving half a unit for centering
 
 	modelview.reset();
 	modelview.translate(boundaries.hp + boundaries.htp + t,
 	                    boundaries.vp);
-	modelview.scale(w, -1*h); // -1 low values at bottom
-    modelview.translate(0, -(ctx->nbins)); // shift for low values at bottom
+	modelview.scale(w, -1 * h);            // -1 low values at bottom
+	modelview.translate(0, -(ctx->nbins)); // shift for low values at bottom
 
 	// set inverse
 	modelviewI = modelview.inverted();
@@ -265,7 +265,7 @@ void Viewport2::updateModelview(bool newBinning)
 	// restore previous position in plot (zoom>1 avoids initial bork transform)
 	if (newBinning && zoom > 1) {
 		QPointF zerolocal = modelviewI.map(zero);
-		modelview.translate(zerolocal.x(),zerolocal.y());
+		modelview.translate(zerolocal.x(), zerolocal.y());
 		modelview.scale(zoom, zoom);
 
 		// reset inverse
@@ -274,20 +274,19 @@ void Viewport2::updateModelview(bool newBinning)
 		// reset y-axis
 		updateYAxis(true);
 	}
-
 }
 
 void Viewport2::drawBins(QPainter &painter, QTimer &renderTimer,
-                        unsigned int &renderedLines, unsigned int renderStep,
-                        bool highlight)
+                         unsigned int &renderedLines, unsigned int renderStep,
+                         bool highlight)
 {
-    //SharedDataLock ctxlock(ctx->mutex);
+	//SharedDataLock ctxlock(ctx->mutex);
 	// TODO: this also locks shuffleIdx implicitely, better do it explicitely?
-    //SharedDataLock setslock(sets->mutex);
+	//SharedDataLock setslock(sets->mutex);
 
-    Subscription::Lock<std::vector<BinSet>, ViewportCtx> lock(*sub);
-    std::vector<BinSet>* sets = lock();
-    ViewportCtx* ctx = lock.meta();
+	Subscription::Lock<std::vector<BinSet>, ViewportCtx> lock(*sub);
+	std::vector<BinSet>* sets = lock();
+	ViewportCtx        * ctx  = lock.meta();
 
 	// Stopwatch watch("drawBins");
 
@@ -295,37 +294,37 @@ void Viewport2::drawBins(QPainter &painter, QTimer &renderTimer,
 	target->makeCurrent();
 	painter.beginNativePainting();
 	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	bool success = vb.bind();
 	if (!success) {
 		GerbilApplication::internalError(
-                    "Vertex buffer could not be bound in Viewport2 drawBins().",
-		            false);
+			"Vertex buffer could not be bound in Viewport2 drawBins().",
+			false);
 		painter.endNativePainting();
 		return;
 	}
 	glEnableClientState(GL_VERTEX_ARRAY);
 	glVertexPointer(2, GL_FLOAT, 0, 0);
-    size_t iD = renderedLines * ctx->dimensionality;
+	size_t iD = renderedLines * ctx->dimensionality;
 
 	/* determine drawing range. could be expanded to only draw spec. labels */
-    // make sure that Viewport2 draws "unlabeled" data in ignore-label case
-    int start = ((showUnlabeled || ctx->ignoreLabels == 1) ? 0 : 1);
-    int end = (showLabeled ? (int)sets->size() : 1);
+	// make sure that Viewport2 draws "unlabeled" data in ignore-label case
+	int start = ((showUnlabeled || ctx->ignoreLabels == 1) ? 0 : 1);
+	int end   = (showLabeled ? (int)sets->size() : 1);
 
 	size_t total = shuffleIdx.size();
 	size_t first = renderedLines;
-	size_t last = std::min((size_t)(renderedLines + renderStep), total);
+	size_t last  = std::min((size_t)(renderedLines + renderStep), total);
 
 	// loop over all elements in vertex index, update element and vector indices
 	for (size_t i = first; i < last;
-         ++i, iD += ctx->dimensionality) {
+	     ++i, iD += ctx->dimensionality) {
 		std::pair<int, BinSet::HashKey> &idx = shuffleIdx[i];
 
 		// filter out according to label
 		bool filter = ((idx.first < start || idx.first >= end));
 		// do not filter out highlighted label(s)
-        if (!ctx->ignoreLabels) {
+		if (!ctx->ignoreLabels) {
 			filter = filter && !highlightLabels.contains(idx.first);
 		}
 		if (filter) {
@@ -339,12 +338,11 @@ void Viewport2::drawBins(QPainter &painter, QTimer &renderTimer,
 
 		// highlight mode (foreground buffer)
 		if (highlight) {
-
 			//test if we are part of the highlight
 			bool highlighted = false;
 			if (limiterMode) {
 				highlighted = true;
-                for (size_t i = 0; i < ctx->dimensionality; ++i) {
+				for (size_t i = 0; i < ctx->dimensionality; ++i) {
 					unsigned char k = K[i];
 					if (k < limiters[i].first || k > limiters[i].second)
 						highlighted = false;
@@ -363,12 +361,12 @@ void Viewport2::drawBins(QPainter &painter, QTimer &renderTimer,
 		}
 
 		// grab binset and bin according to key
-        BinSet &s = (*sets)[idx.first];
+		BinSet &s = (*sets)[idx.first];
 		std::pair<BinSet::HashMap::const_iterator, BinSet::HashMap::const_iterator> binitp =
-		        s.bins.equal_range(K);
+			s.bins.equal_range(K);
 		if (s.bins.end() == binitp.first) {
 			// FIXME this is an error and should be treated accordingly
-			GGDBGM("no bin"<< endl);
+			GGDBGM("no bin" << endl);
 			return;
 		}
 		Bin const &b = s.bins.equal_range(K).first->second;
@@ -381,7 +379,7 @@ void Viewport2::drawBins(QPainter &painter, QTimer &renderTimer,
 		target->qglColor(color);
 
 		// draw polyline
-        glDrawArrays(GL_LINE_STRIP, (GLsizei)iD, (GLint)ctx->dimensionality);
+		glDrawArrays(GL_LINE_STRIP, (GLsizei)iD, (GLint)ctx->dimensionality);
 	}
 	vb.release();
 	painter.endNativePainting();
@@ -398,11 +396,11 @@ void Viewport2::drawBins(QPainter &painter, QTimer &renderTimer,
 }
 
 QColor Viewport2::determineColor(const QColor &basecolor,
-                                float weight, float totalweight,
-                                bool highlighted, bool single)
+                                 float weight, float totalweight,
+                                 bool highlighted, bool single)
 {
 	QColor color = basecolor;
-	qreal alpha;
+	qreal  alpha;
 	/* TODO: this is far from optimal yet. challenge is to give a good
 	   view where important information is not lost, yet not clutter
 	   the view with too much low-weight information */
@@ -410,9 +408,9 @@ QColor Viewport2::determineColor(const QColor &basecolor,
 	   this should be configurable. */
 	alpha = useralpha;
 	if (drawLog->isChecked())
-		alpha *= (0.01 + 0.99*(std::log(weight+1) / std::log(totalweight)));
+		alpha *= (0.01 + 0.99 * (std::log(weight + 1) / std::log(totalweight)));
 	else
-		alpha *= (0.01 + 0.99*(weight / totalweight));
+		alpha *= (0.01 + 0.99 * (weight / totalweight));
 	color.setAlphaF(std::min(alpha, 1.)); // cap at 1
 
 	if (highlighted) {
@@ -421,7 +419,7 @@ QColor Viewport2::determineColor(const QColor &basecolor,
 		} else {
 			color.setGreen(std::min(color.green() + 195, 255));
 			color.setRed(std::min(color.red() + 195, 255));
-			color.setBlue(color.blue()/2);
+			color.setBlue(color.blue() / 2);
 		}
 		color.setAlphaF(1.);
 	}
@@ -439,18 +437,18 @@ void Viewport2::continueDrawing(int buffer)
 	if (b.dirty)
 		return;
 
-    Subscription::Lock<std::vector<BinSet>, ViewportCtx> lock(*sub);
-    std::vector<BinSet>* sets = lock();
-    ViewportCtx* ctx = lock.meta();
+	Subscription::Lock<std::vector<BinSet>, ViewportCtx> lock(*sub);
+	std::vector<BinSet>* sets = lock();
+	ViewportCtx        * ctx  = lock.meta();
 
-    //SharedDataLock ctxlock(ctx->mutex);
-    //SharedDataLock setslock(sets->mutex);
+	//SharedDataLock ctxlock(ctx->mutex);
+	//SharedDataLock setslock(sets->mutex);
 
-    if (sets->empty() || ctx->wait)
+	if (sets->empty() || ctx->wait)
 		return;
 
-    //setslock.unlock();
-    //ctxlock.unlock();
+	//setslock.unlock();
+	//ctxlock.unlock();
 
 	QPainter painter(b.fbo);
 
@@ -468,21 +466,20 @@ void Viewport2::continueDrawing(int buffer)
 
 void Viewport2::drawAxesFg(QPainter *painter)
 {
+	//SharedDataLock ctxlock(ctx->mutex);
+	Subscription::Lock<std::vector<BinSet>, ViewportCtx> lock(*sub);
+	// std::vector<BinSet>* sets = lock();
+	ViewportCtx* ctx = lock.meta();
 
-    //SharedDataLock ctxlock(ctx->mutex);
-    Subscription::Lock<std::vector<BinSet>, ViewportCtx> lock(*sub);
-   // std::vector<BinSet>* sets = lock();
-    ViewportCtx* ctx = lock.meta();
-
-    if (selection < 0 || selection >= (int)ctx->dimensionality)
+	if (selection < 0 || selection >= (int)ctx->dimensionality)
 		return;
 
 	QPen pen;
-	pen.setWidth(0); // hairline width, needed because of our projection
+	pen.setWidth(0);                           // hairline width, needed because of our projection
 	pen.setColor(active ? Qt::red : Qt::gray); // draw selection in foreground
 	painter->setPen(pen);
 
-    qreal top = (ctx->nbins);
+	qreal top = (ctx->nbins);
 	if (illuminant_show && !illuminantCurve.empty())
 		top *= illuminantCurve.at(selection);
 	painter->drawLine(QPointF(selection, 0.), QPointF(selection, top));
@@ -491,14 +488,14 @@ void Viewport2::drawAxesFg(QPainter *painter)
 	if (limiterMode) {
 		pen.setColor(Qt::red);
 		painter->setPen(pen);
-        for (size_t i = 0; i < ctx->dimensionality; ++i) {
+		for (size_t i = 0; i < ctx->dimensionality; ++i) {
 			qreal y1 = limiters[i].first, y2 = limiters[i].second + 1;
 			if (!illuminantAppl.empty()) {
 				y1 *= illuminantAppl.at(i);
 				y2 *= illuminantAppl.at(i);
 			}
-            qreal h = ctx->nbins*0.01;
-			if (h > y2 - y1)	// don't let them overlap, looks uncool
+			qreal h = ctx->nbins * 0.01;
+			if (h > y2 - y1)    // don't let them overlap, looks uncool
 				h = y2 - y1;
 			QPolygonF polygon;
 			polygon << QPointF(i - 0.25, y1 + h)
@@ -517,10 +514,10 @@ void Viewport2::drawAxesFg(QPainter *painter)
 }
 void Viewport2::drawAxesBg(QPainter *painter)
 {
-    //SharedDataLock ctxlock(ctx->mutex);
-    Subscription::Lock<std::vector<BinSet>, ViewportCtx> lock(*sub);
-  //  std::vector<BinSet>* sets = lock();
-    ViewportCtx* ctx = lock.meta();
+	//SharedDataLock ctxlock(ctx->mutex);
+	Subscription::Lock<std::vector<BinSet>, ViewportCtx> lock(*sub);
+	//  std::vector<BinSet>* sets = lock();
+	ViewportCtx* ctx = lock.meta();
 
 	// draw axes in background
 	QPen pen(QColor(64, 64, 64));
@@ -529,8 +526,8 @@ void Viewport2::drawAxesBg(QPainter *painter)
 
 	/* without illuminant */
 	if (!illuminant_show || illuminantCurve.empty()) {
-        for (size_t i = 0; i < ctx->dimensionality; ++i)
-            painter->drawLine(i, 0, i, ctx->nbins);
+		for (size_t i = 0; i < ctx->dimensionality; ++i)
+			painter->drawLine(i, 0, i, ctx->nbins);
 		return;
 	}
 
@@ -538,13 +535,13 @@ void Viewport2::drawAxesBg(QPainter *painter)
 
 	// polygon describing illuminant
 	QPolygonF poly;
-    for (size_t i = 0; i < ctx->dimensionality; ++i) {
-        qreal top = (ctx->nbins-1) * illuminantCurve.at(i);
+	for (size_t i = 0; i < ctx->dimensionality; ++i) {
+		qreal top = (ctx->nbins - 1) * illuminantCurve.at(i);
 		painter->drawLine(QPointF(i, 0.), QPointF(i, top));
 		poly << QPointF(i, top);
 	}
-    poly << QPointF(ctx->dimensionality-1, ctx->nbins-1);
-    poly << QPointF(0, ctx->nbins-1);
+	poly << QPointF(ctx->dimensionality - 1, ctx->nbins - 1);
+	poly << QPointF(0, ctx->nbins - 1);
 
 	// visualize illuminant
 	QPolygonF poly2 = modelview.map(poly);
@@ -555,7 +552,7 @@ void Viewport2::drawAxesBg(QPainter *painter)
 	painter->setPen(Qt::NoPen);
 	painter->drawPolygon(poly2);
 	painter->setPen(Qt::white);
-    poly2.remove((int)ctx->dimensionality, 2);
+	poly2.remove((int)ctx->dimensionality, 2);
 	painter->drawPolyline(poly2);
 	painter->save();
 	painter->setWorldTransform(modelview);
@@ -563,25 +560,25 @@ void Viewport2::drawAxesBg(QPainter *painter)
 
 void Viewport2::drawLegend(QPainter *painter, int sel)
 {
-    //SharedDataLock ctxlock(ctx->mutex);
-    Subscription::Lock<std::vector<BinSet>, ViewportCtx> lock(*sub);
-  //  std::vector<BinSet>* sets = lock();
-    ViewportCtx* ctx = lock.meta();
+	//SharedDataLock ctxlock(ctx->mutex);
+	Subscription::Lock<std::vector<BinSet>, ViewportCtx> lock(*sub);
+	//  std::vector<BinSet>* sets = lock();
+	ViewportCtx* ctx = lock.meta();
 
-    assert(ctx->xlabels.size() == (unsigned int)ctx->dimensionality);
+	assert(ctx->xlabels.size() == (unsigned int)ctx->dimensionality);
 
 	painter->setPen(Qt::white);
 
 	//drawing background for x-axis
-	QRectF xbgrect(0, height-35, width, 35);;
+	QRectF xbgrect(0, height - 35, width, 35);;
 
 	painter->save();
-	painter->setBrush(QColor(0,0,0, 128));
-	painter->fillRect(xbgrect, QBrush(QColor(0,0,0,128)));
+	painter->setBrush(QColor(0, 0, 0, 128));
+	painter->fillRect(xbgrect, QBrush(QColor(0, 0, 0, 128)));
 	painter->restore();
 
 	// x-axis
-    for (size_t i = 0; i < ctx->dimensionality; ++i) {
+	for (size_t i = 0; i < ctx->dimensionality; ++i) {
 		//		GGDBGM((format("label %1%: '%2%'")
 		//		 %i % ((*ctx)->labels[i].toStdString()))  << endl);
 		QPointF l = modelview.map(QPointF(i - 1.f, 0.f));
@@ -608,27 +605,27 @@ void Viewport2::drawLegend(QPainter *painter, int sel)
 		bool highlight = ((int)i == sel);
 		if (highlight)
 			painter->setPen(Qt::red);
-        painter->drawText(rect, Qt::AlignCenter, ctx->xlabels[i]);
-		if (highlight)	// revert back color
+		painter->drawText(rect, Qt::AlignCenter, ctx->xlabels[i]);
+		if (highlight)  // revert back color
 			painter->setPen(Qt::white);
 	}
 
 	//drawing background for y-axis
-	QRectF ybgrect(0, 0, yaxisWidth+25, height-35);
+	QRectF ybgrect(0, 0, yaxisWidth + 25, height - 35);
 
 	painter->save();
-	painter->setBrush(QColor(0,0,0, 128));
-	painter->fillRect(ybgrect, QBrush(QColor(0,0,0,128)));
+	painter->setBrush(QColor(0, 0, 0, 128));
+	painter->fillRect(ybgrect, QBrush(QColor(0, 0, 0, 128)));
 	painter->restore();
 
 	/// y-axis
 	for (size_t i = 0; i < yaxis.size(); ++i) {
-		QPointF b(0.f, (displayHeight)/(yaxis.size()-1) * i + boundaries.vp);
+		QPointF b(0.f, (displayHeight) / (yaxis.size() - 1) * i + boundaries.vp);
 
 		QPointF t = b;
 		t += QPointF(0.f, 10.f);
 		t.setX(0);
-		b.setX(yaxisWidth+15);
+		b.setX(yaxisWidth + 15);
 		QRectF rect(t, b);
 
 		painter->drawText(rect, Qt::AlignVCenter | Qt::AlignRight, yaxis[i]);
@@ -639,7 +636,7 @@ void Viewport2::drawOverlay(QPainter *painter)
 {
 	painter->save();
 	QPolygonF poly = modelview.map(overlayPoints);
-	QPen pen(QColor(0, 0, 0, 127));
+	QPen      pen(QColor(0, 0, 0, 127));
 	pen.setWidth(5);
 	painter->setPen(pen);
 	painter->drawPolyline(poly);

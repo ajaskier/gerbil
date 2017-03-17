@@ -48,7 +48,6 @@ private:
 	QButtonGroup *cursorGroup;
 
 	void setCursorButtonsVisible(bool visible);
-
 };
 
 #endif // MODEWIDGET_H

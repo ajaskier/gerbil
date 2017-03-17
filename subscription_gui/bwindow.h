@@ -10,32 +10,32 @@ class BWindow;
 
 class BWindow : public QWidget
 {
-    Q_OBJECT
+	Q_OBJECT
 
 public:
-    explicit BWindow(QWidget *parent = 0);
-    ~BWindow();
+	explicit BWindow(QWidget *parent = 0);
+	~BWindow();
 
 private:
-    Ui::BWindow *ui;
-    Subscription* dataBSub;
-    Subscription* dataDSub;
+	Ui::BWindow *ui;
+	Subscription* dataBSub;
+	Subscription* dataDSub;
 
 
 signals:
-    void buttonBClicked();
-    void buttonDClicked();
-    void inputBChanged(int b);
-    void inputDChanged(int d);
+	void buttonBClicked();
+	void buttonDClicked();
+	void inputBChanged(int b);
+	void inputDChanged(int d);
 
 private slots:
-    void displayB();
-    void displayD();
+	void displayB();
+	void displayD();
 
-    void on_computeBButton_clicked();
-    void on_computeDButton_clicked();
-    void on_inputD_textChanged(const QString &arg1);
-    void on_inputB_textChanged(const QString &arg1);
+	void on_computeBButton_clicked();
+	void on_computeDButton_clicked();
+	void on_inputD_textChanged(const QString &arg1);
+	void on_inputB_textChanged(const QString &arg1);
 };
 
 #endif // BWINDOW_H

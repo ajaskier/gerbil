@@ -9,10 +9,10 @@
 
 class FoldingBar : public QWidget, private Ui::FoldingBar
 {
-    Q_OBJECT
+	Q_OBJECT
 
 public:
-    explicit FoldingBar(QWidget *parent = 0);
+	explicit FoldingBar(QWidget *parent = 0);
 
 	void fold();
 	void unfold();

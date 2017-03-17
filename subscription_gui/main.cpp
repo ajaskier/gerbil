@@ -6,13 +6,13 @@
 
 int main(int argc, char *argv[])
 {
-    qRegisterMetaType<SubscriptionType>("Subscription");
-    qRegisterMetaType<Task*>("Task*");
+	qRegisterMetaType<SubscriptionType>("Subscription");
+	qRegisterMetaType<Task*>("Task*");
 
-    QApplication a(argc, argv);
+	QApplication a(argc, argv);
 
-    MainWindow mainWin;
-    mainWin.show();
+	MainWindow mainWin;
+	mainWin.show();
 
-    return a.exec();
+	return a.exec();
 }
