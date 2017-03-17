@@ -8,14 +8,14 @@
 #include <QDebug>
 
 ModelA::ModelA(int a, TaskScheduler *scheduler, QObject *parent)
-    : Model(scheduler, parent), a(a)
+	: Model(scheduler, parent), a(a)
 {
-    registerData("DATA_A", {});
+	registerData("DATA_A", {});
 }
 
 void ModelA::delegateTask(QString id, QString parentId)
 {
-    if (id == "DATA_A") {
-        sendTask<TaskA>(a);
-    }
+	if (id == "DATA_A") {
+		sendTask<TaskA>(a);
+	}
 }

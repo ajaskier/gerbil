@@ -6,17 +6,15 @@
 
 class TaskA : public Task
 {
-
 public:
-    explicit TaskA(int a);
-    virtual ~TaskA();
+	explicit TaskA(int a);
+	virtual ~TaskA();
 
-    virtual bool run() override;
+	virtual bool run() override;
 
 private:
 
-    int a;
-
+	int a;
 };
 
 #endif // TASK_A_H

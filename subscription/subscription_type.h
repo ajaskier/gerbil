@@ -2,21 +2,20 @@
 #define SUBSCRIPTION_TYPE_H
 
 enum class SubscriptionType {
-    READ,
-    WRITE
+	READ,
+	WRITE
 };
 
 inline QString toString(SubscriptionType s)
 {
-    switch(s)
-    {
-    case SubscriptionType::READ:
-        return "READ";
-    case SubscriptionType::WRITE:
-        return "WRITE";
-    }
+	switch (s) {
+	case SubscriptionType::READ:
+		return "READ";
+	case SubscriptionType::WRITE:
+		return "WRITE";
+	}
 
-    throw "!";
+	throw "!";
 }
 
 #endif // SUBSCRIPTION_TYPE_H

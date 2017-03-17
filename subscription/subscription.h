@@ -11,48 +11,48 @@
 #include "dependency.h"
 
 enum class AccessType {
-    DIRECT,
-    DEFERRED,
-    FORCED
+	DIRECT,
+	DEFERRED,
+	FORCED
 };
 
 class Subscription : public QObject
 {
-    Q_OBJECT
+	Q_OBJECT
 
 public:
-    virtual ~Subscription() override;
-    void returnData();
-    void forceUnsubscribe();
+	virtual ~Subscription() override;
+	void returnData();
+	void forceUnsubscribe();
 
-    int getId() { return id; }
-    AccessType getAccessType() { return dependency.accessType; }
-    Dependency getDependency() { return dependency; }
+	int getId() { return id; }
+	AccessType getAccessType() { return dependency.accessType; }
+	Dependency getDependency() { return dependency; }
 
-    template <class T1, class T2 = int>
-    class Lock;
+	template <class T1, class T2 = int>
+	class Lock;
 
 signals:
-    void update();
+	void update();
 
 private:
-    explicit Subscription(Dependency dependency, /*AccessType accessType,*/
-                          int id, SubscriptionManager& sm,
+	explicit Subscription(Dependency dependency, /*AccessType accessType,*/
+	                      int id, SubscriptionManager& sm,
 	                      QObject* requester = {},
 	                      std::function<void(void)> updateSlot = {});
-    handle_pair leaseData();
-    int version();
-    void setVersion(int version);
+	handle_pair leaseData();
+	int version();
+	void setVersion(int version);
 
-    Dependency dependency;
-    //AccessType accessType;
-    SubscriptionManager& sm;
-    const int id;
+	Dependency dependency;
+	//AccessType accessType;
+	SubscriptionManager& sm;
+	const int id;
 
-    static int spawnCounter;
-    static int destroyCounter;
+	static int spawnCounter;
+	static int destroyCounter;
 
-    bool forcedDelete = false;
+	bool forcedDelete = false;
 	friend class DataRegister;
 };
 

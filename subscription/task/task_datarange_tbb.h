@@ -9,18 +9,17 @@
 
 class TaskDataRangeTbb : public Task
 {
-
 public:
-    explicit TaskDataRangeTbb(QString destId);
-    virtual ~TaskDataRangeTbb();
+	explicit TaskDataRangeTbb(QString destId);
+	virtual ~TaskDataRangeTbb();
 
-    virtual bool run() override;
+	virtual bool run() override;
 
 protected:
 
-    virtual bool isCancelled() { return stopper.is_group_execution_cancelled(); }
+	virtual bool isCancelled() { return stopper.is_group_execution_cancelled(); }
 
-    tbb::task_group_context stopper;
+	tbb::task_group_context stopper;
 };
 
 

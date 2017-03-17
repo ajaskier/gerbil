@@ -7,18 +7,17 @@
 
 class TaskBand : public Task
 {
-
 public:
-    explicit TaskBand(QString sourceId, QString destId,
-                      size_t dim, representation::t repr);
-    virtual ~TaskBand();
+	explicit TaskBand(QString sourceId, QString destId,
+	                  size_t dim, representation::t repr);
+	virtual ~TaskBand();
 
-    virtual bool run() override;
+	virtual bool run() override;
 
 private:
 
-    size_t dim;
-    representation::t repr;
+	size_t dim;
+	representation::t repr;
 };
 
 

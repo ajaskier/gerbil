@@ -8,22 +8,22 @@
 
 class TaskNormRangeTbb : public TaskDataRangeTbb
 {
-
 public:
-    explicit TaskNormRangeTbb(QString destId, multi_img::NormMode mode,
-                              multi_img::Value minval, multi_img::Value maxval, representation::t type,
-                              bool update);
-    virtual ~TaskNormRangeTbb();
+	explicit TaskNormRangeTbb(QString destId, multi_img::NormMode mode,
+	                          multi_img::Value minval, multi_img::Value maxval,
+	                          representation::t type,
+	                          bool update);
+	virtual ~TaskNormRangeTbb();
 
-    virtual bool run() override;
+	virtual bool run() override;
 
 private:
 
-    multi_img::NormMode mode;
-    multi_img::Value minval;
-    multi_img::Value maxval;
-    representation::t type;
-    bool update;
+	multi_img::NormMode mode;
+	multi_img::Value minval;
+	multi_img::Value maxval;
+	representation::t type;
+	bool update;
 };
 
 

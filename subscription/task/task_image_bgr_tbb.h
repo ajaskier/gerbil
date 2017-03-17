@@ -9,15 +9,13 @@
 
 class TaskImageBgrTbb : public Task
 {
-
 public:
-    explicit TaskImageBgrTbb(QString destId, QString sourceId);
-    virtual bool run() override;
+	explicit TaskImageBgrTbb(QString destId, QString sourceId);
+	virtual bool run() override;
 
 protected:
-    virtual bool isCancelled() { return stopper.is_group_execution_cancelled(); }
-    tbb::task_group_context stopper;
-
+	virtual bool isCancelled() { return stopper.is_group_execution_cancelled(); }
+	tbb::task_group_context stopper;
 };
 
 

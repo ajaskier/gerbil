@@ -8,14 +8,14 @@
 
 ModelD::ModelD(int d, TaskScheduler* scheduler,
                QObject *parent)
-    : Model(scheduler, parent), d(d)
+	: Model(scheduler, parent), d(d)
 {
-    registerData("DATA_D", {"DATA_A"});
+	registerData("DATA_D", { "DATA_A" });
 }
 
 void ModelD::delegateTask(QString id, QString parentId)
 {
-    if (id == "DATA_D") {
-        sendTask<TaskD>(d);
-    }
+	if (id == "DATA_D") {
+		sendTask<TaskD>(d);
+	}
 }

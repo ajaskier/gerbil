@@ -16,46 +16,46 @@
 
 class DistModel : public Model
 {
-    Q_OBJECT
+	Q_OBJECT
 
 public:
 	explicit DistModel(TaskScheduler* scheduler, QObject *parent = nullptr);
 
-    virtual void delegateTask(QString id, QString parentId = "") override;
+	virtual void delegateTask(QString id, QString parentId = "") override;
 
-    void addImage(bool withTemp = false, bool partialLabelsUpdate = false);
-    void subImage(int version, bool partialLabelsUpdate = false);
+	void addImage(bool withTemp = false, bool partialLabelsUpdate = false);
+	void subImage(int version, bool partialLabelsUpdate = false);
 
 public slots:
-    void taskFinished(QString id, bool success);
+	void taskFinished(QString id, bool success);
 
 private:
 
-    void imageIMGUpdated();
-    void fromLabelsUpdate();
+	void imageIMGUpdated();
+	void fromLabelsUpdate();
 
-    void labelsPartialUpdate();
-    void fromROIUpdate();
-    void directUpdate();
+	void labelsPartialUpdate();
+	void fromROIUpdate();
+	void directUpdate();
 
-    ViewportCtx* createInitialContext();
+	ViewportCtx* createInitialContext();
 
-    std::unique_ptr<Subscription> imgSub;
-    std::unique_ptr<Subscription> distTmpSub;
-    std::unique_ptr<Subscription> labelsSub;
+	std::unique_ptr<Subscription> imgSub;
+	std::unique_ptr<Subscription> distTmpSub;
+	std::unique_ptr<Subscription> labelsSub;
 
-    representation::t type;
-    cv::Mat1s labels;
-    QVector<QColor> labelColors;
+	representation::t type;
+	cv::Mat1s labels;
+	QVector<QColor> labelColors;
 
-    std::vector<multi_img::Value> illuminant;
-    bool ignoreLabels;
-    cv::Mat1b highlightMask;
-    bool inbetween;
+	std::vector<multi_img::Value> illuminant;
+	bool ignoreLabels;
+	cv::Mat1b highlightMask;
+	bool inbetween;
 
 
-    bool directRequest = false;
-    bool labelsUpdateScheduled = false;
+	bool directRequest         = false;
+	bool labelsUpdateScheduled = false;
 };
 
 #endif // DIST_MODEL_H

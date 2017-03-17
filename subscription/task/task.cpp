@@ -5,34 +5,34 @@
 #include "subscription.h"
 
 Task::Task(QString target, std::map<QString, SourceDeclaration> sources)
-    : id(target), sources(sources)
+	: id(target), sources(sources)
 {
-    setDependencies(target);
+	setDependencies(target);
 }
 
 Task::Task(QString id, QString target, std::map<QString, SourceDeclaration> sources)
-    : id(id), sources(sources)
+	: id(id), sources(sources)
 {
-    setDependencies(target);
+	setDependencies(target);
 }
 
 Task::~Task()
 {
-    //qDebug() << "deleting task" << id;
+	//qDebug() << "deleting task" << id;
 }
 
 void Task::setDependencies(QString target)
 {
-    for (auto source : sources) {
+	for (auto source : sources) {
+		SourceDeclaration s = source.second;
+		dependencies.push_back(Dependency(s.dataId, SubscriptionType::READ, s.accessType,
+		                                  s.version));
+		subscriptions[source.first] = std::shared_ptr<Subscription>();
+	}
 
-        SourceDeclaration s = source.second;
-        dependencies.push_back(Dependency(s.dataId, SubscriptionType::READ, s.accessType, s.version));
-        subscriptions[source.first] = std::shared_ptr<Subscription>();
-    }
-
-    dependencies.push_back(Dependency(target, SubscriptionType::WRITE, AccessType::DIRECT));
-    subscriptions["dest"] = std::shared_ptr<Subscription>();
-    this->sources["dest"] = target;
+	dependencies.push_back(Dependency(target, SubscriptionType::WRITE, AccessType::DIRECT));
+	subscriptions["dest"] = std::shared_ptr<Subscription>();
+	this->sources["dest"] = target;
 }
 
 void Task::importSubscription(std::shared_ptr<Subscription> sub)
@@ -43,7 +43,7 @@ void Task::importSubscription(std::shared_ptr<Subscription> sub)
 	/* find task-local identifier */
 	//TODO: this can be done better!
 	auto it = std::find_if(sources.begin(), sources.end(),
-	                       [=](const std::pair<QString, SourceDeclaration>& v) {
+	                       [ = ](const std::pair<QString, SourceDeclaration>& v) {
 		return v.second.dataId == id;
 	});
 	QString parsedId = it->first;
@@ -52,29 +52,31 @@ void Task::importSubscription(std::shared_ptr<Subscription> sub)
 	subscriptions[parsedId] = sub;
 }
 
-bool Task::start() {
-    bool success = run();
-    emit taskFinished(this->id, success);
-    return success;
+bool Task::start()
+{
+	bool success = run();
+	emit taskFinished(this->id, success);
+	return success;
 }
 
 void Task::invalidateSubscriptions()
 {
-    for (auto& s : subscriptions) {
-        s.second->forceUnsubscribe();
-    }
+	for (auto& s : subscriptions) {
+		s.second->forceUnsubscribe();
+	}
 }
 
 bool Task::subExists(QString id)
 {
-    return subscriptions.find(id) != subscriptions.end();
+	return subscriptions.find(id) != subscriptions.end();
 }
 
-std::shared_ptr<Subscription> Task::sub(QString id) {
-    auto it = subscriptions.find(id);
+std::shared_ptr<Subscription> Task::sub(QString id)
+{
+	auto it = subscriptions.find(id);
 
-    assert(it != subscriptions.end());
-    assert(it->second);
+	assert(it != subscriptions.end());
+	assert(it->second);
 
-    return it->second;
+	return it->second;
 }

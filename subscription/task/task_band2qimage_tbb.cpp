@@ -13,37 +13,35 @@
 
 TaskBand2QImageTbb::TaskBand2QImageTbb(QString sourceId, QString destId,
                                        size_t dim)
-    : Task(destId, {{"source", sourceId}}), dim(dim)
-{
-}
+	: Task(destId, { { "source", sourceId } }), dim(dim)
+{}
 
 TaskBand2QImageTbb::~TaskBand2QImageTbb()
-{
-}
+{}
 
 bool TaskBand2QImageTbb::run()
 {
-    Subscription::Lock<multi_img> source_lock(*sub("source"));
-    multi_img* multi = source_lock();
+	Subscription::Lock<multi_img> source_lock(*sub("source"));
+	multi_img * multi = source_lock();
 
-    if (dim >= multi->size()) {
-        return false;
-    }
+	if (dim >= multi->size()) {
+		return false;
+	}
 
-    multi_img::Band &source = multi->bands[dim];
-    QImage* target = new QImage(source.cols, source.rows, QImage::Format_ARGB32);
-    Band2QImage converter(source, *target, multi->minval, multi->maxval);
-    tbb::parallel_for(tbb::blocked_range2d<int>(0, source.rows, 0, source.cols),
-                      converter, tbb::auto_partitioner(), stopper);
+	multi_img::Band &source   = multi->bands[dim];
+	QImage           * target = new QImage(source.cols, source.rows, QImage::Format_ARGB32);
+	Band2QImage      converter(source, *target, multi->minval, multi->maxval);
+	tbb::parallel_for(tbb::blocked_range2d<int>(0, source.rows, 0, source.cols),
+	                  converter, tbb::auto_partitioner(), stopper);
 
-    if (isCancelled()) {
-        delete target;
-        return false;
-    } else {
-        std::pair<QImage, QString> data(*target, QString());
+	if (isCancelled()) {
+		delete target;
+		return false;
+	} else {
+		std::pair<QImage, QString> data(*target, QString());
 
-        Subscription::Lock<std::pair<QImage, QString>> dest_lock(*sub("dest"));
-        dest_lock.swap(data);
-        return true;
-    }
+		Subscription::Lock<std::pair<QImage, QString> > dest_lock(*sub("dest"));
+		dest_lock.swap(data);
+		return true;
+	}
 }

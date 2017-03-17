@@ -9,25 +9,24 @@
 
 class TaskImagePCA : public Task
 {
-
 public:
-    explicit TaskImagePCA(QString sourceId, QString destId, multi_img::NormMode normMode,
-                          multi_img_base::Range normRange,
-                          representation::t type, bool update,
-                          unsigned int components = 0, bool includecache = true);
-    virtual ~TaskImagePCA();
-    virtual bool run() override;
+	explicit TaskImagePCA(QString sourceId, QString destId, multi_img::NormMode normMode,
+	                      multi_img_base::Range normRange,
+	                      representation::t type, bool update,
+	                      unsigned int components = 0, bool includecache = true);
+	virtual ~TaskImagePCA();
+	virtual bool run() override;
 
 private:
 
-    bool includecache;
-    unsigned int components;
+	bool includecache;
+	unsigned int components;
 
-    //normalization
-    multi_img::NormMode normMode;
-    multi_img_base::Range normRange;
-    representation::t type;
-    bool update;
+	//normalization
+	multi_img::NormMode normMode;
+	multi_img_base::Range normRange;
+	representation::t type;
+	bool update;
 };
 
 

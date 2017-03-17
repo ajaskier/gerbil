@@ -6,17 +6,16 @@
 
 class TaskImageLim : public Task
 {
-
 public:
-    explicit TaskImageLim(const QString &filename, bool limitedMode);
-    virtual ~TaskImageLim();
+	explicit TaskImageLim(const QString &filename, bool limitedMode);
+	virtual ~TaskImageLim();
 
-    virtual bool run() override;
+	virtual bool run() override;
 
 private:
 
-    const QString& filename;
-    bool limitedMode;
+	const QString& filename;
+	bool limitedMode;
 };
 
 

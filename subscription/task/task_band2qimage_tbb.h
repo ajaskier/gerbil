@@ -8,20 +8,18 @@
 
 class TaskBand2QImageTbb : public Task
 {
-
 public:
-    explicit TaskBand2QImageTbb(QString sourceId, QString destId, size_t dim);
-    virtual ~TaskBand2QImageTbb();
+	explicit TaskBand2QImageTbb(QString sourceId, QString destId, size_t dim);
+	virtual ~TaskBand2QImageTbb();
 
-    virtual bool run() override;
+	virtual bool run() override;
 
 private:
 
-    virtual bool isCancelled() { return stopper.is_group_execution_cancelled(); }
+	virtual bool isCancelled() { return stopper.is_group_execution_cancelled(); }
 
-    size_t dim;
-    tbb::task_group_context stopper;
-
+	size_t dim;
+	tbb::task_group_context stopper;
 };
 
 

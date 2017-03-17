@@ -15,62 +15,62 @@
 class Labels
 {
 public:
-    Labels() {}
+	Labels() {}
 
-    cv::Mat1s fullLabels;
-    cv::Mat1s scopedlabels;
-    QVector<QColor> colors;
+	cv::Mat1s fullLabels;
+	cv::Mat1s scopedlabels;
+	QVector<QColor> colors;
 };
 
 class LabelsMeta
 {
 public:
-    LabelsMeta() {}
+	LabelsMeta() {}
 
-    cv::Mat1s oldLabels;
-    cv::Mat1b mask;
+	cv::Mat1s oldLabels;
+	cv::Mat1b mask;
 };
 
 class LabelsModel : public Model
 {
-    Q_OBJECT
+	Q_OBJECT
 
 public:
 	explicit LabelsModel(TaskScheduler* scheduler, QObject *parent = nullptr);
 
-    virtual void delegateTask(QString id, QString parentId = "") override;
+	virtual void delegateTask(QString id, QString parentId = "") override;
 
 
 public slots:
 
-    void setLabels(const Labeling &labeling, bool full);
-    void setLabels(const cv::Mat1s &labeling);
+	void setLabels(const Labeling &labeling, bool full);
+	void setLabels(const cv::Mat1s &labeling);
 
-    void alterPixels(const cv::Mat1s &newLabels,
-                     const cv::Mat1b &mask);
+	void alterPixels(const cv::Mat1s &newLabels,
+	                 const cv::Mat1b &mask);
 
-    void addLabel();
-    void mergeLabels(const QVector<int> mlabels);
-    void deleteLabels(const QVector<int> mlabels);
-    void consolidateLabels();
+	void addLabel();
+	void mergeLabels(const QVector<int> mlabels);
+	void deleteLabels(const QVector<int> mlabels);
+	void consolidateLabels();
 
-    void setImageSize(cv::Size imgSize);
+	void setImageSize(cv::Size imgSize);
 
-    void setApplyROI(bool applyROI);
-    void setIconsSize(QSize size);
+	void setApplyROI(bool applyROI);
+	void setIconsSize(QSize size);
 
 
 private:
 
-    void computeIcons();
+	void computeIcons();
 
-    bool applyROI;
-    QSize iconSize;
+	bool applyROI;
+	QSize iconSize;
 
-    Labeling lastLabeling;
-    cv::Mat1b lastMask;
+	Labeling lastLabeling;
+	cv::Mat1b lastMask;
 
-    cv::Size originalImageSize;
+	cv::Size originalImageSize;
 };
 
 #endif // LABELS_MODEL_H

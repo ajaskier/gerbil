@@ -7,16 +7,15 @@
 
 class TaskB : public Task
 {
-
 public:
-    explicit TaskB(int b);
-    virtual ~TaskB();
+	explicit TaskB(int b);
+	virtual ~TaskB();
 
-    virtual bool run() override;
+	virtual bool run() override;
 
 private:
 
-    int b;
+	int b;
 };
 
 #endif // TASK_B_H

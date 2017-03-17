@@ -6,15 +6,16 @@
 
 enum class AccessType;
 
-struct Dependency {
-    Dependency(QString dataId, SubscriptionType subscription, AccessType accessType,
-               int version = -1)
-        : dataId(dataId), subscription(subscription),
-          accessType(accessType), version(version) {}
+struct Dependency
+{
+	Dependency(QString dataId, SubscriptionType subscription, AccessType accessType,
+	           int version = -1)
+		: dataId(dataId), subscription(subscription),
+		accessType(accessType), version(version) {}
 
-    QString dataId;
-    SubscriptionType subscription;
-	AccessType accessType;
+	QString          dataId;
+	SubscriptionType subscription;
+	AccessType       accessType;
 	int version;
 };
 

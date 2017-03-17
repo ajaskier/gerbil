@@ -8,18 +8,17 @@
 
 class TaskGradientTbb : public Task
 {
-
 public:
-    explicit TaskGradientTbb(bool includecache = true);
-    virtual ~TaskGradientTbb();
+	explicit TaskGradientTbb(bool includecache = true);
+	virtual ~TaskGradientTbb();
 
-    virtual bool run() override;
+	virtual bool run() override;
 private:
 
-    virtual bool isCancelled() { return stopper.is_group_execution_cancelled(); }
+	virtual bool isCancelled() { return stopper.is_group_execution_cancelled(); }
 
-    tbb::task_group_context stopper;
-    bool includecache;
+	tbb::task_group_context stopper;
+	bool includecache;
 };
 
 

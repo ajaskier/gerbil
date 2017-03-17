@@ -13,45 +13,43 @@
 class Model;
 class Subscription;
 
-using handle = std::shared_ptr<boost::dynamic_any>;
+using handle      = std::shared_ptr<boost::dynamic_any>;
 using handle_pair = std::pair<handle, handle>;
 
 class DataEntry {
-
 public:
 
-    handle data_handle = nullptr;
-    handle meta_handle = nullptr;
+	handle data_handle = nullptr;
+	handle meta_handle = nullptr;
 
-    Model* creator = nullptr;
-    std::vector<QString> dependants;
-    std::map<int, Subscription*> currentSubs;
+	Model* creator = nullptr;
+	std::vector<QString> dependants;
+	std::map<int, Subscription*> currentSubs;
 
-    int willReads = 0;
-    bool willWrite = false;
-    int doReads = 0;
-    bool doWrite = false;
-    bool upToDate = false;
-    bool initialized = false;
+	int willReads    = 0;
+	bool willWrite   = false;
+	int doReads      = 0;
+	bool doWrite     = false;
+	bool upToDate    = false;
+	bool initialized = false;
 
-    int minorVersion = 0;
-    int majorVersion = 0;
-    std::priority_queue<int, std::vector<int>, std::greater<int> > subscribedVersions;
+	int minorVersion = 0;
+	int majorVersion = 0;
+	std::priority_queue<int, std::vector<int>, std::greater<int> > subscribedVersions;
 
-    handle_pair read();
-    void endRead();
-    handle_pair write();
-    void endWrite();
+	handle_pair read();
+	void endRead();
+	handle_pair write();
+	void endWrite();
 
-    int& getMajorVersion();
-    int getMinorVersion();
+	int& getMajorVersion();
+	int getMinorVersion();
 
 private:
 
-    std::mutex mu;
-    std::condition_variable not_reading;
-    std::condition_variable not_writing;
-
+	std::mutex mu;
+	std::condition_variable not_reading;
+	std::condition_variable not_writing;
 };
 
 #endif // DATA_ENTRY_H

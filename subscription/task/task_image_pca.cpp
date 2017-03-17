@@ -11,28 +11,28 @@ TaskImagePCA::TaskImagePCA(QString sourceId, QString destId,
                            multi_img_base::Range normRange,
                            representation::t type, bool update,
                            unsigned int components, bool includecache)
-    : Task(destId, {{"source", sourceId}}), normMode(normMode),
-      normRange(normRange), type(type), update(update),
-      components(components), includecache(includecache)
-{
-}
+	: Task(destId, { { "source", sourceId } }), normMode(normMode),
+	normRange(normRange), type(type), update(update),
+	components(components), includecache(includecache)
+{}
 
 TaskImagePCA::~TaskImagePCA()
 {}
 
 bool TaskImagePCA::run()
 {
-    auto sourceId = sub("source")->getDependency().dataId;
-    auto destId = sub("dest")->getDependency().dataId;
-    TaskPcaTbb taskPca(sourceId, destId, components, includecache);
+	auto       sourceId = sub("source")->getDependency().dataId;
+	auto       destId   = sub("dest")->getDependency().dataId;
+	TaskPcaTbb taskPca(sourceId, destId, components, includecache);
 
 	taskPca.importSubscription(sub("source"));
 	taskPca.importSubscription(sub("dest"));
-    auto success = taskPca.start();
-    if (!success) return success;
+	auto success = taskPca.start();
+	if (!success)
+		return success;
 
-    TaskNormRangeTbb normRangeTbb(destId, normMode, normRange.min,
-                                  normRange.max, type, update);
+	TaskNormRangeTbb normRangeTbb(destId, normMode, normRange.min,
+	                              normRange.max, type, update);
 	normRangeTbb.importSubscription(sub("dest"));
-    return normRangeTbb.start();
+	return normRangeTbb.start();
 }

@@ -9,21 +9,20 @@
 
 class TaskImageNORM : public Task
 {
-
 public:
-    explicit TaskImageNORM(multi_img::NormMode normMode,
-                           multi_img_base::Range normRange,
-                           representation::t type, bool update);
-    virtual ~TaskImageNORM();
-    virtual bool run() override;
+	explicit TaskImageNORM(multi_img::NormMode normMode,
+	                       multi_img_base::Range normRange,
+	                       representation::t type, bool update);
+	virtual ~TaskImageNORM();
+	virtual bool run() override;
 
 private:
 
-    //normalization
-    multi_img::NormMode normMode;
-    multi_img_base::Range normRange;
-    representation::t type;
-    bool update;
+	//normalization
+	multi_img::NormMode normMode;
+	multi_img_base::Range normRange;
+	representation::t type;
+	bool update;
 };
 
 

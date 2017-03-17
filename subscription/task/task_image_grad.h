@@ -9,24 +9,23 @@
 
 class TaskImageGRAD : public Task
 {
-
 public:
-    explicit TaskImageGRAD(multi_img::NormMode normMode,
-                           multi_img_base::Range normRange,
-                           representation::t type, bool update,
-                           bool includecache = true);
-    virtual ~TaskImageGRAD();
-    virtual bool run() override;
+	explicit TaskImageGRAD(multi_img::NormMode normMode,
+	                       multi_img_base::Range normRange,
+	                       representation::t type, bool update,
+	                       bool includecache = true);
+	virtual ~TaskImageGRAD();
+	virtual bool run() override;
 
 private:
 
-    bool includecache;
+	bool includecache;
 
-    //normalization
-    multi_img::NormMode normMode;
-    multi_img_base::Range normRange;
-    representation::t type;
-    bool update;
+	//normalization
+	multi_img::NormMode normMode;
+	multi_img_base::Range normRange;
+	representation::t type;
+	bool update;
 };
 
 

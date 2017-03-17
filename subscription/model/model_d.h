@@ -7,18 +7,17 @@
 
 class ModelD : public Model
 {
-    Q_OBJECT
+	Q_OBJECT
 public:
 	explicit ModelD(int d, TaskScheduler *scheduler,
 	                QObject *parent = 0);
 
 public slots:
-    virtual void delegateTask(QString id, QString parentId = "") override;
-    void setD(int d) { this->d = d; }
+	virtual void delegateTask(QString id, QString parentId = "") override;
+	void setD(int d) { this->d = d; }
 
 protected:
-    int d;
-
+	int d;
 };
 
 #endif // MODEL_D_H

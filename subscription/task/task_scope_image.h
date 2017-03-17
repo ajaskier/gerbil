@@ -8,13 +8,11 @@
 
 class TaskScopeImage : public Task
 {
-
 public:
-    explicit TaskScopeImage();
-    virtual ~TaskScopeImage();
+	explicit TaskScopeImage();
+	virtual ~TaskScopeImage();
 
-    virtual bool run() override;
-
+	virtual bool run() override;
 };
 
 

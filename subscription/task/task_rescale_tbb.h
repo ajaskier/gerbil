@@ -10,23 +10,21 @@
 
 class TaskRescaleTbb : public Task
 {
-
 public:
-    explicit TaskRescaleTbb(size_t bands, size_t roiBands, bool includecache = true);
-    virtual ~TaskRescaleTbb();
+	explicit TaskRescaleTbb(size_t bands, size_t roiBands, bool includecache = true);
+	virtual ~TaskRescaleTbb();
 
-    virtual bool run() override;
+	virtual bool run() override;
 
 private:
 
-    virtual bool isCancelled() { return stopper.is_group_execution_cancelled(); }
+	virtual bool isCancelled() { return stopper.is_group_execution_cancelled(); }
 
-    size_t bands;
-    size_t roiBands;
-    size_t newsize;
-    bool includecache;
-    tbb::task_group_context stopper;
-
+	size_t bands;
+	size_t roiBands;
+	size_t newsize;
+	bool includecache;
+	tbb::task_group_context stopper;
 };
 
 #endif // TASK_RESCALE_TBB_H

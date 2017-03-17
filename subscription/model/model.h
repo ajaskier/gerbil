@@ -11,33 +11,34 @@ enum class SubscriptionType;
 
 class Model : public QObject
 {
-    Q_OBJECT
+	Q_OBJECT
 
 public:
 	explicit Model(TaskScheduler* scheduler,
-                   QObject *parent = 0);
-    virtual ~Model();
+	               QObject      *parent = 0);
+	virtual ~Model();
 
 public slots:
-    virtual void delegateTask(QString requestedId, QString parentId = "") = 0;
-    virtual void taskFinished(QString id, bool success);
+	virtual void delegateTask(QString requestedId, QString parentId = "") = 0;
+	virtual void taskFinished(QString id, bool success);
 
 protected:
-    void registerData(QString dataId, std::vector<QString> dependencies);
-    bool isTaskCurrent(QString id);
+	void registerData(QString dataId, std::vector<QString> dependencies);
+	bool isTaskCurrent(QString id);
 
 	// send a prepared task
 	void sendTask(std::shared_ptr<Task> t);
 
 	// construct task of type T and send it right away
-	template<typename T, typename... A>
-	void sendTask(A&&... args) {
-		sendTask(std::make_shared<T>(std::forward<A>(args)...));
+	template<typename T, typename ... A>
+	void sendTask(A&& ... args)
+	{
+		sendTask(std::make_shared<T>(std::forward<A>(args) ...));
 	}
 
 private:
-    TaskScheduler* scheduler;
-    std::map<QString, std::shared_ptr<Task>> tasks;
+	TaskScheduler* scheduler;
+	std::map<QString, std::shared_ptr<Task> > tasks;
 };
 
 #endif // MODEL_H

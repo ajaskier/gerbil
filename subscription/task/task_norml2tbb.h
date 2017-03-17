@@ -8,18 +8,17 @@
 
 class TaskNormL2Tbb : public Task
 {
-
 public:
-    explicit TaskNormL2Tbb();
-    virtual ~TaskNormL2Tbb();
+	explicit TaskNormL2Tbb();
+	virtual ~TaskNormL2Tbb();
 
-    virtual bool run() override;
+	virtual bool run() override;
 
 private:
 
-    virtual bool isCancelled() { return stopper.is_group_execution_cancelled(); }
+	virtual bool isCancelled() { return stopper.is_group_execution_cancelled(); }
 
-    tbb::task_group_context stopper;
+	tbb::task_group_context stopper;
 };
 
 #endif // TASK_NORML2TBB_H

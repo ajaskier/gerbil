@@ -19,82 +19,80 @@
 #include "task/labels/task_labels_consolidate.h"
 
 LabelsModel::LabelsModel(TaskScheduler *scheduler, QObject *parent)
-    : Model(scheduler, parent), iconSize(32, 32)
+	: Model(scheduler, parent), iconSize(32, 32)
 {
-    registerData("labels", {"ROI"});
-    registerData("labels.icons", {"labels"});
+	registerData("labels", { "ROI" });
+	registerData("labels.icons", { "labels" });
 }
 
 void LabelsModel::delegateTask(QString id, QString parentId)
 {
-
-    if (id == "labels") {
-        setLabels(lastLabeling, true);
-    } else if (id == "labels.icons") {
-        computeIcons();
-    }
-
+	if (id == "labels") {
+		setLabels(lastLabeling, true);
+	} else if (id == "labels.icons") {
+		computeIcons();
+	}
 }
 
 void LabelsModel::setImageSize(cv::Size imgSize)
 {
-    originalImageSize = imgSize;
+	originalImageSize = imgSize;
 }
 
 void LabelsModel::setLabels(const cv::Mat1s &labeling)
 {
-    Labeling vl(labeling, false);
-    setLabels(vl, false);
+	Labeling vl(labeling, false);
+	setLabels(vl, false);
 }
 
 void LabelsModel::setLabels(const Labeling &labeling, bool full)
 {
-    lastLabeling = labeling;
-    sendTask<TaskSetLabels>(labeling, originalImageSize, full);
+	lastLabeling = labeling;
+	sendTask<TaskSetLabels>(labeling, originalImageSize, full);
 }
 
 void LabelsModel::alterPixels(const cv::Mat1s &newLabels, const cv::Mat1b &mask)
 {
-    lastMask = mask.clone(); //looks tricky, but it's the best I can for now
-    sendTask<TaskLabelsAlterPixels>(newLabels, lastMask);
+	lastMask = mask.clone(); //looks tricky, but it's the best I can for now
+	sendTask<TaskLabelsAlterPixels>(newLabels, lastMask);
 }
 
 void LabelsModel::addLabel()
 {
-    sendTask<TaskAddLabel>();
+	sendTask<TaskAddLabel>();
 }
 
 void LabelsModel::computeIcons()
 {
-    sendTask<TaskLabelsIcons>(iconSize, applyROI);
+	sendTask<TaskLabelsIcons>(iconSize, applyROI);
 }
 
 void LabelsModel::setApplyROI(bool applyROI)
 {
-    this->applyROI = applyROI;
-    computeIcons();
+	this->applyROI = applyROI;
+	computeIcons();
 }
 
 void LabelsModel::setIconsSize(QSize size)
 {
-    this->iconSize = size;
-    computeIcons();
+	this->iconSize = size;
+	computeIcons();
 }
 
 void LabelsModel::mergeLabels(const QVector<int> mlabels)
 {
-    sendTask<TaskMergeLabels>(mlabels);
+	sendTask<TaskMergeLabels>(mlabels);
 }
 
 void LabelsModel::deleteLabels(const QVector<int> mlabels)
 {
-    QVector<int> tmp = mlabels;
-    tmp.append(0);
+	QVector<int> tmp = mlabels;
+	tmp.append(0);
 
-    sendTask<TaskMergeLabels>(tmp);
+	sendTask<TaskMergeLabels>(tmp);
 }
 
 void LabelsModel::consolidateLabels()
 {
-    sendTask<TaskLabelsConsolidate>(originalImageSize);
+	sendTask<TaskLabelsConsolidate>(originalImageSize);
 }

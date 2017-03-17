@@ -8,18 +8,16 @@
 
 class TaskRoi : public Task
 {
-
 public:
-    explicit TaskRoi(cv::Rect oldRoi, cv::Rect newRoi);
+	explicit TaskRoi(cv::Rect oldRoi, cv::Rect newRoi);
 
-    virtual ~TaskRoi();
-    virtual bool run() override;
+	virtual ~TaskRoi();
+	virtual bool run() override;
 
 private:
 
-    cv::Rect oldRoi;
-    cv::Rect newRoi;
-
+	cv::Rect oldRoi;
+	cv::Rect newRoi;
 };
 
 

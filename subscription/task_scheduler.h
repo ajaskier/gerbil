@@ -10,23 +10,23 @@ class SubscriptionManager;
 
 class TaskScheduler : public QObject
 {
-    Q_OBJECT
+	Q_OBJECT
 
 public:
-    TaskScheduler(SubscriptionManager& sm);
-    void pushTask(std::shared_ptr<Task> task);
+	TaskScheduler(SubscriptionManager& sm);
+	void pushTask(std::shared_ptr<Task> task);
 
 private:
-    void checkTaskPool();
-    void startTask(std::shared_ptr<Task> task);
-    void removeRelated(QString id);
-    void createSubscriptions(std::shared_ptr<Task> task);
-    void taskEnded(QString id, bool success);
+	void checkTaskPool();
+	void startTask(std::shared_ptr<Task> task);
+	void removeRelated(QString id);
+	void createSubscriptions(std::shared_ptr<Task> task);
+	void taskEnded(QString id, bool success);
 
-    void printPool();
+	void printPool();
 
-    std::list<std::shared_ptr<Task>> taskPool;
-    SubscriptionManager& sm;
+	std::list<std::shared_ptr<Task> > taskPool;
+	SubscriptionManager& sm;
 };
 
 #endif // TASK_SCHEDULER_H

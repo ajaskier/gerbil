@@ -9,29 +9,28 @@
 
 class TaskImageIMG : public Task
 {
-
 public:
-    explicit TaskImageIMG(size_t bands, size_t roiBands,
-                          multi_img::NormMode normMode,
-                          multi_img_base::Range normRange,
-                          representation::t type, bool update,
-                          bool includecache = true);
-    virtual ~TaskImageIMG();
-    virtual bool run() override;
+	explicit TaskImageIMG(size_t bands, size_t roiBands,
+	                      multi_img::NormMode normMode,
+	                      multi_img_base::Range normRange,
+	                      representation::t type, bool update,
+	                      bool includecache = true);
+	virtual ~TaskImageIMG();
+	virtual bool run() override;
 
 private:
 
-    //rescale
-    size_t bands;
-    size_t roiBands;
-    //size_t newsize;
-    bool includecache;
+	//rescale
+	size_t bands;
+	size_t roiBands;
+	//size_t newsize;
+	bool includecache;
 
-    //normalization
-    multi_img::NormMode normMode;
-    multi_img_base::Range normRange;
-    representation::t type;
-    bool update;
+	//normalization
+	multi_img::NormMode normMode;
+	multi_img_base::Range normRange;
+	representation::t type;
+	bool update;
 };
 
 
