@@ -89,18 +89,18 @@ void DistModel::delegateTask(QString id, QString parentId)
 
 	if (!imgSub) {
 		imgSub = std::unique_ptr<Subscription>(
-			DataRegister::subscribe(Dependency("image.IMG",
-			                                   SubscriptionType::READ,
-			                                   AccessType::DEFERRED),
-			                        this, std::bind(&DistModel::imageIMGUpdated, this)));
+		    DataRegister::subscribe(Dependency("image.IMG",
+		                                       SubscriptionType::READ,
+		                                       AccessType::DEFERRED),
+		                            this, std::bind(&DistModel::imageIMGUpdated, this)));
 	}
 
 	if (!distTmpSub) {
 		distTmpSub =
-			std::unique_ptr<Subscription>(
-				DataRegister::subscribe(Dependency("dist.tmp.IMG",
-				                                   SubscriptionType::READ,
-				                                   AccessType::DIRECT)));
+		    std::unique_ptr<Subscription>(
+		        DataRegister::subscribe(Dependency("dist.tmp.IMG",
+		                                           SubscriptionType::READ,
+		                                           AccessType::DIRECT)));
 	}
 }
 
@@ -143,8 +143,8 @@ ViewportCtx* DistModel::createInitialContext()
 	ctx->nbins        = 64;
 
 	ctx->valid = false;
-	ctx->reset.fetch_and_store(1);
-	ctx->wait.fetch_and_store(1);
+	//ctx->reset.fetch_and_store(1);
+	//ctx->wait.fetch_and_store(1);
 
 	return ctx;
 }

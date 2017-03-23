@@ -206,6 +206,13 @@
        </widget>
       </item>
       <item>
+       <widget class="QCheckBox" name="clustering_checkbox">
+        <property name="text">
+         <string>clustering</string>
+        </property>
+       </widget>
+      </item>
+      <item>
        <widget class="QCheckBox" name="roi_checkbox">
         <property name="text">
          <string>roi</string>

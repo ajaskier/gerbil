@@ -105,7 +105,7 @@ struct BinSet
 	 * the hash realizes a sparse histogram
 	 */
 	typedef tbb::concurrent_hash_map<HashKey, Bin, vector_char_hash_compare>
-	    HashMap;
+	HashMap;
 	HashMap bins;
 	/* to set opacity value we normalize by total weight == sum of bin weights
 	 * this is atomic to allow multi-threaded adding of vectors into the hash
@@ -125,9 +125,9 @@ struct ViewportCtx
 	representation::t type;
 
 	// true if viewport has freshly computed data, but not on GPU yet
-	tbb::atomic<int>                 wait;
+	//tbb::atomic<int>                 wait;
 	// true if viewport needs a full reset
-	tbb::atomic<int>                 reset;
+	//tbb::atomic<int>                 reset;
 
 	/* metadata depending on image data */
 	size_t dimensionality;
@@ -176,7 +176,7 @@ public:
 		void join(PreprocessBins &toJoin);
 		std::vector<std::pair<int, int> > GetRanges() { return ranges; }
 private:
-		int label;
+		int    label;
 		size_t dimensionality;
 		multi_img::Value maxval;
 		const std::vector<multi_img::BandDesc> &meta;
@@ -206,14 +206,14 @@ public:
 			index(index), varr(varr) {}
 		void operator()(const tbb::blocked_range<size_t> &r) const;
 private:
-		bool drawMeans;
+		bool   drawMeans;
 		size_t dimensionality;
 		multi_img::Value minval;
 		multi_img::Value binsize;
 		const std::vector<multi_img::Value> &illuminant;
 		const std::vector<BinSet> &sets;
 		const binindex &index;
-		GLfloat *varr;
+		GLfloat         *varr;
 	};
 };
 

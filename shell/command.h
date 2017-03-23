@@ -13,21 +13,20 @@
 #include "progress_observer.h"
 
 class CommandRunner;
+class CommandTask;
 
 namespace shell {
-
 class Command {
-
 public:
 	Command(const std::string &name, Config& config,
 	        const std::string &contributor_name = "",
-			const std::string &contributor_mail = "",
-			ProgressObserver *po = NULL)
-	 : name(name),
-	   contributor_name(contributor_name),
-	   contributor_mail(contributor_mail),
-	   po(NULL),
-	   abstract_config(config)
+	        const std::string &contributor_mail = "",
+	        ProgressObserver *po = NULL)
+	    : name(name),
+	    contributor_name(contributor_name),
+	    contributor_mail(contributor_mail),
+	    po(NULL),
+	    abstract_config(config)
 	{}
 
 	virtual ~Command() {}
@@ -36,9 +35,18 @@ public:
 	virtual const std::string& getContributorMail() const { return contributor_mail; }
 	virtual Config& getConfig() { return abstract_config; }
 	virtual int execute() = 0;
-	virtual std::map<std::string, boost::any> execute(std::map<std::string, boost::any> &input, ProgressObserver *progress = NULL) { /*dummy*/ assert(false); std::map<std::string, boost::any> a; return a; }
+	virtual std::map<std::string, boost::any> execute(std::map<std::string, boost::any> &input,
+	                                                  ProgressObserver *progress =
+	                                                      NULL)   /*dummy*/
+	{
+		assert(false);
+		std
+		::map<std::string,
+		      boost::any> a;
+		return a;
+	}
 	virtual void printShortHelp() const = 0;
-	virtual void printHelp() const = 0;
+	virtual void printHelp() const      = 0;
 
 protected:
 	ProgressObserver *progressObserver() { return po; }
@@ -47,7 +55,8 @@ protected:
 
 	/** Return true if a ProgressObserver is set and it has the abort flag set.
 	 */
-	bool isAborted() const {
+	bool isAborted() const
+	{
 		return progressObserver() && progressObserver()->isAborted();
 	}
 
@@ -61,8 +70,8 @@ private:
 
 	// setProgressObserver()
 	friend class ::CommandRunner;
+	friend class ::CommandTask;
 };
-
 }
 
 #endif // COMMAND_H

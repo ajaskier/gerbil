@@ -70,7 +70,8 @@ Viewport2::~Viewport2()
 		delete buffers[i].blit;
 	}
 
-	delete sub;
+	//delete sub;
+	sub->deleteLater();
 }
 
 /********* I N I T **************/
@@ -241,19 +242,19 @@ void Viewport2::prepareLines()
 	//SharedDataLock setslock(sets->mutex);
 
 	Subscription::Lock<std::vector<BinSet>, ViewportCtx> lock(*sub);
-	std::vector<BinSet>* sets = lock();
-	ViewportCtx        * ctx  = lock.meta();
+	std::vector<BinSet> sets = *lock();
+	ViewportCtx         ctx  = *(lock.meta());
 
-	ctx->wait.fetch_and_store(0);      // set to zero: our data will be usable
-	if (ctx->reset.fetch_and_store(0)) // is true if it was 1 before
-		reset();
+	//ctx.wait.fetch_and_store(0);      // set to zero: our data will be usable
+	//if (ctx.reset.fetch_and_store(0)) // is true if it was 1 before
+	//	reset();
 
 	// first step (cpu only)
-	Compute::preparePolylines(*ctx, *sets, shuffleIdx);
+	Compute::preparePolylines(ctx, sets, shuffleIdx);
 
 	// second step (cpu -> gpu)
 	target->makeCurrent();
-	Compute::storeVertices(*ctx, *sets, shuffleIdx, vb,
+	Compute::storeVertices(ctx, sets, shuffleIdx, vb,
 	                       drawMeans->isChecked(), illuminantAppl);
 }
 
@@ -328,7 +329,7 @@ void Viewport2::setLimiters(int label)
 		if ((int)sets->size() > label && (*sets)[label].totalweight > 0) {
 			// use range from this label
 			const std::vector<std::pair<int, int> > &b =
-				(*sets)[label].boundary;
+			    (*sets)[label].boundary;
 			limiters.assign(b.begin(), b.end());
 		} else {
 			setLimiters(0);
@@ -341,7 +342,7 @@ void Viewport2::toggleLabelHighlight(int index)
 	if (highlightLabels.contains(index)) {
 		int pos = highlightLabels.indexOf(index);
 		highlightLabels.remove(pos, 1);
-	}else  {
+	}else {
 		highlightLabels.push_back(index);
 	}
 

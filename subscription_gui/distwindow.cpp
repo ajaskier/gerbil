@@ -38,8 +38,9 @@ void DistWindow::displayDist()
 
 DistWindow::~DistWindow()
 {
-	delete distSub;
-	gui->deleteLater();
+	distSub->deleteLater();
+	if (guiCreated)
+		gui->deleteLater();
 }
 
 void DistWindow::on_pushButton_clicked()

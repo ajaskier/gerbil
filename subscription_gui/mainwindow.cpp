@@ -14,6 +14,7 @@
 #include "model/img_model.h"
 #include "model/dist_model.h"
 #include "model/labels_model.h"
+#include "model/clusterization_model.h"
 
 #include "normdock.h"
 #include "labels/banddock.h"
@@ -21,6 +22,7 @@
 
 #include "labels/labeldock.h"
 #include "roi/roidock.h"
+#include "clustering/clusteringdock.h"
 
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -36,17 +38,18 @@ void MainWindow::initCrucials()
 	scheduler = new TaskScheduler(sm);
 	DataRegister::init(&sm);
 
-	imageModel  = new ImgModel(false, scheduler, this);
-	labelsModel = new LabelsModel(scheduler, this);
-	distModel   = new DistModel(scheduler, this);
+	imageModel          = new ImgModel(false, scheduler, this);
+	labelsModel         = new LabelsModel(scheduler, this);
+	distModel           = new DistModel(scheduler, this);
+	clusterizationModel = new ClusterizationModel(scheduler, this);
 	imageModel->setFilename("/home/ocieslak/gerbil_data/fake_and_real_food.txt");
 	imgSub =
-		std::unique_ptr<Subscription>(DataRegister::subscribe(Dependency("image",
-		                                                                 SubscriptionType::READ,
-		                                                                 AccessType::DEFERRED),
-		                                                      this,
-		                                                      std::bind(&MainWindow::imgUpdated,
-		                                                                this)));
+	    std::unique_ptr<Subscription>(DataRegister::subscribe(Dependency("image",
+	                                                                     SubscriptionType::READ,
+	                                                                     AccessType::DEFERRED),
+	                                                          this,
+	                                                          std::bind(&MainWindow::imgUpdated,
+	                                                                    this)));
 }
 
 void MainWindow::initRest()
@@ -76,7 +79,7 @@ MainWindow::~MainWindow()
 void MainWindow::displayROI()
 {
 	Subscription::Lock<
-		cv::Rect, ROIMeta> lock(*roiSub);
+	    cv::Rect, ROIMeta> lock(*roiSub);
 
 
 	int startX = lock()->x;
@@ -99,12 +102,12 @@ void MainWindow::displayROI()
 void MainWindow::imgUpdated()
 {
 	roiSub =
-		std::unique_ptr<Subscription>(DataRegister::subscribe(Dependency("ROI",
-		                                                                 SubscriptionType::READ,
-		                                                                 AccessType::DEFERRED),
-		                                                      this,
-		                                                      std::bind(&MainWindow::displayROI,
-		                                                                this)));
+	    std::unique_ptr<Subscription>(DataRegister::subscribe(Dependency("ROI",
+	                                                                     SubscriptionType::READ,
+	                                                                     AccessType::DEFERRED),
+	                                                          this,
+	                                                          std::bind(&MainWindow::displayROI,
+	                                                                    this)));
 
 	{
 		Subscription::Lock<multi_img> lock(*imgSub);
@@ -283,7 +286,7 @@ void MainWindow::on_labels_checkbox_toggled(bool checked)
 		        labelsModel, &LabelsModel::alterPixels);
 
 		connect(bandDock->bandView(), SIGNAL(newLabeling(cv::Mat1s)),
-		        labelsModel, SLOT(setLabels(const cv::Mat1s&)));
+		        labelsModel, SLOT(setLabels(const cv::Mat1s &)));
 	} else {
 		removeDockWidget(bandDock);
 		bandDock->deleteLater();
@@ -329,5 +332,25 @@ void MainWindow::on_roi_checkbox_toggled(bool checked)
 	} else {
 		removeDockWidget(roiDock);
 		roiDock->deleteLater();
+	}
+}
+
+void MainWindow::on_clustering_checkbox_toggled(bool checked)
+{
+	if (checked) {
+		clusteringDock = new ClusteringDock(this);
+		addDockWidget(Qt::TopDockWidgetArea, clusteringDock);
+
+		connect(clusteringDock, SIGNAL(segmentationRequested(ClusteringRequest)),
+		        clusterizationModel, SLOT(requestSegmentation(ClusteringRequest)));
+
+		connect(clusteringDock, SIGNAL(cancelSegmentationRequested()),
+		        clusterizationModel, SIGNAL(abort()));
+
+		connect(clusterizationModel, SIGNAL(segmentationCompleted()),
+		        clusteringDock, SLOT(processSegmentationCompleted()));
+	} else {
+		removeDockWidget(clusteringDock);
+		clusteringDock->deleteLater();
 	}
 }

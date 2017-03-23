@@ -109,7 +109,7 @@ void Viewport2::updateBuffers(RenderMode spectrum, RenderMode highlight)
 	{
 		//SharedDataLock ctxlock(ctx->mutex);
 		//SharedDataLock setslock(sets->mutex);
-		if (sets->empty() || ctx->wait)
+		if (sets->empty()) // || ctx->wait)
 			return;
 	}
 
@@ -132,8 +132,8 @@ void Viewport2::updateBuffers(RenderMode spectrum, RenderMode highlight)
 
 		if (!(b.fbo->isValid() && b.blit->isValid())) {
 			GerbilApplication::internalError(
-				"Framebuffer not valid in Viewport2 updateBuffers().",
-				false);
+			    "Framebuffer not valid in Viewport2 updateBuffers().",
+			    false);
 			return;
 		}
 
@@ -298,8 +298,8 @@ void Viewport2::drawBins(QPainter &painter, QTimer &renderTimer,
 	bool success = vb.bind();
 	if (!success) {
 		GerbilApplication::internalError(
-			"Vertex buffer could not be bound in Viewport2 drawBins().",
-			false);
+		    "Vertex buffer could not be bound in Viewport2 drawBins().",
+		    false);
 		painter.endNativePainting();
 		return;
 	}
@@ -363,7 +363,7 @@ void Viewport2::drawBins(QPainter &painter, QTimer &renderTimer,
 		// grab binset and bin according to key
 		BinSet &s = (*sets)[idx.first];
 		std::pair<BinSet::HashMap::const_iterator, BinSet::HashMap::const_iterator> binitp =
-			s.bins.equal_range(K);
+		    s.bins.equal_range(K);
 		if (s.bins.end() == binitp.first) {
 			// FIXME this is an error and should be treated accordingly
 			GGDBGM("no bin" << endl);
@@ -444,11 +444,14 @@ void Viewport2::continueDrawing(int buffer)
 	//SharedDataLock ctxlock(ctx->mutex);
 	//SharedDataLock setslock(sets->mutex);
 
-	if (sets->empty() || ctx->wait)
+	if (sets->empty()) //|| ctx->wait)
 		return;
 
 	//setslock.unlock();
 	//ctxlock.unlock();
+
+	if (!b.fbo || !(b.fbo->isValid()))
+		return;
 
 	QPainter painter(b.fbo);
 

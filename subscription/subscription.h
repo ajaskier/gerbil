@@ -49,6 +49,7 @@ private:
 	SubscriptionManager& sm;
 	const int id;
 
+
 	static int spawnCounter;
 	static int destroyCounter;
 

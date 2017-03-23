@@ -24,6 +24,8 @@ vole_compile_library(
 	model/model_d
 
 	task/task
+	task/command_task
+
 	task/task_a
 	task/task_b
 	task/task_c
@@ -57,9 +59,12 @@ vole_compile_library(
     task/labels/task_merge_labels
     task/labels/task_labels_consolidate
 
+	task/task_meanshift_sp
+
     model/img_model
     model/dist_model
     model/labels_model
+	model/clusterization_model
 
     distviewcompute_utils
 
@@ -72,6 +77,7 @@ vole_moc_library(
 	worker_thread.h
 
     task/task.h
+	task/command_task.h
 	model/model.h
 	model/model_a.h
 	model/model_b.h
@@ -80,6 +86,9 @@ vole_moc_library(
     model/img_model.h
     model/dist_model.h
     model/labels_model.h
+	model/clusterization_model.h
+
+	task/task_meanshift_sp.h
 )
 
 vole_add_module()
