@@ -51,7 +51,7 @@ int MeanShiftSOM::execute() {
 
 	Stopwatch watch("Total time");
 
-	Result res = execute(input);
+	Result res = execute(*input);
 	if (res.labels->empty())
 		return 0;
 
@@ -74,20 +74,20 @@ int MeanShiftSOM::execute() {
 #endif
 }
 
-MeanShiftSOM::Result MeanShiftSOM::execute(multi_img::ptr input)
+MeanShiftSOM::Result MeanShiftSOM::execute(const multi_img &input)
 {
 	// SOM setup
-	boost::shared_ptr<som::GenSOM> som(som::GenSOM::create(config.som, *input));
+	boost::shared_ptr<som::GenSOM> som(som::GenSOM::create(config.som, input));
 
 	// build lookup table
 	boost::shared_ptr<som::SOMClosestN>
-			mapping(new som::SOMClosestN(*som, *input, 1));
+	        mapping(new som::SOMClosestN(*som, input, 1));
 
 	// create meanshift input
-	multi_img msinput = som->img(input->meta,
-								 multi_img_base::Range(
-									 input->minval, input->maxval));
-/*	if (config.sp_withGrad) {	TODO cleanup
+	multi_img msinput = som->img(input.meta,
+	                             multi_img_base::Range(
+	                                 input.minval, input.maxval));
+	/*	if (config.sp_withGrad) {	TODO cleanup
 		msinput.apply_logarithm();
 		msinput = msinput.spec_gradient();
 	}*/
@@ -99,8 +99,8 @@ MeanShiftSOM::Result MeanShiftSOM::execute(multi_img::ptr input)
 	std::vector<int> spsizes(som->size2D().area(), 0.f);
 	{
 		Stopwatch watch("Influence-based weight calculation");
-		for (int y = 0; y < input->height; ++y) {
-			for (int x = 0; x < input->width; ++x) {
+		for (int y = 0; y < input.height; ++y) {
+			for (int x = 0; x < input.width; ++x) {
 				som::SOMClosestN::resultAccess answer =
 						mapping->closestN(cv::Point(x, y));
 				cv::Point pos = som->getCoord2D(answer.first->index);
@@ -137,11 +137,11 @@ MeanShiftSOM::Result MeanShiftSOM::execute(multi_img::ptr input)
 	ret_out.lookup = mapping;
 
 	// translate results back to original image domain
-	ret_out.labels->create(input->height, input->width);
+	ret_out.labels->create(input.height, input.width);
 	{
 		Stopwatch watch("Label Image Generation");
-		for (int y = 0; y < input->height; ++y) {
-			for (int x = 0; x < input->width; ++x) {
+		for (int y = 0; y < input.height; ++y) {
+			for (int x = 0; x < input.width; ++x) {
 				som::SOMClosestN::resultAccess answer =
 						mapping->closestN(cv::Point(x, y));
 				cv::Point pos = som->getCoord2D(answer.first->index);

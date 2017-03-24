@@ -15,8 +15,8 @@ public:
 	std::map<std::string, boost::any> execute(
 	        std::map<std::string, boost::any> &input,
 	        ProgressObserver *progress);
-	MeanShift::Result execute(multi_img::ptr input,
-	                          multi_img::ptr input_grad);
+	MeanShift::Result execute(const multi_img &input,
+	                          const multi_img &input_grad);
 
 	void printShortHelp() const;
 	void printHelp() const;

@@ -16,10 +16,11 @@
 
 #include <multi_img.h>
 #include <stopwatch.h>
+#include <labeling.h>
 #include <opencv2/highgui/highgui.hpp>
 #include <iostream>
 #include <string.h>
-#include <labeling.h>
+#include <memory>
 
 using namespace boost::program_options;
 
@@ -56,7 +57,7 @@ int MeanShiftSP::execute()
 		input_grad->rebuildPixels(false);
 	}
 
-	MeanShift::Result ret = execute(input, input_grad);
+	MeanShift::Result ret = execute(*input, *input_grad);
 	if (ret.labels->empty())
 		return 0;
 
@@ -105,7 +106,7 @@ std::map<std::string, boost::any> MeanShiftSP::execute(std::map<std::string, boo
 	if (isAborted())
 		return output;
 
-	MeanShift::Result res = execute(inputimg, inputgrad);
+	MeanShift::Result res = execute(*inputimg, *inputgrad);
 
 	if (isAborted())
 		return output;
@@ -118,7 +119,7 @@ std::map<std::string, boost::any> MeanShiftSP::execute(std::map<std::string, boo
 #endif // WITH_SEG_FELZENSZWALB
 }
 
-MeanShift::Result MeanShiftSP::execute(multi_img::ptr input, multi_img::ptr input_grad)
+MeanShift::Result MeanShiftSP::execute(const multi_img& input, const multi_img& input_grad)
 {
 #ifdef WITH_SEG_FELZENSZWALB
 	Stopwatch watch("Total time");
@@ -129,7 +130,7 @@ MeanShift::Result MeanShiftSP::execute(multi_img::ptr input, multi_img::ptr inpu
 
 	// run superpixel pre-segmentation
 	std::pair<cv::Mat1i, seg_felzenszwalb::segmap> result =
-		 seg_felzenszwalb::segment_image(*input, config.superpixel);
+	     seg_felzenszwalb::segment_image(input, config.superpixel);
 	sp_translate = result.first;
 	std::swap(sp_map, result.second);
 
@@ -146,13 +147,13 @@ MeanShift::Result MeanShiftSP::execute(multi_img::ptr input, multi_img::ptr inpu
 	}
 
 	// create meanshift input
-	multi_img::ptr in = (config.sp_withGrad ? input_grad : input);
+	const multi_img &in = (config.sp_withGrad ? input_grad : input);
 
-	int D = in->size();
+	int D = in.size();
 	multi_img msinput((int)sp_map.size(), 1, D);
-	msinput.minval = in->minval;
-	msinput.maxval = in->maxval;
-	msinput.meta = in->meta;
+	msinput.minval = in.minval;
+	msinput.maxval = in.maxval;
+	msinput.meta = in.meta;
 	vector<double> weights(sp_map.size());
 	std::vector<int> spsizes; // HACK
 	seg_felzenszwalb::segmap::const_iterator mit = sp_map.begin();
@@ -164,7 +165,7 @@ MeanShift::Result MeanShiftSP::execute(multi_img::ptr input, multi_img::ptr inpu
 
 		// sum up all superpixel members
 		for (int i = 0; i < N; ++i) {
-			const multi_img::Pixel &s = in->atIndex((*mit)[i]);
+			const multi_img::Pixel &s = in.atIndex((*mit)[i]);
 			for (int d = 0; d < D; ++d)
 				p[d] += s[d];
 		}
@@ -221,7 +222,7 @@ MeanShift::Result MeanShiftSP::execute(multi_img::ptr input, multi_img::ptr inpu
 
 	// translate results back to original image domain
 	cv::Mat1s labels_ms = *res.labels;
-	cv::Mat1s labels_mask(in->height, in->width);
+	cv::Mat1s labels_mask(in.height, in.width);
 	cv::Mat1s::iterator itr = labels_mask.begin();
 	cv::Mat1i::const_iterator itl = sp_translate.begin();
 	for (; itr != labels_mask.end(); ++itl, ++itr) {

@@ -160,7 +160,6 @@ void LabelingModel::alterLabel(short index, cv::Mat1b mask,
 void LabelingModel::alterPixels(const cv::Mat1s &newLabels,
 								const cv::Mat1b &mask)
 {
-    int depth = mask.depth();
     // replace pixels
 	newLabels.copyTo(labels, mask);
 

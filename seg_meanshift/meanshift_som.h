@@ -27,7 +27,7 @@ public:
 	MeanShiftSOM();
 	~MeanShiftSOM();
 	int execute();
-	Result execute(multi_img::ptr input);
+	Result execute(const multi_img &input);
 
 	void printShortHelp() const;
 	void printHelp() const;

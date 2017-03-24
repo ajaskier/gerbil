@@ -16,14 +16,13 @@
 
 #ifdef WITH_OPENCV2 // theoretically, vole could be built w/o opencv..
 
+#include <opencv2/imgproc/imgproc.hpp>
+
 #include <cfloat>
 #include <vector>
 #include <sstream>
 #include <iostream>
-#include <opencv2/imgproc/imgproc.hpp>
-#ifdef WITH_BOOST
-	#include <boost/shared_ptr.hpp>
-#endif
+#include <memory>
 #ifdef WITH_QT
 	class QImage;
 #endif
@@ -206,7 +205,7 @@ public:
 
 #ifdef WITH_BOOST
 	/// for convenience: a multi_img shared ptr
-	typedef boost::shared_ptr<multi_img> ptr;
+	typedef std::unique_ptr<multi_img> ptr;
 #endif
 
 	/// a spectral pixel.
