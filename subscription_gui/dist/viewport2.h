@@ -213,14 +213,14 @@ private:
 	// draw vectors skewed according to illuminant
 	std::vector<multi_img::Value> illuminantAppl;
 
-	int selection, hover;
+	int  selection, hover;
 	bool limiterMode;
 	std::vector<std::pair<int, int> > limiters;
 
 	float useralpha;
 
-	bool showLabeled, showUnlabeled;
-	bool overlayMode;
+	bool      showLabeled, showUnlabeled;
+	bool      overlayMode;
 	QPolygonF overlayPoints;
 
 	// target widget needed for GL context
@@ -239,7 +239,7 @@ private:
 	/* if in limiter mode, user has to release mouse button before switching
 	   band. this is for usability, users tend to accidentially switch bands */
 	bool holdSelection;
-	int *activeLimiter;
+	int  *activeLimiter;
 
 	// draw with log weights vs. linear weights
 	QAction* drawLog;
@@ -275,6 +275,15 @@ private:
 		int vtp = 22; // lower padding for text (legend)
 		int htp;      // left padding for text (legend)
 	} boundaries;
+
+	int currentDistMajorVersion = 0;
+	int currentDistMinorVersion = 0;
+
+	int newDistMajorVersion = 0;
+	int newDistMinorVersion = 0;
+
+	int waitFlag;
+	int resetFlag;
 };
 
 Q_DECLARE_METATYPE(Viewport2::BufferFormat)

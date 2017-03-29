@@ -45,13 +45,13 @@ private:
 	std::unique_ptr<Subscription> labelsSub;
 
 	representation::t type;
-	cv::Mat1s labels;
-	QVector<QColor> labelColors;
+	cv::Mat1s         labels;
+	QVector<QColor>   labelColors;
 
 	std::vector<multi_img::Value> illuminant;
-	bool ignoreLabels;
+	bool      ignoreLabels;
 	cv::Mat1b highlightMask;
-	bool inbetween;
+	bool      inbetween;
 
 
 	bool directRequest         = false;

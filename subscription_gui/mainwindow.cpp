@@ -42,7 +42,7 @@ void MainWindow::initCrucials()
 	labelsModel         = new LabelsModel(scheduler, this);
 	distModel           = new DistModel(scheduler, this);
 	clusterizationModel = new ClusterizationModel(scheduler, this);
-	imageModel->setFilename("/home/ocieslak/gerbil_data/fake_and_real_food.txt");
+	imageModel->setFilename("/home/ocieslak/gerbil_data/fake_and_real_peppers_ms.txt");
 	imgSub =
 	    std::unique_ptr<Subscription>(DataRegister::subscribe(Dependency("image",
 	                                                                     SubscriptionType::READ,
@@ -346,6 +346,9 @@ void MainWindow::on_clustering_checkbox_toggled(bool checked)
 
 		connect(clusteringDock, SIGNAL(cancelSegmentationRequested()),
 		        clusterizationModel, SIGNAL(abort()));
+
+		connect(clusterizationModel, SIGNAL(progressChanged(int)),
+		        clusteringDock, SLOT(updateProgress(int)));
 
 		connect(clusterizationModel, SIGNAL(segmentationCompleted()),
 		        clusteringDock, SLOT(processSegmentationCompleted()));

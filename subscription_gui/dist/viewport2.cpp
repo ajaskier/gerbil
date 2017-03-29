@@ -35,9 +35,7 @@
 
 
 Viewport2::Viewport2(representation::t type, QGLWidget *target)
-	: type(type), target(target), width(0), height(0),
-	//ctx(new SharedData<ViewportCtx>(new ViewportCtx())),
-	//sets(new SharedData<std::vector<BinSet> >(new std::vector<BinSet>())),
+    : type(type), target(target), width(0), height(0),
 	selection(0), hover(-1), limiterMode(false),
 	active(false), useralpha(1.f),
 	showLabeled(true), showUnlabeled(true),
@@ -48,9 +46,6 @@ Viewport2::Viewport2(representation::t type, QGLWidget *target)
 	bufferFormat(BufferFormat::RGBA16F),
 	drawingState(HIGH_QUALITY), yaxisWidth(0), vb(QGLBuffer::VertexBuffer)
 {
-	//(*ctx)->wait = 1;
-	//(*ctx)->reset = 1;
-	//(*ctx)->ignoreLabels = false;
 
 	restoreState();
 	initTimers();
@@ -70,7 +65,6 @@ Viewport2::~Viewport2()
 		delete buffers[i].blit;
 	}
 
-	//delete sub;
 	sub->deleteLater();
 }
 
@@ -220,6 +214,19 @@ void Viewport2::rebuild()
 //	SharedDataLock ctxlock(ctx->mutex);
 //	SharedDataLock setslock(sets->mutex);
 
+	currentDistMajorVersion = newDistMajorVersion;
+	currentDistMinorVersion = newDistMinorVersion;
+
+	newDistMajorVersion = DataRegister::majorVersion("dist.IMG");
+	newDistMinorVersion = DataRegister::minorVersion("dist.IMG");
+
+	waitFlag = (newDistMajorVersion != currentDistMajorVersion
+	            || newDistMinorVersion != currentDistMinorVersion);
+
+	resetFlag = newDistMajorVersion != currentDistMajorVersion;
+
+
+
 	qDebug() << "\nREBUILDDDDDDD\n";
 
 	prepareLines(); // will also call reset() if indicated by ctx
@@ -228,26 +235,16 @@ void Viewport2::rebuild()
 
 void Viewport2::prepareLines()
 {
-//	if (!ctx) {
-//		GGDBGM("no ctx" << endl);
-//		return;
-//	}
-//	if (!sets) {
-//		GGDBGM("no sets" << endl);
-//		return;
-//	}
-
-	// lock context and sets
-	//SharedDataLock ctxlock(ctx->mutex);
-	//SharedDataLock setslock(sets->mutex);
 
 	Subscription::Lock<std::vector<BinSet>, ViewportCtx> lock(*sub);
 	std::vector<BinSet> sets = *lock();
 	ViewportCtx         ctx  = *(lock.meta());
 
-	//ctx.wait.fetch_and_store(0);      // set to zero: our data will be usable
-	//if (ctx.reset.fetch_and_store(0)) // is true if it was 1 before
-	//	reset();
+	waitFlag = false;
+	if (resetFlag) {
+		reset();
+		resetFlag = false;
+	}
 
 	// first step (cpu only)
 	Compute::preparePolylines(ctx, sets, shuffleIdx);

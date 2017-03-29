@@ -4,7 +4,7 @@
 	This file may be licensed under the terms of of the GNU General Public
 	License, version 3, as published by the Free Software Foundation. You can
 	find it here: http://www.gnu.org/licenses/gpl.html
-*/
+ */
 
 #include "meanshift_sp.h"
 #include "meanshift.h"
@@ -25,13 +25,12 @@
 using namespace boost::program_options;
 
 namespace seg_meanshift {
-
 MeanShiftSP::MeanShiftSP()
- : Command(
-		"meanshiftsp",
-		config,
-		"Johannes Jordan",
-		"johannes.jordan@informatik.uni-erlangen.de")
+    : Command(
+        "meanshiftsp",
+        config,
+        "Johannes Jordan",
+        "johannes.jordan@informatik.uni-erlangen.de")
 {}
 
 MeanShiftSP::~MeanShiftSP() {}
@@ -41,7 +40,7 @@ int MeanShiftSP::execute()
 #ifdef WITH_SEG_FELZENSZWALB
 	multi_img::ptr input, input_grad;
 	if (config.sp_withGrad) {
-		input = imginput::ImgInput(config.input).execute();
+		input      = imginput::ImgInput(config.input).execute();
 		input_grad = multi_img::ptr(new multi_img(*input, true));
 		input_grad->apply_logarithm();
 		*input_grad = input_grad->spec_gradient();
@@ -66,31 +65,37 @@ int MeanShiftSP::execute()
 	// write out beautifully colored label image
 	Labeling labels = *ret.labels;
 	labels.yellowcursor = false;
-	labels.shuffle = true;
+	labels.shuffle      = true;
 
 	std::string output_name = config.output_directory + "/"
-				  + config.output_prefix + "-segmentation_rgb.png";
+	                          + config.output_prefix + "-segmentation_rgb.png";
 	cv::imwrite(output_name, labels.bgr());
 	return 0;
 #else
 	std::cerr << "FATAL: Felzenszwalb superpixel segmentation was not built-in!"
-			  << std::endl;
+	          << std::endl;
 	return 1;
 #endif
 }
 
-std::map<std::string, boost::any> MeanShiftSP::execute(std::map<std::string, boost::any> &input, ProgressObserver *progress) {
+std::map<std::string, boost::any> MeanShiftSP::execute(std::map<std::string, boost::any> &input,
+                                                       ProgressObserver *progress)
+{
 #ifdef WITH_SEG_FELZENSZWALB
 	// XXX: for now, gradient/rescale is expected to be done by caller
 
 	setProgressObserver(progress);
 
-	boost::shared_ptr<multi_img> inputimg =
-			boost::any_cast<boost::shared_ptr<multi_img> >(input["multi_img"]);
-	boost::shared_ptr<multi_img> inputgrad;
+	//boost::shared_ptr<multi_img> inputimg =
+	//		boost::any_cast<boost::shared_ptr<multi_img> >(input["multi_img"]);
+	//boost::shared_ptr<multi_img> inputgrad;
+
+	const multi_img * inputimg = boost::any_cast<multi_img*>(input["multi_img"]);
+	const multi_img *inputgrad;
 	if (config.sp_withGrad) {
 		inputgrad =
-			boost::any_cast<boost::shared_ptr<multi_img> >(input["multi_grad"]);
+		    boost::any_cast<multi_img*>(input["multi_grad"]);
+		//boost::any_cast<boost::shared_ptr<multi_img> >(input["multi_grad"]);
 	}
 
 	// make sure pixel caches are built
@@ -111,10 +116,10 @@ std::map<std::string, boost::any> MeanShiftSP::execute(std::map<std::string, boo
 	if (isAborted())
 		return output;
 
-	output["labels"]  = res.labels;
-	output["modes"]   = res.modes;
+	output["labels"] = res.labels;
+	output["modes"]  = res.modes;
 	return output;
-#else // WITH_SEG_FELZENSZWALB
+#else   // WITH_SEG_FELZENSZWALB
 	throw std::runtime_error("Module seg_felzenszwalb needed, but missing!");
 #endif // WITH_SEG_FELZENSZWALB
 }
@@ -123,38 +128,38 @@ MeanShift::Result MeanShiftSP::execute(const multi_img& input, const multi_img& 
 {
 #ifdef WITH_SEG_FELZENSZWALB
 	Stopwatch watch("Total time");
-	Labeling labels;
+	Labeling  labels;
 	// superpixel setup
 	cv::Mat1i sp_translate;
 	seg_felzenszwalb::segmap sp_map;
 
 	// run superpixel pre-segmentation
 	std::pair<cv::Mat1i, seg_felzenszwalb::segmap> result =
-	     seg_felzenszwalb::segment_image(input, config.superpixel);
+	    seg_felzenszwalb::segment_image(input, config.superpixel);
 	sp_translate = result.first;
 	std::swap(sp_map, result.second);
 
 	std::cout << "SP: " << sp_map.size() << " segments" << std::endl;
 	if (config.verbosity > 1) {
 		std::string output_name;
-		Labeling output;
+		Labeling    output;
 		output.yellowcursor = false;
-		output.shuffle = true;
+		output.shuffle      = true;
 		output.read(result.first, false);
 		output_name = config.output_directory + "/"
-					  + config.output_prefix + "-superpixels.png";
+		              + config.output_prefix + "-superpixels.png";
 		cv::imwrite(output_name, output.bgr());
 	}
 
 	// create meanshift input
 	const multi_img &in = (config.sp_withGrad ? input_grad : input);
 
-	int D = in.size();
+	int       D = in.size();
 	multi_img msinput((int)sp_map.size(), 1, D);
 	msinput.minval = in.minval;
 	msinput.maxval = in.maxval;
-	msinput.meta = in.meta;
-	vector<double> weights(sp_map.size());
+	msinput.meta   = in.meta;
+	vector<double>   weights(sp_map.size());
 	std::vector<int> spsizes; // HACK
 	seg_felzenszwalb::segmap::const_iterator mit = sp_map.begin();
 	for (int ii = 0; mit != sp_map.end(); ++ii, ++mit) {
@@ -185,7 +190,7 @@ MeanShift::Result MeanShiftSP::execute(const multi_img& input, const multi_img& 
 
 	// arrange weights around their mean
 	cv::Mat1d wmat(weights);
-	double wmean = cv::mean(wmat)[0];
+	double    wmean = cv::mean(wmat)[0];
 	wmat /= wmean;
 
 	// execute mean shift
@@ -206,12 +211,12 @@ MeanShift::Result MeanShiftSP::execute(const multi_img& input, const multi_img& 
 
 		config.K = ret.K; config.L = ret.L;
 		std::cout << "Found K = " << config.K
-				  << "\tL = " << config.L << std::endl;
+		          << "\tL = " << config.L << std::endl;
 		return MeanShift::Result();
 	}
 
 	MeanShift::Result res = ms.execute(msinput, 0,
-									 (config.sp_weight > 0 ? &weights : 0));
+	                                   (config.sp_weight > 0 ? &weights : 0));
 	if (res.labels->empty())
 		return MeanShift::Result();
 
@@ -223,28 +228,29 @@ MeanShift::Result MeanShiftSP::execute(const multi_img& input, const multi_img& 
 	// translate results back to original image domain
 	cv::Mat1s labels_ms = *res.labels;
 	cv::Mat1s labels_mask(in.height, in.width);
-	cv::Mat1s::iterator itr = labels_mask.begin();
+	cv::Mat1s::iterator       itr = labels_mask.begin();
 	cv::Mat1i::const_iterator itl = sp_translate.begin();
 	for (; itr != labels_mask.end(); ++itl, ++itr) {
 		*itr = labels_ms(*itl, 0);
 	}
 
 	return MeanShift::Result(*res.modes, labels_mask);
-#endif // WITH_SEG_FELZENSWALB
+#endif  // WITH_SEG_FELZENSWALB
 }
 
-void MeanShiftSP::printShortHelp() const {
+void MeanShiftSP::printShortHelp() const
+{
 	std::cout << "Fast adaptive mean shift segmentation on superpixels" << std::endl;
 }
 
-void MeanShiftSP::printHelp() const {
+void MeanShiftSP::printHelp() const
+{
 	std::cout << "Fast adaptive mean shift segmentation on superpixels" << std::endl;
 	std::cout << std::endl;
 	std::cout << "Applies superpixel segmentation as a pre-processing step.\n";
 	std::cout << "Please read \"Georgescu et. al: Mean Shift Based Clustering in High\n"
-	             "Dimensions: A Texture Classification Example\"";
+	"Dimensions: A Texture Classification Example\"";
 	std::cout << std::endl;
 }
-
 }
 

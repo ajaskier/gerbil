@@ -50,11 +50,17 @@ std::vector<cv::Rect> TaskDistAdd::getDiff(const cv::Mat1b &mask, const multi_im
 
 	std::vector<cv::Rect> diff;
 	if (partialLabelsUpdate) {
-		if (mask.cols == 0 && mask.rows == 0) {
-			diff.push_back(cv::Rect(0, 0, img.width, img.height));
-		} else {
+		if (!mask.empty()) {
 			diff.push_back(cv::Rect(0, 0, mask.cols, mask.rows));
 		}
+
+		//if (mask.empty()) {
+		//	diff.push_back(cv::Rect(0, 0, img.width, img.height));
+		// partialLabelsUpdate = false;
+		//}
+		//else {
+		//	diff.push_back(cv::Rect(0, 0, mask.cols, mask.rows));
+		//}
 	} else if (!roimeta.profitable) {
 		diff.push_back(cv::Rect(0, 0, img.width, img.height));
 	} else {
@@ -87,7 +93,7 @@ std::vector<BinSet> TaskDistAdd::coreExecution(ViewportCtx *args, cv::Mat1s& lab
 	std::vector<BinSet> result;
 	if (reuse && reuseDist) {
 		result = *reuseDist;
-	} else if (!partialLabelsUpdate) {
+	} else { //if (!partialLabelsUpdate) {
 		diff.clear();
 		diff.push_back(cv::Rect(0, 0, img.width, img.height));
 	}

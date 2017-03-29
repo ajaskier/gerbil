@@ -108,13 +108,13 @@ void DistModel::taskFinished(QString id, bool success)
 {
 	Model::taskFinished(id, success);
 
-	if (id == "taskAddLabelsUpdate") {
-		labelsUpdateScheduled = false;
-	}
-
 	if (id == "taskAdd") {
 		distTmpSub.reset(nullptr);
 		imgSub.reset(nullptr);
+
+		if (labelsUpdateScheduled) {
+			labelsUpdateScheduled = false;
+		}
 	}
 	directRequest = false;
 }
@@ -143,8 +143,8 @@ ViewportCtx* DistModel::createInitialContext()
 	ctx->nbins        = 64;
 
 	ctx->valid = false;
-	//ctx->reset.fetch_and_store(1);
-	//ctx->wait.fetch_and_store(1);
+	//ctx->wait  = true;
+	//ctx->reset = true;
 
 	return ctx;
 }

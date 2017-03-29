@@ -25,7 +25,7 @@ bool Viewport2::drawScene(QPainter *painter, bool withDynamics)
 		/* TODO: disabled member state instead? */
 		//SharedDataLock ctxlock(ctx->mutex);
 		//SharedDataLock setslock(sets->mutex);
-		if (sets->empty()) // || ctx->wait)
+		if (sets->empty() || waitFlag)
 			disabled = true;
 	}
 
@@ -107,9 +107,7 @@ void Viewport2::updateBuffers(RenderMode spectrum, RenderMode highlight)
 	ViewportCtx        * ctx  = lock.meta();
 
 	{
-		//SharedDataLock ctxlock(ctx->mutex);
-		//SharedDataLock setslock(sets->mutex);
-		if (sets->empty()) // || ctx->wait)
+		if (sets->empty() || waitFlag)
 			return;
 	}
 
@@ -444,8 +442,9 @@ void Viewport2::continueDrawing(int buffer)
 	//SharedDataLock ctxlock(ctx->mutex);
 	//SharedDataLock setslock(sets->mutex);
 
-	if (sets->empty()) //|| ctx->wait)
+	if (sets->empty() || waitFlag) {
 		return;
+	}
 
 	//setslock.unlock();
 	//ctxlock.unlock();

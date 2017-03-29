@@ -20,26 +20,28 @@ TaskMeanShiftSP::TaskMeanShiftSP(QString sourceId, QString sourceGradId)
 
 bool TaskMeanShiftSP::run()
 {
-	multi_img* source;
-	multi_img* sourceGrad;
+	multi_img * source;
+	multi_img * sourceGrad;
+
+	std::map<std::string, boost::any> output;
 	{
 		Subscription::Lock<multi_img> lock(*sub("source"));
 		source = lock();
 		Subscription::Lock<multi_img> grad_lock(*sub("sourceGrad"));
 		sourceGrad = grad_lock();
-	}
 
-	std::map<std::string, boost::any> input;
-	input["multi_img"]  = boost::shared_ptr<multi_img>(new multi_img(*source));
-	input["multi_grad"] = boost::shared_ptr<multi_img>(new multi_img(*sourceGrad));
+		std::map<std::string, boost::any> input;
 
-	std::map<std::string, boost::any> output;
-	emit progressChanged(0);
-	try {
-		output = cmd->execute(input, this);
-	} catch (std::exception &) {
-		emit exception(std::current_exception(), false);
-		abort();
+		input["multi_img"]  = new multi_img(*source);
+		input["multi_grad"] = new multi_img(*sourceGrad);
+
+		emit progressChanged(0);
+		try {
+			output = cmd->execute(input, this);
+		} catch (std::exception &) {
+			emit exception(std::current_exception(), false);
+			abort();
+		}
 	}
 
 	if (isAborted()) {
