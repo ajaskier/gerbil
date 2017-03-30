@@ -67,6 +67,11 @@ void SubscriptionManager::subscribeWrite(QString dataId)
 	invalidDependants(dataId);
 }
 
+std::vector<QString> SubscriptionManager::getDataDependencies(QString dataId)
+{
+	return dataPool[dataId].dependants;
+}
+
 void SubscriptionManager::unsubscribe(QString dataId, SubscriptionType sub,
                                       int version, Subscription *subObj, bool consumed)
 {

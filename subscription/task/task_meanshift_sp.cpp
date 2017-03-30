@@ -2,12 +2,12 @@
 #include "subscription_type.h"
 #include "subscription.h"
 #include <QThread>
+
+#include <QDebug>
+
 #include "data.h"
-
 #include "multi_img.h"
-
 #include "model/labels_model.h"
-
 #include "labels/task_set_labels.h"
 
 namespace seg_meanshift {
@@ -38,7 +38,8 @@ bool TaskMeanShiftSP::run()
 		emit progressChanged(0);
 		try {
 			output = cmd->execute(input, this);
-		} catch (std::exception &) {
+		} catch (std::exception& e) {
+			qDebug() << e.what();
 			emit exception(std::current_exception(), false);
 			abort();
 		}

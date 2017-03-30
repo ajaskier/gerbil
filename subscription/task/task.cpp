@@ -64,6 +64,8 @@ void Task::invalidateSubscriptions()
 	for (auto& s : subscriptions) {
 		s.second->forceUnsubscribe();
 	}
+
+	emit taskFinished(id, false);
 }
 
 bool Task::subExists(QString id)
@@ -79,4 +81,17 @@ std::shared_ptr<Subscription> Task::sub(QString id)
 	assert(it->second);
 
 	return it->second;
+}
+
+QString Task::targetId()
+{
+	auto it = std::find_if(dependencies.begin(), dependencies.end(),
+	    [ = ](const Dependency& dep) {
+		    return dep.subscription == SubscriptionType::WRITE;
+	    });
+
+	if (it != dependencies.end())
+		return it->dataId;
+	else
+		return QString();
 }

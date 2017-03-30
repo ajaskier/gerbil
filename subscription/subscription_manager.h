@@ -56,6 +56,7 @@ private:
 	void setMajorVersion(QString id, int version);
 
 	bool processDependencies(std::vector<Dependency>& dependencies);
+	std::vector<QString> getDataDependencies(QString dataId);
 
 	void askModelForTask(QString requestedId, QString beingComputedId = "");
 	void updateState(QString id);

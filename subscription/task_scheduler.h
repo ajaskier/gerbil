@@ -19,13 +19,16 @@ public:
 private:
 	void checkTaskPool();
 	void startTask(std::shared_ptr<Task> task);
-	void removeRelated(QString id);
 	void createSubscriptions(std::shared_ptr<Task> task);
 	void taskEnded(QString id, bool success);
+	void removeDependantTasks(QString dataId);
 
 	void printPool();
 
 	std::list<std::shared_ptr<Task> > taskPool;
+
+	std::map<QString, std::shared_ptr<Task>> runningTasks;
+
 	SubscriptionManager& sm;
 };
 
