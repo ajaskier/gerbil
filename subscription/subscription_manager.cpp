@@ -88,8 +88,8 @@ void SubscriptionManager::unsubscribe(QString dataId, SubscriptionType sub,
 	} else {
 		dataPool[dataId].willWrite = false;
 
-		qDebug() << "WRITE OF DATA" << dataId << "ENDED. CURRENT VERSION: "
-		         << dataPool[dataId].majorVersion << "." << dataPool[dataId].minorVersion;
+		//qDebug() << "WRITE OF DATA" << dataId << "ENDED. CURRENT VERSION: "
+		//         << dataPool[dataId].majorVersion << "." << dataPool[dataId].minorVersion;
 
 		if (consumed && !dataPool[dataId].data_handle->empty()) {
 			sendUpdate(dataId);
@@ -98,7 +98,7 @@ void SubscriptionManager::unsubscribe(QString dataId, SubscriptionType sub,
 
 	if (!dataPool[dataId].willWrite && dataPool[dataId].willReads == 0) {
 		if (dataPool[dataId].upToDate) {
-			qDebug() << "data" << dataId << "would be erased but it's valid";
+			//qDebug() << "data" << dataId << "would be erased but it's valid";
 		} else {
 			removeData(dataId);
 		}
@@ -283,7 +283,7 @@ bool SubscriptionManager::processDependencies(std::vector<Dependency> &dependenc
 		}
 
 		if (dep.subscription == SubscriptionType::WRITE
-		    && !isNoneState(dataId))
+		    && !isNoneState(dataId) && !isWriteState(dataId))
 			return false;
 	}
 	return true;

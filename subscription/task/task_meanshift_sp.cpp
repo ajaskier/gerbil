@@ -20,20 +20,19 @@ TaskMeanShiftSP::TaskMeanShiftSP(QString sourceId, QString sourceGradId)
 
 bool TaskMeanShiftSP::run()
 {
-	multi_img * source;
-	multi_img * sourceGrad;
+	Subscription::Lock<multi_img> lock(*sub("source"));
+	const multi_img* source = lock();
+	Subscription::Lock<multi_img> grad_lock(*sub("sourceGrad"));
+	const multi_img* sourceGrad = grad_lock();
 
 	std::map<std::string, boost::any> output;
 	{
-		Subscription::Lock<multi_img> lock(*sub("source"));
-		source = lock();
-		Subscription::Lock<multi_img> grad_lock(*sub("sourceGrad"));
-		sourceGrad = grad_lock();
+
 
 		std::map<std::string, boost::any> input;
 
-		input["multi_img"]  = new multi_img(*source);
-		input["multi_grad"] = new multi_img(*sourceGrad);
+		input["multi_img"]  = source;//new multi_img(*source);
+		input["multi_grad"] = sourceGrad;//new multi_img(*sourceGrad);
 
 		emit progressChanged(0);
 		try {

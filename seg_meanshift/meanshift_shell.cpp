@@ -127,14 +127,14 @@ MeanShiftShell::execute(std::map<std::string, boost::any> &input,
 //	boost::shared_ptr<multi_img> inputimg =
 //	        boost::any_cast<boost::shared_ptr<multi_img> >(input["multi_img"]);
 //	boost::shared_ptr<multi_img> inputgrad;
-	const multi_img *inputimg = boost::any_cast<multi_img*>(input["multi_img"]);
+	const multi_img *inputimg = boost::any_cast<const multi_img*>(input["multi_img"]);
 	const multi_img *inputgrad;
 
 #ifdef WITH_SEG_FELZENSZWALB
 	if (config.sp_withGrad) {
 		//inputgrad =
 		    //boost::any_cast<boost::shared_ptr<multi_img> >(input["multi_grad"]);
-		inputgrad = boost::any_cast<multi_img*>(input["multi_grad"]);
+		inputgrad = boost::any_cast<const multi_img*>(input["multi_grad"]);
 	}
 #endif
 

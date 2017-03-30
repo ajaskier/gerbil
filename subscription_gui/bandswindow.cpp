@@ -28,14 +28,11 @@ BandsWindow::~BandsWindow()
 
 void BandsWindow::display()
 {
-	qDebug() << "did I crash?!";
 	Subscription::Lock<std::pair<QImage, QString> > lock(*bandsSub);
-	//multi_img* img = lock();
 	QImage  img  = lock()->first;
 	QString desc = lock()->second;
 	qDebug() << desc;
 
-	//QPixmap pix = QPixmap::fromImage(img->export_qt(1));
 	QPixmap pix = QPixmap::fromImage(img);
 	ui->imageLabel->setPixmap(pix);
 }

@@ -225,10 +225,6 @@ void Viewport2::rebuild()
 
 	resetFlag = newDistMajorVersion != currentDistMajorVersion;
 
-
-
-	qDebug() << "\nREBUILDDDDDDD\n";
-
 	prepareLines(); // will also call reset() if indicated by ctx
 	updateBuffers();
 }

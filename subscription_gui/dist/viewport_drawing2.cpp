@@ -64,7 +64,6 @@ bool Viewport2::drawScene(QPainter *painter, bool withDynamics)
 	for (int i = 0; i < (drawHighlight ? 2 : 1); ++i) {
 		renderbuffer &b = buffers[i];
 		if (b.dirty) {
-			qDebug() << "its dirty ;c";
 			drawWaitMessage(painter);
 			// nothing to draw yet, don't even bother with other buffer,
 			disabled = true;

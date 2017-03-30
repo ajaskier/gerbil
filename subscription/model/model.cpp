@@ -24,7 +24,7 @@ void Model::sendTask(std::shared_ptr<Task> t)
 {
 	QString id = t->getId();
 	if (isTaskCurrent(id)) {
-		qDebug() << "Task is current, new task will not be sent" << id;
+		//qDebug() << "Task is current, new task will not be sent" << id;
 		return;
 	}
 
@@ -35,6 +35,6 @@ void Model::sendTask(std::shared_ptr<Task> t)
 
 void Model::taskFinished(QString id, bool success)
 {
-	qDebug() << "removing the task" << id << "in model";
+	//qDebug() << "removing the task" << id << "in model";
 	tasks.erase(id);
 }

@@ -90,11 +90,11 @@ std::map<std::string, boost::any> MeanShiftSP::execute(std::map<std::string, boo
 	//		boost::any_cast<boost::shared_ptr<multi_img> >(input["multi_img"]);
 	//boost::shared_ptr<multi_img> inputgrad;
 
-	const multi_img * inputimg = boost::any_cast<multi_img*>(input["multi_img"]);
+	const multi_img * inputimg = boost::any_cast<const multi_img*>(input["multi_img"]);
 	const multi_img *inputgrad;
 	if (config.sp_withGrad) {
 		inputgrad =
-		    boost::any_cast<multi_img*>(input["multi_grad"]);
+		    boost::any_cast<const multi_img*>(input["multi_grad"]);
 		//boost::any_cast<boost::shared_ptr<multi_img> >(input["multi_grad"]);
 	}
 

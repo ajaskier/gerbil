@@ -191,7 +191,6 @@ void BandDock::changeBand(representation::t repr, int bandId,
 		return;
 	}
 
-	qDebug() << "band has width" << band.width() << "and height:" << band.height();
 	bv->setPixmap(band);
 	setWindowTitle(desc);
 }

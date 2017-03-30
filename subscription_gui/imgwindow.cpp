@@ -33,7 +33,6 @@ void ImgWindow::display()
 {
 	Subscription::Lock<multi_img> lock(*sub);
 	multi_img* img = lock();
-	qDebug() << "height:" << img->height << "width:" << img->width;
 
 	QPixmap pix = QPixmap::fromImage(img->export_qt(1));
 	ui->label->setPixmap(pix);
