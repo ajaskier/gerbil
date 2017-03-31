@@ -44,13 +44,13 @@ inline double SpectralInformationDivergence<T>::getSimilarity(const cv::Mat_<T> 
 		return 0.;
 		// can be harmful to graphseg: return (s1[0] == s2[0] ? 0. : std::numeric_limits<double>::max());
 
-	p1 /= s1[0];
-	p2 /= s2[0];
+	auto n1 = p1 / s1[0];
+	auto n2 = p2 / s2[0];
 
 	cv::Mat_<T> l1, l2;
-	cv::log(p1 / p2, l1);
-	cv::log(p2 / p1, l2);
-	cv::Scalar ret = cv::sum(p1.mul(l1)) + cv::sum(p2.mul(l2));
+	cv::log(n1 / n2, l1);
+	cv::log(n2 / n1, l2);
+	cv::Scalar ret = cv::sum(n1.mul(l1)) + cv::sum(n2.mul(l2));
 	return std::max(ret[0], 0.); // negative values come from strange pixels.
 }
 
