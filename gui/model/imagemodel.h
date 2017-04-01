@@ -26,8 +26,8 @@ public:
 	// the type we have
 	representation::t type;
 
-	// multispectral image data
-	SharedMultiImgPtr image;
+    // multispectral image data
+    SharedMultiImgPtr image;
 
 	// normalization mode and range
 	multi_img::NormMode normMode;

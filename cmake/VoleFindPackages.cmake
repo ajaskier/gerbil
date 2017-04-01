@@ -69,7 +69,7 @@ if(Qt5Widgets_FOUND)
 			"${Qt5Widgets_VERSION} (minimum required: ${VOLE_MINIMUM_QT_VERSION})")
 		# cmake configure will fail after SEND_ERROR
 	endif()
-	if(${Qt5Widgets_VERSION} VERSION_EQUAL "5.6")
+	if(${Qt5Widgets_VERSION} VERSION_EQUAL "5.5.1")
 		# see https://codereview.qt-project.org/#/c/114591/
 		# and https://codereview.qt-project.org/#/c/144603/
 		add_definitions(-DQT_BROKEN_MAPTOGLOBAL)
@@ -255,4 +255,13 @@ endif (OpenCL_FOUND)
 
 # Find threading library.
 # On Linux/UNIX this pthreads.
-find_package(Threads)
+find_package(Threads REQUIRED)
+vole_check_package(Threads
+        "Threads"
+        "Please check your Threads installation."
+        THREADS_FOUND
+        "${THREADS_INCLUDE_DIR}"
+        "${THREADS_LIBRARIES}"
+)
+
+

@@ -14,14 +14,14 @@
 #define GGDBG_MODULE
 #include "gerbil_gui_debug.h"
 
-ClusteringModel::ClusteringModel(QObject *parent )
+ClusteringModel::ClusteringModel(QObject *parent)
 	: QObject(parent),
-	  commandRunner(NULL),
-	  state(State::Idle)
+    commandRunner(NULL),
+    state(State::Idle)
 {
 	// for CommandRunner result slot, onSegmentationCompleted
 	qRegisterMetaType< std::map<std::string, boost::any> >(
-				"std::map<std::string, boost::any>");
+	    "std::map<std::string, boost::any>");
 }
 
 ClusteringModel::~ClusteringModel()
@@ -41,11 +41,11 @@ void ClusteringModel::requestSegmentation(const ClusteringRequest &r)
 
 	if (request) {
 		std::cerr << "ClusteringModel::requestSegmentation(): "
-				  << "bad state, request != NULL" << std::endl;
+		          << "bad state, request != NULL" << std::endl;
 		return;
 	}
 	request = boost::shared_ptr<ClusteringRequest>(
-				new ClusteringRequest(r));
+	    new ClusteringRequest(r));
 
 	if (State::Idle == state) {
 		// We are not subscribed for image data yet.
@@ -75,7 +75,7 @@ void ClusteringModel::startSegmentation()
 	bool good = true;
 	if (!request) {
 		std::cerr << "ClusteringModel::startSegmentation(): "
-				  << "request is NULL" << std::endl;
+		          << "request is NULL" << std::endl;
 		good = false;
 	}
 
@@ -85,15 +85,15 @@ void ClusteringModel::startSegmentation()
 	for (auto r : reps) {
 		if (!inputMap[r]) {
 			std::cerr << "ClusteringModel::startSegmentation(): "
-					  << "input " << request->repr << " is NULL"
-					  << std::endl;
+			          << "input " << request->repr << " is NULL"
+			          << std::endl;
 			good = false;
 		} else {
 			SharedMultiImgBaseGuard guard(*inputMap[r]);
 			if ((*inputMap[r])->empty()) {
 				std::cerr << "ClusteringModel::startSegmentation(): "
-						  << "input " << request->repr << " is empty"
-						  << std::endl;
+				          << "input " << request->repr << " is empty"
+				          << std::endl;
 				good = false;
 			}
 		}
@@ -110,11 +110,10 @@ void ClusteringModel::startSegmentation()
 
 	// Meanshift
 	if (ClusteringMethod::FAMS == request->method ||
-			ClusteringMethod::PSPMS == request->method)
-	{
+	    ClusteringMethod::PSPMS == request->method) {
 		using namespace seg_meanshift;
 		// Object owned by CommandRunner.
-		MeanShiftShell *cmd = new MeanShiftShell();
+		MeanShiftShell   *cmd   = new MeanShiftShell();
 		MeanShiftConfig &config = cmd->config;
 		commandRunner->setCommand(cmd);
 
@@ -122,80 +121,78 @@ void ClusteringModel::startSegmentation()
 		// fixed settings
 		config.verbosity = 0;
 		if (ClusteringMethod::PSPMS == request->method) {
-			/* if combination of gradient and PSPMS requested, we assume that
-			   the user wants our best-working method in paper (sp_withGrad)
-			 */
-			config.sp_withGrad = onGradient;
+		/* if combination of gradient and PSPMS requested, we assume that
+		   the user wants our best-working method in paper (sp_withGrad)
+		 */
+		config.sp_withGrad = onGradient;
 
-			config.starting = SUPERPIXEL;
+		config.starting = SUPERPIXEL;
 
-			config.superpixel.eqhist=1;
-			config.superpixel.c=0.05f;
-			config.superpixel.min_size=5;
-			config.superpixel.similarity.function
-					= similarity_measures::SPEC_INF_DIV;
+		config.superpixel.eqhist   = 1;
+		config.superpixel.c        = 0.05f;
+		config.superpixel.min_size = 5;
+		config.superpixel.similarity.function
+		    = similarity_measures::SPEC_INF_DIV;
 		}
 		config.use_LSH = request->lsh;
 	} else if (ClusteringMethod::FSPMS == request->method) { // FSPMS
 		using namespace seg_meanshift;
 		// Object owned by CommandRunner.
-		MeanShiftSP *cmd = new MeanShiftSP();
+		MeanShiftSP      *cmd   = new MeanShiftSP();
 		MeanShiftConfig &config = cmd->config;
 		commandRunner->setCommand(cmd);
 
 		// fixed settings
 		/* see method == ClusteringMethod::PSPMS
 		 */
-		config.verbosity = 0;
-		config.sp_withGrad = onGradient;
-		config.superpixel.eqhist=1;
-		config.superpixel.c=0.05f;
-		config.superpixel.min_size=5;
+		config.verbosity           = 0;
+		config.sp_withGrad         = onGradient;
+		config.superpixel.eqhist   = 1;
+		config.superpixel.c        = 0.05f;
+		config.superpixel.min_size = 5;
 		config.superpixel.similarity.function
-				= similarity_measures::SPEC_INF_DIV;
+		    = similarity_measures::SPEC_INF_DIV;
 		config.sp_weight = 2;
 
 		config.use_LSH = request->lsh;
 	}
 
 	connect(commandRunner, SIGNAL(progressChanged(int)),
-			this, SIGNAL(progressChanged(int)));
+	        this, SIGNAL(progressChanged(int)));
 
 	connect(commandRunner,
-			SIGNAL(success(std::map<std::string,boost::any>)),
-			this,
-			SLOT(processSegmentationCompleted(
-					 std::map<std::string,boost::any>)));
+	        SIGNAL(success(std::map<std::string, boost::any>)),
+	        this,
+	        SLOT(processSegmentationCompleted(
+	                 std::map<std::string, boost::any>)));
 	connect(commandRunner,
-			SIGNAL(failure()),
-			this,
-			SLOT(processSegmentationFailed()));
+	        SIGNAL(failure()),
+	        this,
+	        SLOT(processSegmentationFailed()));
 
 	// create copies of the input image images
 	{
-		// Meanshift always needs the IMG/NORM representation for SUPERPIXEL.
-		SharedMultiImgBaseGuard guard(*inputMap[representation::NORM]);
-		commandRunner->input["multi_img"] =
-				boost::shared_ptr<multi_img>(
-					new multi_img(**inputMap[representation::NORM]));
+	// Meanshift always needs the IMG/NORM representation for SUPERPIXEL.
+	SharedMultiImgBaseGuard guard(*inputMap[representation::NORM]);
+	commandRunner->input["multi_img"] =
+	    new const multi_img(**inputMap[representation::NORM]);
 	}
 	if (representation::NORM == request->repr) {
-		commandRunner->input["multi_grad"] = boost::shared_ptr<multi_img>();
+		commandRunner->input["multi_grad"] = new const multi_img(); //boost::shared_ptr<multi_img>();
 	} else if (representation::GRAD == request->repr) {
 		SharedMultiImgBaseGuard guard(*inputMap[representation::GRAD]);
 		commandRunner->input["multi_grad"] =
-						boost::shared_ptr<multi_img>(
-							new multi_img(**inputMap[representation::GRAD]));;
+		    new const multi_img(**inputMap[representation::GRAD]);
 	} else {
 		std::cerr << "ClusteringModel::startSegmentation(): "
-				  << "bad representation in request: "
-				  << request->repr << std::endl;
+		          << "bad representation in request: "
+		          << request->repr << std::endl;
 		delete commandRunner;
 		return;
 	}
 
 	GGDBGM("CommandRunner object is "
-		   <<  static_cast<CommandRunner*>(commandRunner) << endl);
+	       << static_cast<CommandRunner*>(commandRunner) << endl);
 	commandRunner->start();
 	state = State::Executing;
 #endif
@@ -213,16 +210,16 @@ void ClusteringModel::cancel()
 void ClusteringModel::resetToIdle()
 {
 	GGDBGM("deleteing request, unsubscribing representations, state = Idle"
-		   << endl);
+	       << endl);
 	request = boost::shared_ptr<ClusteringRequest>();
-	state = State::Idle;
+	state   = State::Idle;
 	emit unsubscribeRepresentation(this, representation::NORM);
 	emit unsubscribeRepresentation(this, representation::GRAD);
 }
 
 void ClusteringModel::processImageUpdate(representation::t repr,
-										 SharedMultiImgPtr image,
-										 bool duplicate)
+                                         SharedMultiImgPtr image,
+                                         bool              duplicate)
 {
 	if (State::Idle == state) {
 		if (!duplicate) {
@@ -235,10 +232,9 @@ void ClusteringModel::processImageUpdate(representation::t repr,
 		GGDBGM("duplicate update" << endl);
 		return;
 	} else if (State::Executing == state &&
-			   !duplicate &&
-			   inputMap[representation::NORM] &&
-			   inputMap[representation::GRAD])
-	{
+	           !duplicate &&
+	           inputMap[representation::NORM] &&
+	           inputMap[representation::GRAD]) {
 		GGDBGM("update while executing, reseting input" << endl);
 		// reset input pointers
 		inputMap[representation::NORM] = SharedMultiImgPtr();
@@ -247,15 +243,14 @@ void ClusteringModel::processImageUpdate(representation::t repr,
 
 	if (!request) {
 		std::cerr << "ClusteringModel::processImageUpdate(): "
-				  << "request is NULL" << std::endl;
+		          << "request is NULL" << std::endl;
 		return;
 	}
 
-	if (representation::NORM == repr || representation::GRAD == repr)
-	{
-		GGDBGM("saving pointer to " << repr << endl) ;
+	if (representation::NORM == repr || representation::GRAD == repr) {
+		GGDBGM("saving pointer to " << repr << endl);
 	} else {
-		GGDBGM("we are not interested in " << repr <<  endl);
+		GGDBGM("we are not interested in " << repr << endl);
 		return;
 	}
 
@@ -268,7 +263,7 @@ void ClusteringModel::processImageUpdate(representation::t repr,
 
 	// Tell running CommandRunner to abort.
 	if (commandRunner) {
-		GGDBGM("canceling running segmentation"<< endl);
+		GGDBGM("canceling running segmentation" << endl);
 		abortCommandRunner();
 	}
 
@@ -276,20 +271,20 @@ void ClusteringModel::processImageUpdate(representation::t repr,
 }
 
 void ClusteringModel::processSegmentationCompleted(
-		std::map<std::string, boost::any> output)
+    std::map<std::string, boost::any> output)
 {
 	resetToIdle();
 	if (output.count("labels")) {
 		boost::shared_ptr<cv::Mat1s> labelMask =
-				boost::any_cast< boost::shared_ptr<cv::Mat1s> >(
-					output["labels"]);
+		    boost::any_cast< boost::shared_ptr<cv::Mat1s> >(
+		        output["labels"]);
 		// was: setLabels(*labelMask);
 		emit setLabelsRequested(*labelMask);
 	}
 
 	if (output.count("findKL.K") && output.count("findKL.L")) {
-		int foundK = boost::any_cast<int>(output["findKL.K"]);
-		int foundL = boost::any_cast<int>(output["findKL.L"]);
+		int  foundK = boost::any_cast<int>(output["findKL.K"]);
+		int  foundL = boost::any_cast<int>(output["findKL.L"]);
 		emit resultKL(foundK, foundL);
 	}
 	emit segmentationCompleted();
@@ -316,7 +311,7 @@ void ClusteringModel::abortCommandRunner()
 	commandRunner->abort();
 	// make sure the old runner is deleted after the thread has joined.
 	connect(commandRunner, SIGNAL(finished()),
-			commandRunner, SLOT(deleteLater()));
+	        commandRunner, SLOT(deleteLater()));
 	commandRunner = NULL;
 }
 

@@ -131,16 +131,13 @@ public:
 	SharedDataMutex mutex;
 
 	SharedData(multi_img_base *data) : data(data) {}
-	SharedData(multi_img::ptr ptr) : data(ptr.get()), owner(ptr) {}
+	SharedData(multi_img::ptr ptr) : data(ptr.release()) {}
 
 	void replace(multi_img_base *newData) {
 		if (data == newData)
 			return;
 
-		if (owner.get()) // data is owned by a shared pointer
-			owner.reset();
-		else
-			delete data;
+		delete data;
 		data = newData;
 	}
 	// throws bad_cast, if the encapsulated pointer points to multi_img_base
@@ -165,7 +162,6 @@ public:
 
 protected:
 	multi_img_base *data;
-	multi_img::ptr owner;
 private:
 	// non-copyable
 	SharedData(const SharedData<multi_img_base> &other);

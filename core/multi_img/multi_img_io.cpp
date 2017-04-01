@@ -127,13 +127,13 @@ void multi_img::read_image(const std::vector<std::string> &files,
 
 		channels = read_mat(src);
 		
-		std::cerr << "Added " << files[fi] << ":\t" << channels
-             << (channels == 1 ? " channel, " : " channels, ")
-			 << (src.depth() == CV_16U ? 16 : 8) << " bits";
-		if (descs.empty() || descs[fi].empty)
-			std::cerr << std::endl;
-		else
-			std::cerr << ", " << descs[fi].center << " nm" << std::endl;
+//		std::cerr << "Added " << files[fi] << ":\t" << channels
+//             << (channels == 1 ? " channel, " : " channels, ")
+//			 << (src.depth() == CV_16U ? 16 : 8) << " bits";
+//		if (descs.empty() || descs[fi].empty)
+//			std::cerr << std::endl;
+//		else
+//			std::cerr << ", " << descs[fi].center << " nm" << std::endl;
 	}
 
 	/* invalidate pixel cache as pixel length has changed

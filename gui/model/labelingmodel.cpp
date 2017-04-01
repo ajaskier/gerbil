@@ -160,7 +160,7 @@ void LabelingModel::alterLabel(short index, cv::Mat1b mask,
 void LabelingModel::alterPixels(const cv::Mat1s &newLabels,
 								const cv::Mat1b &mask)
 {
-	// replace pixels
+    // replace pixels
 	newLabels.copyTo(labels, mask);
 
 	// signal change

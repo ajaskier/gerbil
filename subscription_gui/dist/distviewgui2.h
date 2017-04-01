@@ -1,0 +1,116 @@
+#ifndef DISTVIEWGUI2_H
+#define DISTVIEWGUI2_H
+
+#include "ui_distviewgui2.h"
+#include "ui_viewportcontrol.h"
+
+#include "viewport2.h"
+#include <QMenu>
+
+class DistViewGUI2 : public QWidget
+{
+	Q_OBJECT
+public:
+	explicit DistViewGUI2(representation::t type);
+	virtual ~DistViewGUI2();
+	void initSignals(QObject *dvctrl);
+	void initSubscriptions();
+
+	QWidget* getFrame() { return frame; }
+
+//	vpctx_ptr getContext() { return vp->ctx; }
+//	sets_ptr getBinSets() { return vp->sets; }
+
+	int getBinCount() { return uivc->binSlider->value(); }
+
+	void setTitle(representation::t type);
+	void setTitle(representation::t type,
+	              multi_img::Value min, multi_img::Value max);
+
+	// not a signal as needs to be directly called for each GUI component
+	void insertPixelOverlay(const QPolygonF &points);
+
+	static QIcon colorIcon(const QColor &color);
+
+	/** True if the distview is unfolded, i.e. visible and subscribed. Otherwise false. */
+	bool isVisible();
+
+public slots:
+	void setActive()    { vp->activate(); vp->update(); }
+	void setInactive()  { vp->active = false; vp->update(); }
+	void setEnabled(bool enabled);
+	void rebuild()      { vp->rebuild(); }
+
+	// fold in or out
+	void fold(bool folded);
+	void toggleFold();
+
+	// from outside
+	void updateLabelColors(QVector<QColor> colors);
+
+	// from our GUI
+	void setAlpha(int alpha);
+	void setBinLabel(int n);
+	void setBinCount(int n);
+	void showLimiterMenu();
+	void showFrameBufferMenu();
+
+	void updateBufferFormat(Viewport2::BufferFormat format);
+
+signals:
+	// from GUI elements to controller
+	void activated();
+	void bandSelected(int dim);
+	void requestOverlay(int dim, int bin);
+	void requestOverlay(const std::vector<std::pair<int, int> >& limiters,
+	                    int dim);
+
+	void requestBinCount(representation::t type, int bins);
+
+	// from controller to GUI elements
+	void newIlluminantCurve(QVector<multi_img::Value>);
+	void toggleIlluminationShown(bool show);
+	void newIlluminantApplied(QVector<multi_img::Value>);
+
+	// Tell the DVC we need new binning prior to new representation subscription,
+	// so that he can handle the image update correctly.
+	void needBinning(representation::t type);
+	void subscribeRepresentation(QObject *subscriber, representation::t type);
+	void unsubscribeRepresentation(QObject *subscriber, representation::t type);
+
+	// The folding state changed.
+	void foldingStateChanged(representation::t type, bool folded);
+
+protected slots:
+	void saveState();
+
+protected:
+	// initialize target, vp, ui::gv
+	void initVP();
+	//initialize viewport actions
+	void initVPActions();
+	// initialize vc, uivc
+	void initVC(representation::t type);
+	// initialize topbar, title
+	void initTop();
+	// (re-)create the menu according to labels
+	void createLimiterMenu();
+
+	void createFrameBufferMenu();
+
+	void restoreState();
+
+	representation::t type;
+
+	QWidget *frame;
+	Ui::DistViewGUI2 *ui;
+	Ui::ViewportControl *uivc;
+	Viewport2 *vp;
+	AutohideWidget *vc;
+
+	QVector<QColor> labelColors;
+	QMenu limiterMenu;
+	QMenu frameBufferMenu;
+};
+
+#endif // DISTVIEWGUI2_H

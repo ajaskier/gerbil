@@ -76,6 +76,9 @@ set(VOLE_PACKAGE_LIST "" CACHE INTERNAL "Package list" FORCE)
 set(VOLE_EXTERNAL_SUBDIRECTORIES "" CACHE INTERNAL "External subdirectories" FORCE)
 set(VOLE_MODULE_LIST "" CACHE INTERNAL "Module list" FORCE)
 
+set(CMAKE_THREAD_PREFER_PTHREAD TRUE)
+set(THREADS_PREFER_PTHREAD_FLAG TRUE)
+
 include(VoleFindPackages)
 include(VoleFindExternalModules)
 
@@ -102,4 +105,3 @@ include(VoleCheckDependencies)
 include(VoleProcessOptionalDependencies)
 
 include("cmake/TargetDoc.cmake" OPTIONAL)
-

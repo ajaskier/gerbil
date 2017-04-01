@@ -91,7 +91,7 @@ cv::Rect ImageModel::loadImage(const QString &filename)
 		imginput::ImgInputConfig inputConfig;
 		inputConfig.file = fn;
 		multi_img::ptr img = imginput::ImgInput(inputConfig).execute();
-		image_lim = boost::make_shared<SharedMultiImgBase>(img);
+		image_lim = boost::make_shared<SharedMultiImgBase>(std::move(img));
 	}
 
 	multi_img_base &i = image_lim->getBase();
@@ -324,7 +324,6 @@ void ImageModel::setNormalizationParameters(representation::t type,
 	SharedDataLock lock(map[type]->normRange->mutex);
 	**(map[type]->normRange) = targetRange;
 }
-
 
 void ImageModel::processNewImageData(representation::t type,
 									 SharedMultiImgPtr image)
