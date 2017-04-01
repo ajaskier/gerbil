@@ -175,14 +175,14 @@ void ClusteringModel::startSegmentation()
 	// Meanshift always needs the IMG/NORM representation for SUPERPIXEL.
 	SharedMultiImgBaseGuard guard(*inputMap[representation::NORM]);
 	commandRunner->input["multi_img"] =
-	    new multi_img(**inputMap[representation::NORM]);
+	    new const multi_img(**inputMap[representation::NORM]);
 	}
 	if (representation::NORM == request->repr) {
-		commandRunner->input["multi_grad"] = new multi_img(); //boost::shared_ptr<multi_img>();
+		commandRunner->input["multi_grad"] = new const multi_img(); //boost::shared_ptr<multi_img>();
 	} else if (representation::GRAD == request->repr) {
 		SharedMultiImgBaseGuard guard(*inputMap[representation::GRAD]);
 		commandRunner->input["multi_grad"] =
-		    new multi_img(**inputMap[representation::GRAD]);
+		    new const multi_img(**inputMap[representation::GRAD]);
 	} else {
 		std::cerr << "ClusteringModel::startSegmentation(): "
 		          << "bad representation in request: "

@@ -9,23 +9,20 @@
 
 class TaskSetLabels : public Task
 {
-
 public:
-    explicit TaskSetLabels(const Labeling &labeling, const cv::Size originalImageSize,
-                            bool full);
+	explicit TaskSetLabels(const Labeling &labeling, const cv::Size originalImageSize,
+	                       bool full);
 
-    virtual bool run() override;
+	virtual bool run() override;
 
 protected:
 
-    Labels getLabels(cv::Mat1s m);
-    void setColors(const std::vector<cv::Vec3b> &newColors, Labels &l);
+	Labels getLabels(cv::Mat1s m, Labels *dst);
+	void setColors(const std::vector<cv::Vec3b> &newColors, Labels &l);
 
-    const Labeling &labeling;
-    const cv::Size originalImageSize;
-    bool full;
-
+	const Labeling &labeling;
+	const cv::Size  originalImageSize;
+	bool full;
 };
-
 
 #endif // TASK_SET_LABELS_H

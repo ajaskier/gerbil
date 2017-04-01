@@ -39,7 +39,7 @@ void ClusterizationModel::requestSegmentation(const ClusteringRequest &r)
 
 	//this should be parametrized, because
 	//the task can get different combination of images
-	std::shared_ptr<TaskMeanShiftSP> task(new TaskMeanShiftSP("image.IMG", "image.GRAD"));
+	std::shared_ptr<TaskMeanShiftSP> task(new TaskMeanShiftSP("image.NORM", "image.GRAD"));
 
 	if (r.method == ClusteringMethod::FAMS || r.method == ClusteringMethod::PSPMS) {
 		MeanShiftShell   *cmd   = new MeanShiftShell();

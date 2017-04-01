@@ -11,7 +11,7 @@ namespace seg_meanshift {
 class TaskMeanShiftSP : public CommandTask
 {
 public:
-	explicit TaskMeanShiftSP(QString sourceImg, QString sourceGradId);
+	explicit TaskMeanShiftSP(QString sourceId, QString sourceGradId);
 	virtual ~TaskMeanShiftSP() {}
 
 	virtual bool run() override;

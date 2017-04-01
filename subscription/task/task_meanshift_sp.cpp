@@ -1,6 +1,7 @@
 #include "task_meanshift_sp.h"
 #include "subscription_type.h"
 #include "subscription.h"
+#include "lock.h"
 #include <QThread>
 
 #include <QDebug>
@@ -13,26 +14,25 @@
 namespace seg_meanshift {
 TaskMeanShiftSP::TaskMeanShiftSP(QString sourceId, QString sourceGradId)
     : CommandTask("meanshift", "labels",
-                  { { "source", { "image.IMG" } }, { "sourceGrad", { sourceGradId } },
+                  { { "source", { sourceId } }, { "sourceGrad", { sourceGradId } },
                     { "ROI", { "ROI" } } })
 {}
 
 
 bool TaskMeanShiftSP::run()
 {
-	Subscription::Lock<multi_img> lock(*sub("source"));
-	const multi_img* source = lock();
-	Subscription::Lock<multi_img> grad_lock(*sub("sourceGrad"));
-	const multi_img* sourceGrad = grad_lock();
-
 	std::map<std::string, boost::any> output;
 	{
-
-
 		std::map<std::string, boost::any> input;
 
-		input["multi_img"]  = source;//new multi_img(*source);
-		input["multi_grad"] = sourceGrad;//new multi_img(*sourceGrad);
+		Subscription::Lock<multi_img> lock(*sub("source"));
+		const multi_img* const        source = lock();
+
+		Subscription::Lock<multi_img> grad_lock(*sub("sourceGrad"));
+		const multi_img* sourceGrad = grad_lock();
+
+		input["multi_img"]  = source;
+		input["multi_grad"] = sourceGrad;
 
 		emit progressChanged(0);
 		try {
@@ -55,6 +55,9 @@ bool TaskMeanShiftSP::run()
 		boost::shared_ptr<cv::Mat1s> labelMask = boost::any_cast< boost::shared_ptr<cv::Mat1s> >(
 		    output["labels"]);
 		cv::Mat1s mask = labelMask->clone();
+
+		Subscription::Lock<multi_img> lock(*sub("source"));
+		const multi_img* source = lock();
 
 		Labeling      vl(mask, false);
 		TaskSetLabels task(vl, cv::Size(source->width, source->height), false);

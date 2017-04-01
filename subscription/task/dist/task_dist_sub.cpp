@@ -41,12 +41,8 @@ TaskDistSub::TaskDistSub(QString destId, SourceDeclaration sourceId,
 TaskDistSub::~TaskDistSub()
 {}
 
-std::vector<cv::Rect> TaskDistSub::getDiff(cv::Mat1b& mask)
+std::vector<cv::Rect> TaskDistSub::getDiff(cv::Mat1b& mask, const multi_img &img)
 {
-//	if (partialLabelsUpdate && mask.empty()) {
-//		partialLabelsUpdate = false;
-//	}
-
 	Subscription::Lock<cv::Rect, ROIMeta> roi_lock(*sub("ROI"));
 	ROIMeta roimeta = *(roi_lock.meta());
 
@@ -55,6 +51,9 @@ std::vector<cv::Rect> TaskDistSub::getDiff(cv::Mat1b& mask)
 		if (!mask.empty()) {
 			diff.push_back(cv::Rect(0, 0, mask.cols, mask.rows));
 		}
+//		else {
+//			diff.push_back(cv::Rect(0, 0, img.width, img.height));
+//		}
 	} else if (roimeta.profitable) {
 		diff = roimeta.sub;
 	}
@@ -63,13 +62,14 @@ std::vector<cv::Rect> TaskDistSub::getDiff(cv::Mat1b& mask)
 }
 
 std::vector<BinSet> TaskDistSub::coreExecution(ViewportCtx* args, cv::Mat1s& labels,
-                                               QVector<QColor>& colors, cv::Mat1b& mask,
-                                               multi_img& img, std::vector<BinSet>* reuseDist)
+                                               const QVector<QColor>& colors, cv::Mat1b& mask,
+                                               const multi_img &img, std::vector<BinSet>* reuseDist)
 {
-	auto diff = getDiff(mask);
+	auto diff = getDiff(mask, img);
 
 	bool reuse = !diff.empty();
 	bool keepOldContext = false;
+	//bool keepOldContext = args->valid;
 
 	if (reuse) {
 		keepOldContext = ((fabs(args->minval) * REUSE_THRESHOLD) >=
@@ -79,6 +79,7 @@ std::vector<BinSet> TaskDistSub::coreExecution(ViewportCtx* args, cv::Mat1s& lab
 
 		if (!keepOldContext) {
 			reuse = false;
+			//diff.clear();
 		}
 	}
 
@@ -90,6 +91,10 @@ std::vector<BinSet> TaskDistSub::coreExecution(ViewportCtx* args, cv::Mat1s& lab
 	if (reuse && reuseDist) {
 		result = *reuseDist;
 	}
+//	else {
+//		result = std::vector<BinSet>();
+//		diff.push_back(cv::Rect(0, 0, img.width, img.height));
+//	}
 
 	createBinSets(img, colors, result);
 
@@ -115,19 +120,20 @@ bool TaskDistSub::run()
 	}
 
 	Subscription::Lock<multi_img> source_lock(*sub("source"));
-	multi_img* source = source_lock();
+	const multi_img* source = source_lock();
 
 	Subscription::Lock<std::vector<BinSet>, ViewportCtx> dest_lock(*sub("dest"));
 
 	Subscription::Lock<Labels, LabelsMeta> labels_lock(*sub("labels"));
-	Labels l = *labels_lock();
+	const Labels& l = *labels_lock();
 
 	cv::Mat1b mask;
 	cv::Mat1s labels;
 	if (partialLabelsUpdate) {
-		LabelsMeta lMeta = *labels_lock.meta();
-		mask   = lMeta.mask;
-		labels = lMeta.oldLabels;
+		const LabelsMeta lMeta = *labels_lock.meta();
+		mask = lMeta.mask;
+		//labels = lMeta.oldLabels.clone();
+		labels = mask.empty() ? l.scopedlabels.clone() : lMeta.oldLabels.clone();
 	} else {
 		mask   = cv::Mat1b();
 		labels = l.scopedlabels;
@@ -137,12 +143,14 @@ bool TaskDistSub::run()
 	                                           mask, *source, reuseDist);
 
 
-	if (isCancelled()) { // || result.empty()) {
+	if (isCancelled()) {
 		return false;
 	}
 
-	dest_lock.swap(result);
+	//if (!result.empty()) {
 	dest_lock.swapMeta(*args);
+	dest_lock.swap(result);
+	//}
 
 	return true;
 }

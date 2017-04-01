@@ -28,11 +28,11 @@ public:
 
 protected:
 
-    void expression(bool subtract, std::vector<cv::Rect> &collection,
-                    multi_img &multi, std::vector<BinSet> &sets, cv::Mat1s &labels, cv::Mat1b &mask,
-                    const ViewportCtx *args);
-    void createBinSets(multi_img &multi, QVector<QColor> &colors, std::vector<BinSet> &sets);
-    void updateContext(multi_img &multi, ViewportCtx *args);
+	void expression(bool subtract, std::vector<cv::Rect> &collection,
+	                const multi_img &multi, std::vector<BinSet> &sets, const cv::Mat1s &labels, const cv::Mat1b &mask,
+	                const ViewportCtx *args);
+	void createBinSets(const multi_img &multi, const QVector<QColor> &colors, std::vector<BinSet> &sets);
+	void updateContext(const multi_img &multi, ViewportCtx *args);
     virtual bool isCancelled() { return stopper.is_group_execution_cancelled(); }
 
 private:

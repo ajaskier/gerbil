@@ -8,38 +8,36 @@
 
 class TaskDistSub : public TaskDistviewBinsTbb
 {
-
 public:
-    explicit TaskDistSub(QString destId, SourceDeclaration sourceId,
-                            SourceDeclaration sourceDistId,
-                            std::vector<multi_img::Value> &illuminant,
-                            bool apply = true, bool partialLabelsUpdate = false,
-                            ViewportCtx* args = nullptr);
+	explicit TaskDistSub(QString destId, SourceDeclaration sourceId,
+	                     SourceDeclaration sourceDistId,
+	                     std::vector<multi_img::Value> &illuminant,
+	                     bool apply = true, bool partialLabelsUpdate = false,
+	                     ViewportCtx* args = nullptr);
 
+	explicit TaskDistSub(QString destId, SourceDeclaration sourceId,
+	                     std::vector<multi_img::Value> &illuminant,
+	                     bool apply = true, bool partialLabelsUpdate = false,
+	                     ViewportCtx* args = nullptr);
 
-    explicit TaskDistSub(QString destId, SourceDeclaration sourceId,
-                            std::vector<multi_img::Value> &illuminant,
-                            bool apply = true, bool partialLabelsUpdate = false,
-                            ViewportCtx* args = nullptr);
-
-    virtual ~TaskDistSub();
-    virtual bool run() override;
+	virtual ~TaskDistSub();
+	virtual bool run() override;
 
 protected:
 
-    std::vector<BinSet> coreExecution(ViewportCtx* args, cv::Mat1s &labels,
-                                      QVector<QColor> &colors, cv::Mat1b &mask, multi_img &img, std::vector<BinSet> *reuseDist);
+	std::vector<BinSet> coreExecution(ViewportCtx* args, cv::Mat1s &labels,
+	                                  const QVector<QColor> &colors, cv::Mat1b &mask,
+	                                  const multi_img &img,
+	                                  std::vector<BinSet> *reuseDist);
 
 
 
-    std::vector<cv::Rect> getDiff(cv::Mat1b &mask);
+	std::vector<cv::Rect> getDiff(cv::Mat1b &mask, const multi_img &img);
 
-    bool apply;
-    bool partialLabelsUpdate;
+	bool apply;
+	bool partialLabelsUpdate;
 
-    ViewportCtx* args;
-
-
+	ViewportCtx* args;
 };
 
 

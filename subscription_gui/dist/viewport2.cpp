@@ -46,7 +46,6 @@ Viewport2::Viewport2(representation::t type, QGLWidget *target)
 	bufferFormat(BufferFormat::RGBA16F),
 	drawingState(HIGH_QUALITY), yaxisWidth(0), vb(QGLBuffer::VertexBuffer)
 {
-
 	restoreState();
 	initTimers();
 
@@ -231,7 +230,6 @@ void Viewport2::rebuild()
 
 void Viewport2::prepareLines()
 {
-
 	Subscription::Lock<std::vector<BinSet>, ViewportCtx> lock(*sub);
 	std::vector<BinSet> sets = *lock();
 	ViewportCtx         ctx  = *(lock.meta());
@@ -303,8 +301,8 @@ void Viewport2::setAppliedIlluminant(QVector<multi_img_base::Value> illum)
 void Viewport2::setLimiters(int label)
 {
 	Subscription::Lock<std::vector<BinSet>, ViewportCtx> lock(*sub);
-	std::vector<BinSet>* sets = lock();
-	ViewportCtx        * ctx  = lock.meta();
+	const std::vector<BinSet> * sets = lock();
+	const ViewportCtx         * ctx  = lock.meta();
 
 	if (label < 1) {    // not label
 		//SharedDataLock ctxlock(ctx->mutex);
@@ -448,7 +446,7 @@ void Viewport2::adjustBoundaries()
 {
 	Subscription::Lock<std::vector<BinSet>, ViewportCtx> lock(*sub);
 	//std::vector<BinSet>* sets = lock();
-	ViewportCtx* ctx = lock.meta();
+	const ViewportCtx* ctx = lock.meta();
 
 	QPointF empty(0.f, 0.f);
 	empty = modelview.map(empty);
