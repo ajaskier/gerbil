@@ -13,10 +13,10 @@
 #define REUSE_THRESHOLD    0.1
 
 TaskSetLabels::TaskSetLabels(const Labeling &labeling, const cv::Size originalImageSize,
-                             bool full)
+                             bool full, bool recoloring)
     : Task("setLabels", "labels", { { "ROI", { "ROI" } } }),
     labeling(labeling), originalImageSize(originalImageSize),
-    full(full)
+    full(full), recoloring(recoloring)
 {}
 
 bool TaskSetLabels::run()
@@ -53,6 +53,7 @@ Labels TaskSetLabels::getLabels(cv::Mat1s m, Labels* dst)
 
 		int version = DataRegister::majorVersion("labels");
 		if (roi_lock.version() > version) {
+			// ROI BASED CHANGE
 			l.scopedlabels = cv::Mat1s(l.fullLabels, roi);
 			return l;
 		} else {
@@ -78,11 +79,18 @@ Labels TaskSetLabels::getLabels(cv::Mat1s m, Labels* dst)
 		l.scopedlabels = cv::Mat1s(l.fullLabels, roi);
 	}
 
-	if (labeling.colors().size() < 2) {
-		setColors(Labeling::colors(2, true), l);
-	} else {
-		setColors(labeling.colors(), l);
+	if (!dst || recoloring) {
+		auto colors = labeling.colors(true);
+		if (l.colors.size() > (int)colors.size())
+			return l;
+
+		if (colors.size() < 2) {
+			setColors(Labeling::colors(2, true), l);
+		} else {
+			setColors(colors, l);
+		}
 	}
+
 
 	return l;
 }

@@ -17,8 +17,8 @@ class Labels
 public:
 	Labels() {}
 
-	cv::Mat1s fullLabels;
-	cv::Mat1s scopedlabels;
+	cv::Mat1s       fullLabels;
+	cv::Mat1s       scopedlabels;
 	QVector<QColor> colors;
 };
 
@@ -64,13 +64,28 @@ private:
 
 	void computeIcons();
 
-	bool applyROI;
+	virtual void sendTask(std::shared_ptr<Task> t);
+
+	// construct task of type T and send it right away
+	template<typename T, typename ... A>
+	void sendTask(A && ... args)
+	{
+		sendTask(std::make_shared<T>(std::forward<A>(args) ...));
+	}
+
+	void taskFinished(QString id, bool success);
+
+	void labelsUpdated();
+
+	bool  applyROI;
 	QSize iconSize;
 
-	Labeling lastLabeling;
+	Labeling  lastLabeling;
 	cv::Mat1b lastMask;
+	cv::Mat1s lastLabels;
 
 	cv::Size originalImageSize;
+	std::unique_ptr<Subscription> labelsSub;
 };
 
 #endif // LABELS_MODEL_H

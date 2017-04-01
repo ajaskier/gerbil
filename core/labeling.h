@@ -1,10 +1,10 @@
-/*	
+/*
 	Copyright(c) 2011 Johannes Jordan <johannes.jordan@cs.fau.de>.
 
 	This file may be licensed under the terms of of the GNU General Public
 	License, version 3, as published by the Free Software Foundation. You can
 	find it here: http://www.gnu.org/licenses/gpl.html
-*/
+ */
 
 #ifndef LABELING_H
 #define LABELING_H
@@ -18,43 +18,42 @@
 
 /** Class for per-pixel label processing.
 
-This class provides methods to import and export pixel masks or labels as
-images. Another application is seeding input to supervised segmentation.
+   This class provides methods to import and export pixel masks or labels as
+   images. Another application is seeding input to supervised segmentation.
 
-The main purpose of this code is to understand and provide "human-readable"
-labeling images, where the color of a label can be chosen freely. All distinct
-colors observed in the label image lead to a distinct entry in the label set.
+   The main purpose of this code is to understand and provide "human-readable"
+   labeling images, where the color of a label can be chosen freely. All distinct
+   colors observed in the label image lead to a distinct entry in the label set.
 
-The second purpose is to write out labeling images that are human-readable. You
-can also let this class create you nice label colors for your own use.
+   The second purpose is to write out labeling images that are human-readable. You
+   can also let this class create you nice label colors for your own use.
 
-@todo This is also the place for code to "mark" an image, e.g. overlay pixels
-with a label color, or in the binary case, highlighting marked pixels. Code for
-this already exists in forensics/cmfd.
+   @todo This is also the place for code to "mark" an image, e.g. overlay pixels
+   with a label color, or in the binary case, highlighting marked pixels. Code for
+   this already exists in forensics/cmfd.
 
-**/
+ **/
 class Labeling {
-
 public:
 
 	/** Initialize without data.
 		@arg labelcount Set labelcount to create label colors without data.
-	**/
+	 **/
 	Labeling(int labelcount = 0)
 		: yellowcursor(true), shuffle(false), shuffleV(false),
-		  labelcount(labelcount) {}
+	    labelcount(labelcount) {}
 
 	/** Initialize with matrix containing arbitrary labels.
 		See read().
 		@note If your label matrix is a good citizen, consider operator=
 		instead: Labeling l = m;
-	**/
+	 **/
 	Labeling(const cv::Mat &labeling, bool binary);
 	Labeling(const std::string &filename, bool binary);
 
 	/// Construct from existing label matrix. See setLabels and setColors.
-	Labeling(const cv::Mat &labeling,
-			 const std::vector<cv::Vec3b>& colors = std::vector<cv::Vec3b>())
+	Labeling(const cv::Mat &               labeling,
+	         const std::vector<cv::Vec3b>& colors = std::vector<cv::Vec3b>())
 		: yellowcursor(true), shuffle(false), shuffleV(false)
 	{
 		setLabels(labeling);
@@ -63,7 +62,8 @@ public:
 	}
 
 	/// Set label matrix. See setLabels.
-	Labeling & operator=(const cv::Mat &labeling) {
+	Labeling & operator=(const cv::Mat &labeling)
+	{
 		setLabels(labeling);
 		return *this;
 	}
@@ -91,7 +91,7 @@ public:
 		or their are not enough colors present.
 		@arg binary Interpret as binary labeling, i.e. all values > 0 are
 			 interpreted as label 1.
-	**/
+	 **/
 	void read(const cv::Mat &labeling, bool binary);
 	void read(const cv::Mat3b &src);
 	void read(const cv::Mat1w &src, int bins);
@@ -105,14 +105,14 @@ public:
 		@arg yellowcursor When set, yellow is not used as label color.
 		@arg shuffleV When set, value (brightness) is shuffled; this is
 					  visually more bleasing, but bad for processing in qgerbil
-	**/
+	 **/
 	static std::vector<cv::Vec3b> colors(int count, bool yellowcursor,
-										 bool shuffleV = false);
+	                                     bool shuffleV = false);
 
 	/** Obtain label colors of this labeling.
 		If this labeling is based on a colored labeling image, these are custom.
-	**/
-	const std::vector<cv::Vec3b>& colors() const;
+	 **/
+	const std::vector<cv::Vec3b>& colors(int forced = false) const;
 
 	/// Set colors used for label image generation
 	void setColors(const std::vector<cv::Vec3b>& colors);
@@ -141,7 +141,7 @@ protected:
 
 	mutable std::vector<cv::Vec3b> labelColors;
 	cv::Mat1s labels;
-	int labelcount;
+	int       labelcount;
 };
 
 #endif // WITH_OPENCV2

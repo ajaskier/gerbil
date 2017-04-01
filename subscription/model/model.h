@@ -27,11 +27,11 @@ protected:
 	bool isTaskCurrent(QString id);
 
 	// send a prepared task
-	void sendTask(std::shared_ptr<Task> t);
+	virtual void sendTask(std::shared_ptr<Task> t);
 
 	// construct task of type T and send it right away
 	template<typename T, typename ... A>
-	void sendTask(A&& ... args)
+	void sendTask(A && ... args)
 	{
 		sendTask(std::make_shared<T>(std::forward<A>(args) ...));
 	}

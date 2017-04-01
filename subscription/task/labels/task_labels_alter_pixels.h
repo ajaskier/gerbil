@@ -9,17 +9,15 @@
 
 class TaskLabelsAlterPixels : public Task
 {
-
 public:
-    explicit TaskLabelsAlterPixels(const cv::Mat1s &newLabels, const cv::Mat1b &mask);
+	explicit TaskLabelsAlterPixels(const cv::Mat1s &newLabels, const cv::Mat1b &mask);
 
-    virtual bool run() override;
+	virtual bool run() override;
 
 protected:
 
-    const cv::Mat1s &newLabels;
-    const cv::Mat1b &mask;
-
+	const cv::Mat1s &newLabels;
+	const cv::Mat1b &mask;
 };
 
 

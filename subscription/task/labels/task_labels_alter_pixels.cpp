@@ -22,7 +22,7 @@ bool TaskLabelsAlterPixels::run()
 	Labels l = *dest_lock();
 
 	LabelsMeta lMeta;
-	lMeta.oldLabels = l.fullLabels.clone();
+	lMeta.oldLabels = l.scopedlabels.clone();
 	lMeta.mask      = mask.clone();
 
 	newLabels.copyTo(l.scopedlabels, mask);

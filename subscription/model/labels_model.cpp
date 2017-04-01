@@ -45,16 +45,52 @@ void LabelsModel::setLabels(const cv::Mat1s &labeling)
 	setLabels(vl, false);
 }
 
+void LabelsModel::sendTask(std::shared_ptr<Task> t)
+{
+	Model::sendTask(t);
+
+	labelsSub = std::unique_ptr<Subscription>(DataRegister::subscribe(Dependency("labels",
+	                                                                             SubscriptionType::
+	                                                                             READ,
+	                                                                             AccessType::
+	                                                                             DEFERRED), this,
+	                                                                  std::bind(&LabelsModel::
+	                                                                            labelsUpdated, this)));
+}
+
+void LabelsModel::labelsUpdated()
+{
+	Labels l;
+	{
+		Subscription::Lock<Labels> lock(*labelsSub);
+		l = *lock();
+	}
+
+	lastLabeling = Labeling(l.scopedlabels.clone(), false);
+	labelsSub.reset(nullptr);
+}
+
+void LabelsModel::taskFinished(QString id, bool success)
+{
+	Model::taskFinished(id, success);
+}
+
 void LabelsModel::setLabels(const Labeling &labeling, bool full)
 {
 	lastLabeling = labeling;
-	sendTask<TaskSetLabels>(labeling, originalImageSize, full);
+	sendTask<TaskSetLabels>(lastLabeling, originalImageSize, full);
 }
 
 void LabelsModel::alterPixels(const cv::Mat1s &newLabels, const cv::Mat1b &mask)
 {
 	lastMask = mask.clone(); //looks tricky, but it's the best I can for now
-	sendTask<TaskLabelsAlterPixels>(newLabels, lastMask);
+
+	bool profitable = (size_t(2 * cv::countNonZero(mask)) < mask.total());
+	if (profitable) {
+		sendTask<TaskLabelsAlterPixels>(newLabels, lastMask);
+	} else {
+		setLabels(newLabels);
+	}
 }
 
 void LabelsModel::addLabel()

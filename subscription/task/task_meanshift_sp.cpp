@@ -60,7 +60,7 @@ bool TaskMeanShiftSP::run()
 		const multi_img* source = lock();
 
 		Labeling      vl(mask, false);
-		TaskSetLabels task(vl, cv::Size(source->width, source->height), false);
+		TaskSetLabels task(vl, cv::Size(source->width, source->height), false, true);
 		task.importSubscription(sub("dest"));
 		task.importSubscription(sub("ROI"));
 

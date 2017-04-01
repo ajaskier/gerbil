@@ -11,7 +11,7 @@ class TaskSetLabels : public Task
 {
 public:
 	explicit TaskSetLabels(const Labeling &labeling, const cv::Size originalImageSize,
-	                       bool full);
+	                       bool full, bool recoloring = false);
 
 	virtual bool run() override;
 
@@ -23,6 +23,7 @@ protected:
 	const Labeling &labeling;
 	const cv::Size  originalImageSize;
 	bool full;
+	bool recoloring;
 };
 
 #endif // TASK_SET_LABELS_H
