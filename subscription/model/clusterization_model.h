@@ -28,9 +28,9 @@ signals:
 
 public slots:
 	void requestSegmentation(const ClusteringRequest &r);
-	void taskFinished(QString id, bool success);
 
 private:
+	void taskFinished(QString id, bool success);
 };
 
 #endif // CLUSTERIZATION_MODEL_H

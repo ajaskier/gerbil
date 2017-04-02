@@ -220,6 +220,13 @@
        </widget>
       </item>
       <item>
+       <widget class="QCheckBox" name="falsecolor_checkbox">
+        <property name="text">
+         <string>falsecolor</string>
+        </property>
+       </widget>
+      </item>
+      <item>
        <widget class="QCheckBox" name="labels_checkbox">
         <property name="text">
          <string>labels</string>

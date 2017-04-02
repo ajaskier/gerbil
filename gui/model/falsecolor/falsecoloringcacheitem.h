@@ -1,6 +1,8 @@
 #ifndef FALSECOLORINGCACHEITEM_H
 #define FALSECOLORINGCACHEITEM_H
 
+#include <QPixmap>
+
 /** Cache item for computed false color images. */
 class FalseColoringCacheItem {
 public:

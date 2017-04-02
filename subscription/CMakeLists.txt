@@ -60,11 +60,13 @@ vole_compile_library(
     task/labels/task_labels_consolidate
 
 	task/task_meanshift_sp
+	task/task_rgb_display
 
     model/img_model
     model/dist_model
     model/labels_model
 	model/clusterization_model
+	model/falsecolor_model
 
     distviewcompute_utils
 
@@ -87,8 +89,10 @@ vole_moc_library(
     model/dist_model.h
     model/labels_model.h
 	model/clusterization_model.h
+	model/falsecolor_model.h
 
 	task/task_meanshift_sp.h
+	task/task_rgb_display.h
 )
 
 vole_add_module()

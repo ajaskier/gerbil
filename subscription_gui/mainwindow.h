@@ -24,11 +24,12 @@ class DistModel;
 class ImgModel;
 class LabelsModel;
 class ClusterizationModel;
+class FalsecolorModel;
 class BandDock;
 class LabelDock;
 class RoiDock;
 class ClusteringDock;
-
+class FalseColorDock;
 
 namespace Ui {
 class MainWindow;
@@ -59,6 +60,7 @@ private:
 	DistModel   * distModel;
 	LabelsModel * labelsModel;
 	ClusterizationModel * clusterizationModel;
+	FalsecolorModel     * falsecolorModel;
 
 	SubscriptionManager sm;
 	TaskScheduler       * scheduler;
@@ -76,6 +78,7 @@ private:
 	LabelDock      * labelDock;
 	RoiDock        * roiDock;
 	ClusteringDock * clusteringDock;
+	FalseColorDock * falsecolorDock;
 
 	cv::Rect originalRoi;
 
@@ -121,6 +124,7 @@ private slots:
 	void on_labels_icons_checkbox_toggled(bool checked);
 	void on_roi_checkbox_toggled(bool checked);
 	void on_clustering_checkbox_toggled(bool checked);
+	void on_falsecolor_checkbox_toggled(bool checked);
 };
 
 #endif // MAINWINDOW_H

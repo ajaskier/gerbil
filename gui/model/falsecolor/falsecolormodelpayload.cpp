@@ -10,16 +10,18 @@ void FalseColorModelPayload::run()
 	runner = new CommandRunner();
 
 	std::map<std::string, boost::any> input;
-	if(FalseColoring::isBasedOn(coloringType, representation::IMG)) {
-		input["multi_img"] = img;
+	if (FalseColoring::isBasedOn(coloringType, representation::IMG)) {
+		auto sharedmulti   = img.get();
+		multi_img_base* bs = &(sharedmulti->getBase());
+		input["multi_img"] = bs;
 	} else {
-		input["multi_img"] = grad;
+		//multi_img* multigrad = grad.get();
+		input["multi_img"] = &(img.get()->getBase());
 	}
 	runner->input = input;
 	rgb::RGBDisplay *cmd = new rgb::RGBDisplay(); // object owned by CommandRunner
 
-	switch (coloringType)
-	{
+	switch (coloringType) {
 	case FalseColoring::CMF:
 		cmd->config.algo = rgb::COLOR_XYZ;
 		break;
@@ -31,30 +33,30 @@ void FalseColorModelPayload::run()
 	case FalseColoring::SOM:
 	case FalseColoring::SOMGRAD:
 		// default parameters for false coloring (different to regular defaults)
-		cmd->config.algo = rgb::COLOR_SOM;
+		cmd->config.algo        = rgb::COLOR_SOM;
 		cmd->config.som.maxIter = 50000;
-		cmd->config.som.seed = time(NULL);
+		cmd->config.som.seed    = time(NULL);
 
 		// CUBE parameters
-		cmd->config.som.type        = som::SOM_CUBE;
-		cmd->config.som.dsize       = 10;
-		cmd->config.som.sigmaStart  = 4;
-		cmd->config.som.sigmaEnd    = 1;
-		cmd->config.som.learnStart  = 0.75;
-		cmd->config.som.learnEnd    = 0.01;
+		cmd->config.som.type       = som::SOM_CUBE;
+		cmd->config.som.dsize      = 10;
+		cmd->config.som.sigmaStart = 4;
+		cmd->config.som.sigmaEnd   = 1;
+		cmd->config.som.learnStart = 0.75;
+		cmd->config.som.learnEnd   = 0.01;
 
 		break;
-#endif /* WITH_SOM */
+#endif  /* WITH_SOM */
 	default:
 		assert(false);
 	}
 	runner->setCommand(cmd);
 	connect(runner, SIGNAL(success(std::map<std::string, boost::any>)),
-			this, SLOT(processRunnerSuccess(std::map<std::string, boost::any>)));
+	        this, SLOT(processRunnerSuccess(std::map<std::string, boost::any>)));
 	connect(runner, SIGNAL(failure()),
-			this, SLOT(processRunnerFailure()));
+	        this, SLOT(processRunnerFailure()));
 	connect(runner, SIGNAL(progressChanged(int)),
-			this, SLOT(processRunnerProgress(int)));
+	        this, SLOT(processRunnerProgress(int)));
 	// start thread
 	runner->start();
 }
@@ -80,7 +82,7 @@ void FalseColorModelPayload::processRunnerProgress(int percent)
 void FalseColorModelPayload::processRunnerSuccess(std::map<std::string, boost::any> output)
 {
 	runner->deleteLater();
-	if(canceled) {
+	if (canceled) {
 		return;
 	}
 	cv::Mat3f mat = boost::any_cast<cv::Mat3f>(output["multi_img"]);

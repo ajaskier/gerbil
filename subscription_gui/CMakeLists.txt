@@ -31,6 +31,9 @@ vole_compile_library(
 
 		clustering/clusteringdock
 
+		falsecolor/falsecolordock
+		falsecolor/similaritywidget
+
         roi/roidock
         roi/roiview
 )
@@ -57,6 +60,9 @@ vole_moc_library(
 
 	   clustering/clusteringdock.h
 
+	   falsecolor/falsecolordock.h
+	   falsecolor/similaritywidget.h
+
        roi/roidock.h
        roi/roiview.h
 )
@@ -80,6 +86,9 @@ vole_ui_library(
         labels/modewidget.ui
 
 		clustering/clusteringdock.ui
+
+		falsecolor/falsecolordock_sel.ui
+		falsecolor/similaritywidget.ui
 
         roi/roidock.ui
         roi/roidock_buttons.ui

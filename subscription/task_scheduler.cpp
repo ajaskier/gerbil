@@ -19,8 +19,8 @@ void TaskScheduler::pushTask(std::shared_ptr<Task> task)
 
 void TaskScheduler::printPool()
 {
-	//for (auto task : taskPool)
-	    //qDebug() << "in pool: " << task->getId();
+	for (auto task : taskPool)
+		qDebug() << "in pool: " << task->getId();
 }
 
 void TaskScheduler::createSubscriptions(std::shared_ptr<Task> task)
@@ -44,7 +44,6 @@ void TaskScheduler::checkTaskPool()
 			startTask(t);
 
 			runningTasks[t->getId()] = t;
-
 		} else {
 			it++;
 		}
@@ -72,7 +71,7 @@ void TaskScheduler::removeDependantTasks(QString dataId)
 
 	auto it = taskPool.begin();
 	while (it != taskPool.end()) {
-		auto t = *it;
+		auto    t = *it;
 		QString targetDataId = t->targetId();
 
 		auto depsIt = std::find(deps.begin(), deps.end(), targetDataId);
@@ -82,7 +81,6 @@ void TaskScheduler::removeDependantTasks(QString dataId)
 			t->invalidateSubscriptions();
 			qDebug() << "task" << id << "gets removed from the task pool";
 			it = taskPool.erase(it);
-
 		} else {
 			it++;
 		}
