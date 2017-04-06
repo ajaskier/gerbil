@@ -26,7 +26,7 @@ public:
 	virtual ~CommandTask() {}
 	virtual bool run() = 0;
 
-	virtual void cancel() { ProgressObserver::abort(); }
+	virtual void cancel();
 
 	bool update(float report, bool incremental = false);
 
@@ -45,7 +45,7 @@ private:
 	// progress cached for incremental updates
 	float progress;
 	// progress in percent
-	int percent;
+	int percent = 0;
 };
 
 #endif // COMMAND_TASK_H

@@ -20,6 +20,7 @@
 #include <memory>
 
 #include "model/falsecolor_model.h"
+#include "falsecolor_subscription_delegate.h"
 
 //#define GGDBG_MODULE
 #include "gerbil_gui_debug.h"
@@ -48,8 +49,17 @@ static QStringList prettyFalseColorNames = QStringList()
                                            << "Spectral-gradient SOM";
 
 FalseColorDock::FalseColorDock(QWidget *parent)
-	: QDockWidget(parent), lastShown(FalseColoring::CMF)
+    : QDockWidget(parent)
 {
+	for (auto type : FalseColoring::all()) {
+		FalseColorSubscriptionDelegate *delegate = new FalseColorSubscriptionDelegate(type, this);
+
+		connect(delegate, SIGNAL(coloringUpdated(FalseColoring::Type)),
+		        this, SLOT(coloringUpdated(FalseColoring::Type)));
+
+		subs[type] = delegate;
+	}
+
 	setObjectName("FalseColorDock");
 	/* setup our UI here as it is quite minimalistic */
 	QWidget     *contents = new QWidget(this);
@@ -76,6 +86,7 @@ void FalseColorDock::processFalseColoringUpdate(FalseColoring::Type coloringType
 	coloringUpToDate[coloringType] = true;
 	updateTheButton();
 	updateProgressBar();
+
 	sw->doneAction()->setEnabled(false);
 	if (coloringType == selectedColoring()) {
 		//GGDBGM("updating " << coloringType << endl);
@@ -91,17 +102,23 @@ void FalseColorDock::processFalseColoringUpdate(FalseColoring::Type coloringType
 
 void FalseColorDock::processComputationCancelled(FalseColoring::Type coloringType)
 {
-	if (coloringState[coloringType] == FalseColoringState::ABORTING) {
-		coloringProgress[coloringType] = 0;
-		GGDBGM("enterState():" << endl);
-		enterState(coloringType, FalseColoringState::UNKNOWN);
-		updateTheButton();
-		updateProgressBar();
-	} else if (coloringState[coloringType] == FalseColoringState::CALCULATING) {
-		enterState(coloringType, FalseColoringState::UNKNOWN);
-		GGDBGM("restarting cancelled computation" << endl);
-		requestColoring(coloringType);
-	}
+	coloringProgress[coloringType] = 0;
+	GGDBGM("enterState():" << endl);
+	enterState(coloringType, FalseColoringState::UNKNOWN);
+	updateTheButton();
+	updateProgressBar();
+
+//	if (coloringState[coloringType] == FalseColoringState::ABORTING) {
+//		coloringProgress[coloringType] = 0;
+//		GGDBGM("enterState():" << endl);
+//		enterState(coloringType, FalseColoringState::UNKNOWN);
+//		updateTheButton();
+//		updateProgressBar();
+//	} else if (coloringState[coloringType] == FalseColoringState::CALCULATING) {
+//		enterState(coloringType, FalseColoringState::UNKNOWN);
+//		GGDBGM("restarting cancelled computation" << endl);
+//		requestColoring(coloringType);
+//	}
 }
 
 void FalseColorDock::setCalculationInProgress(FalseColoring::Type coloringType)
@@ -115,6 +132,9 @@ void FalseColorDock::setCalculationInProgress(FalseColoring::Type coloringType)
 
 void FalseColorDock::processSelectedColoring()
 {
+	lastColoring    = currentColoring;
+	currentColoring = selectedColoring();
+
 	//emit unsubscribeFalseColoring(this, lastShown);
 	GGDBGM("requesting false color image " << selectedColoring() << endl);
 	requestColoring(selectedColoring());
@@ -242,30 +262,50 @@ FalseColoring::Type FalseColorDock::selectedColoring()
 
 void FalseColorDock::subscribeColoring(FalseColoring::Type coloringType)
 {
-	if (sub) {
-		sub.reset(nullptr);
-		//sub->deleteLater();
+	if (coloringState[lastColoring] != FalseColoringState::CALCULATING) {
+		subs[lastColoring]->invalidate();
+		//subs[lastColoring].reset(nullptr);
 	}
 
-	QString dataSub = "falsecolor." + FalsecolorModel::coloringTypeToString(coloringType);
-	sub =
-	    std::unique_ptr<Subscription>(
-	        DataRegister::subscribe(Dependency(dataSub, SubscriptionType::READ,
-	                                           AccessType::DEFERRED),
-	                                this, std::bind(&FalseColorDock::
-	                                                coloringUpdated, this)));
+	if (!subs[coloringType]->established()) {
+		subs[coloringType]->establish();
+
+//		QString dataSub = "falsecolor." + FalsecolorModel::coloringTypeToString(coloringType);
+//		subs[coloringType].reset(
+//		    DataRegister::subscribe(Dependency(dataSub, SubscriptionType::READ,
+//		                                       AccessType::DEFERRED),
+//		                            this, std::bind(&FalseColorDock::
+//		                                            coloringUpdated, this)));
+
+
+//		if (sub) {
+//			if (sub->getDataId() == dataSub)
+//				return;
+
+//			sub.reset(nullptr);
+//			//sub->deleteLater();
+//		}
+	}
 }
 
-void FalseColorDock::coloringUpdated()
+void FalseColorDock::coloringUpdated(FalseColoring::Type coloringType)
 {
-	Subscription::Lock<QPixmap, FalseColoring::Type> lock(*sub);
+	{
+		Subscription *sub = subs[coloringType]->subscription();
+		Subscription::Lock<QPixmap, FalseColoring::Type> lock(*sub);
 
-	FalseColoring::Type coloringType = *(lock.meta());
-	QPixmap pix(*lock());
+		//FalseColoring::Type coloringType = *(lock.meta());
+		QPixmap pix(*lock());
 
-	qDebug() << "coloring updated" << FalsecolorModel::coloringTypeToString(coloringType);
+		qDebug() << "coloring updated" << FalsecolorModel::coloringTypeToString(coloringType);
 
-	processFalseColoringUpdate(coloringType, pix);
+
+		processFalseColoringUpdate(coloringType, pix);
+	}
+
+	if (coloringType != currentColoring) {
+		subs[coloringType]->invalidate();
+	}
 }
 
 void FalseColorDock::requestColoring(FalseColoring::Type coloringType, bool recalc)
@@ -354,6 +394,12 @@ void FalseColorDock::enterState(FalseColoring::Type coloringType, FalseColoringS
 {
 	GGDBGM(coloringType << " entering state " << state << endl);
 	coloringState[coloringType] = state;
+
+	if (coloringType == selectedColoring()
+	    && state == FalseColoringState::CALCULATING) {
+		//draw wait message
+		scene->setPixmap(QPixmap(0, 0));
+	}
 }
 
 void FalseColorDock::processVisibilityChanged(bool visible)
@@ -370,7 +416,13 @@ void FalseColorDock::processVisibilityChanged(bool visible)
 void FalseColorDock::processCalculationProgressChanged(FalseColoring::Type coloringType,
                                                        int                 percent)
 {
+	//qDebug() << FalsecolorModel::coloringTypeToString(coloringType) << percent;
 	coloringProgress[coloringType] = percent;
+
+	if (coloringState[coloringType] != FalseColoringState::CALCULATING) {
+		enterState(coloringType, FalseColoringState::CALCULATING);
+		updateTheButton();
+	}
 
 	if (coloringType == selectedColoring())
 		updateProgressBar();

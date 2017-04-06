@@ -31,10 +31,15 @@ void FalsecolorTaskDelegate::requestAbort()
 	emit requestTaskAbort();
 }
 
-void FalsecolorTaskDelegate::onTaskFinished()
+void FalsecolorTaskDelegate::onTaskFinished(QString id, bool success)
 {
 	task.reset();
-	emit taskFinished(coloringType);
+
+	if (success) {
+		emit taskFinished(coloringType);
+	} else {
+		emit taskCancelled(coloringType);
+	}
 }
 
 void FalsecolorTaskDelegate::onTaskProgressChanged(int percent)

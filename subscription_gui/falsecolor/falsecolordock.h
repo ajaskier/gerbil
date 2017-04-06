@@ -16,6 +16,7 @@ class AutohideView;
 class ScaledView;
 class AutohideWidget;
 class SimilarityWidget;
+class FalseColorSubscriptionDelegate;
 
 struct FalseColoringState
 {
@@ -39,7 +40,6 @@ signals:
 
 	void pixelOverlay(int, int);
 	void requestComputeSpecSim(int x, int y, similarity_measures::SMConfig conf);
-
 	void cancelComputation(FalseColoring::Type);
 
 public slots:
@@ -65,7 +65,7 @@ protected slots:
 
 	void saveState();
 
-	void coloringUpdated();
+	void coloringUpdated(FalseColoring::Type coloringType);
 
 protected:
 	void initUi();
@@ -91,7 +91,14 @@ protected:
 	// Calculation progress percentage for progressbar for each FalseColoring
 	QMap<FalseColoring::Type, int>  coloringProgress;
 	QMap<FalseColoring::Type, bool> coloringUpToDate;
-	FalseColoring::Type lastShown;
+
+	FalseColoring::Type lastShown = FalseColoring::CMF;
+
+	FalseColoring::Type currentColoring = FalseColoring::CMF;
+	FalseColoring::Type lastColoring    = FalseColoring::CMF;
+
+	//std::map<FalseColoring::Type, std::unique_ptr<Subscription> > subs;
+	std::map<FalseColoring::Type, FalseColorSubscriptionDelegate*> subs;
 
 	// viewport and scene
 	AutohideView *view;
@@ -101,7 +108,7 @@ protected:
 	AutohideWidget          *sel;
 	SimilarityWidget        *sw;
 
-	std::unique_ptr<Subscription> sub;
+	//std::unique_ptr<Subscription> sub;
 };
 
 #endif // FALSECOLORDOCK_H

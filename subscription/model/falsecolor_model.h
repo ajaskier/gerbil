@@ -30,6 +30,7 @@ public:
 signals:
 	void progressChanged(FalseColoring::Type, int);
 	void coloringCompleted(FalseColoring::Type);
+	void coloringCancelled(FalseColoring::Type);
 	//void abort(FalseColoring::Type);
 
 public slots:

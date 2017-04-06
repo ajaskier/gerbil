@@ -33,6 +33,7 @@ vole_compile_library(
 
 		falsecolor/falsecolordock
 		falsecolor/similaritywidget
+		falsecolor/falsecolor_subscription_delegate
 
         roi/roidock
         roi/roiview
@@ -62,6 +63,7 @@ vole_moc_library(
 
 	   falsecolor/falsecolordock.h
 	   falsecolor/similaritywidget.h
+	   falsecolor/falsecolor_subscription_delegate.h
 
        roi/roidock.h
        roi/roiview.h

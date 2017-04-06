@@ -31,11 +31,12 @@ public:
 signals:
 	void taskProgressChanged(FalseColoring::Type, int);
 	void taskFinished(FalseColoring::Type);
+	void taskCancelled(FalseColoring::Type);
 	void requestTaskAbort();
 
 private slots:
 	void onTaskProgressChanged(int percent);
-	void onTaskFinished();
+	void onTaskFinished(QString id, bool success);
 
 private:
 	std::shared_ptr<TaskRGBDisplay> task;

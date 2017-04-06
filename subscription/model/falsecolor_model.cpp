@@ -149,6 +149,9 @@ void FalsecolorModel::setupDelegates()
 		connect(delegate, &FalsecolorTaskDelegate::taskFinished,
 		        this, &FalsecolorModel::coloringCompleted);
 
+		connect(delegate, &FalsecolorTaskDelegate::taskCancelled,
+		        this, &FalsecolorModel::coloringCancelled);
+
 		connect(delegate, &FalsecolorTaskDelegate::taskProgressChanged,
 		        this, &FalsecolorModel::progressChanged);
 
