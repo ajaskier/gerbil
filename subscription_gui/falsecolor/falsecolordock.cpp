@@ -5,7 +5,7 @@
 #include <iostream>
 
 #include "falsecolordock.h"
-//#include "../model/falsecolor/falsecoloring.h"
+#include "model/falsecolor/falsecoloring.h"
 #include "widgets/scaledview.h"
 #include "widgets/autohideview.h"
 #include "widgets/autohidewidget.h"
@@ -131,11 +131,13 @@ void FalseColorDock::processApplyClicked()
 		if (lastShown == selectedColoring()) {
 			// Cancel after re-calc
 			enterState(selectedColoring(), FalseColoringState::UNKNOWN);
+			emit cancelComputation(selectedColoring());
 			//emit unsubscribeFalseColoring(this, selectedColoring());
 			updateProgressBar();
 			updateTheButton();
 		} else {
 			//emit unsubscribeFalseColoring(this, selectedColoring());
+			emit cancelComputation(selectedColoring());
 
 			// go back to last shown coloring
 			if (coloringUpToDate[lastShown]) {
@@ -261,6 +263,8 @@ void FalseColorDock::coloringUpdated()
 	FalseColoring::Type coloringType = *(lock.meta());
 	QPixmap pix(*lock());
 
+	qDebug() << "coloring updated" << FalsecolorModel::coloringTypeToString(coloringType);
+
 	processFalseColoringUpdate(coloringType, pix);
 }
 
@@ -282,7 +286,7 @@ void FalseColorDock::requestColoring(FalseColoring::Type coloringType, bool reca
 	} else {
 		GGDBGM("subscribe " << coloringType << endl);
 		//emit subscribeFalseColoring(this, coloringType);
-		emit requestFalseColoring(coloringType, recalc);
+		//emit requestFalseColoring(coloringType, recalc);
 	}
 	updateProgressBar();
 	updateTheButton();
@@ -297,6 +301,9 @@ void FalseColorDock::updateProgressBar()
 		sel->adjust(); // grow accordingly
 		// stay visible
 		sel->scrollIn(true);
+	} else if (coloringProgress[selectedColoring()] != 100) {
+		enterState(selectedColoring(), FalseColoringState::CALCULATING);
+		updateProgressBar();
 	} else {
 		//GGDBGM(selectedColoring() << " not CALCULATING" << endl);
 		uisel->calcProgress->setValue(0);

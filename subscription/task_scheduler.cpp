@@ -13,6 +13,8 @@ void TaskScheduler::pushTask(std::shared_ptr<Task> task)
 {
 	createSubscriptions(task);
 
+	removeDuplicates(task->getId());
+
 	taskPool.push_front(task);
 	checkTaskPool();
 }
@@ -21,6 +23,9 @@ void TaskScheduler::printPool()
 {
 	for (auto task : taskPool)
 		qDebug() << "in pool: " << task->getId();
+
+	for (auto it : runningTasks)
+		qDebug() << "currently running: " << it.second->getId();
 }
 
 void TaskScheduler::createSubscriptions(std::shared_ptr<Task> task)
@@ -52,7 +57,7 @@ void TaskScheduler::checkTaskPool()
 
 void TaskScheduler::startTask(std::shared_ptr<Task> task)
 {
-	//qDebug() << "starting task" << task->getId();
+	qDebug() << "starting task" << task->getId();
 
 	WorkerThread *thread = new WorkerThread(task);
 
@@ -63,6 +68,23 @@ void TaskScheduler::startTask(std::shared_ptr<Task> task)
 	        Qt::QueuedConnection);
 
 	thread->start();
+}
+
+void TaskScheduler::removeDuplicates(QString id)
+{
+	auto it = taskPool.begin();
+	while (it != taskPool.end()) {
+		auto    t = *it;
+		QString taskDataId = t->getId();
+
+		if (id == taskDataId) {
+			t->invalidateSubscriptions();
+			qDebug() << "task" << id << "gets removed from the task pool";
+			it = taskPool.erase(it);
+		} else {
+			it++;
+		}
+	}
 }
 
 void TaskScheduler::removeDependantTasks(QString dataId)
@@ -95,6 +117,8 @@ void TaskScheduler::taskEnded(QString id, bool success)
 
 		QString targetDataId = t->targetId();
 		removeDependantTasks(targetDataId);
+	} else {
+		qDebug() << "task" << id << "has finished";
 	}
 
 	runningTasks.erase(id);

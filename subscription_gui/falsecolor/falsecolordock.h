@@ -40,6 +40,8 @@ signals:
 	void pixelOverlay(int, int);
 	void requestComputeSpecSim(int x, int y, similarity_measures::SMConfig conf);
 
+	void cancelComputation(FalseColoring::Type);
+
 public slots:
 	void processVisibilityChanged(bool visible);
 	void processCalculationProgressChanged(FalseColoring::Type coloringType, int percent);

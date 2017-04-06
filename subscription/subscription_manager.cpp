@@ -187,7 +187,7 @@ void SubscriptionManager::endDoWriteSubscription(QString id)
 void SubscriptionManager::propagateChange(QString id)
 {
 	for (QString data : dataPool[id].dependants) {
-		if (hasWillReadsRecursive(data) && !dataPool[data].willWrite) {
+		if (hasWillReadsRecursive(data)) { // && !dataPool[data].willWrite) {
 			askModelForTask(data, id);
 		} else if (!hasWillReadsRecursive(data) && !dataPool[data].willWrite) {
 			removeData(data);

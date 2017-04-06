@@ -21,15 +21,8 @@
 
 using SimMeasure = similarity_measures::SimilarityMeasure<multi_img::Value>;
 
-QList<FalseColoring::Type> FalseColoring::allList = QList<FalseColoring::Type>()
-	<< FalseColoring::CMF
-	<< FalseColoring::PCA
-	<< FalseColoring::PCAGRAD
-	<< FalseColoring::SOM
-	<< FalseColoring::SOMGRAD;
-
 FalseColorModel::FalseColorModel(BackgroundTaskQueue *queue,
-                                 QObject *parent)
+                                 QObject             *parent)
 	: QObject(parent), queue(queue), similarityImg(new SharedData<QImage>(new QImage()))
 {
 	int type = QMetaType::type("FalseColoring");
@@ -39,7 +32,7 @@ FalseColorModel::FalseColorModel(BackgroundTaskQueue *queue,
 	type = QMetaType::type("std::map<std::string, boost::any>");
 	if (type == 0 || !QMetaType::isRegistered(type))
 		qRegisterMetaType< std::map<std::string, boost::any> >(
-					"std::map<std::string, boost::any>");
+		    "std::map<std::string, boost::any>");
 
 	for (auto c : FalseColoring::all()) {
 		pendingRequests[c] = false;
@@ -57,7 +50,7 @@ FalseColorModel::~FalseColorModel()
 }
 
 void FalseColorModel::setMultiImg(representation::t type,
-								  SharedMultiImgPtr shared_img)
+                                  SharedMultiImgPtr shared_img)
 {
 	// in the future, we might be interested in the other ones as well.
 	// currently, we don't process other types, so "warn" the caller
@@ -72,11 +65,11 @@ void FalseColorModel::setMultiImg(representation::t type,
 }
 
 void FalseColorModel::processImageUpdate(representation::t type,
-										 SharedMultiImgPtr,
-										 bool duplicate)
+                                         SharedMultiImgPtr,
+                                         bool              duplicate)
 {
 	GGDBGM("representation " << type << ", "
-		   << "duplicate: " << duplicate << endl);
+	                         << "duplicate: " << duplicate << endl);
 	if (duplicate) {
 		return;
 	}
@@ -122,30 +115,29 @@ void FalseColorModel::requestColoring(FalseColoring::Type coloringType, bool rec
 	for (auto r : representation::all()) {
 		if (FalseColoring::isBasedOn(coloringType, r) && !representationInit[r]) {
 			GGDBGM("request for " << coloringType <<
-				   ": representation " << r << " not initialized, deferring request"<< endl);
+			       ": representation " << r << " not initialized, deferring request" << endl);
 			pendingRequests[coloringType] = true;
 			return;
 		}
 	}
 
 	FalseColoringCache::iterator cacheIt = cache.find(coloringType);
-	if(cacheIt != cache.end() && cacheIt->valid()) {
-		if(recalc &&
-				// recalc makes sense only for SOM, the other representations
-				// are deterministic -> no need to recompute
-				!FalseColoring::isDeterministic(coloringType))
-		{
+	if (cacheIt != cache.end() && cacheIt->valid()) {
+		if (recalc &&
+		    // recalc makes sense only for SOM, the other representations
+		    // are deterministic -> no need to recompute
+		    !FalseColoring::isDeterministic(coloringType)) {
 			GGDBGM("have valid cached image, but re-calc requested for "
-				   << coloringType << ", computing" << endl);
+			       << coloringType << ", computing" << endl);
 			cache[coloringType].invalidate();
 			computeColoring(coloringType);
 		} else {
 			GGDBGM("have valid cached image for " << coloringType
-				   << ", emitting falseColoringUpdate" << endl);
+			                                      << ", emitting falseColoringUpdate" << endl);
 			emit falseColoringUpdate(coloringType, cacheIt->pixmap());
 		}
 	} else {
-		GGDBGM("invalid cache for "<< coloringType << ", computing." << endl);
+		GGDBGM("invalid cache for " << coloringType << ", computing." << endl);
 		computeColoring(coloringType);
 	}
 }
@@ -161,21 +153,22 @@ void FalseColorModel::computeColoring(FalseColoring::Type coloringType)
 
 	//GGDBGM("computation starts for "<< coloringType << endl);
 	FalseColorModelPayload *payload =
-			new FalseColorModelPayload(coloringType, shared_img, shared_grad);
+	    new FalseColorModelPayload(coloringType, shared_img, shared_grad);
 	payloads.insert(coloringType, payload);
 	connect(payload, SIGNAL(finished(FalseColoring::Type, bool)),
-			this, SLOT(processComputationFinished(FalseColoring::Type, bool)));
+	        this, SLOT(processComputationFinished(FalseColoring::Type, bool)));
 	// forward progress signal
-	connect(payload, SIGNAL(progressChanged(FalseColoring::Type,int)),
-			this, SIGNAL(progressChanged(FalseColoring::Type,int)));
+	connect(payload, SIGNAL(progressChanged(FalseColoring::Type, int)),
+	        this, SIGNAL(progressChanged(FalseColoring::Type, int)));
 
 	payload->run();
 }
 
-void FalseColorModel::abandonPayload(FalseColoring::Type coloringType) {
+void FalseColorModel::abandonPayload(FalseColoring::Type coloringType)
+{
 	FalseColorModelPayload *payload = NULL;
 	FalseColorModelPayloadMap::iterator payloadIt = payloads.find(coloringType);
-	if(payloadIt != payloads.end()) {
+	if (payloadIt != payloads.end()) {
 		payload = *payloadIt;
 		assert(payload);
 		disconnect(payload, 0, this, 0);
@@ -194,11 +187,11 @@ void FalseColorModel::resetCache()
 
 void FalseColorModel::cancelComputation(FalseColoring::Type coloringType)
 {
-	GGDBGM(coloringType<<endl);
+	GGDBGM(coloringType << endl);
 	//cache[coloringType].invalidate();
 	FalseColorModelPayload *payload = NULL;
 	FalseColorModelPayloadMap::iterator payloadIt = payloads.find(coloringType);
-	if(payloadIt != payloads.end()) {
+	if (payloadIt != payloads.end()) {
 		//GGDBGM("canceling "<< coloringType << endl);
 		payload = *payloadIt;
 		assert(payload);
@@ -216,12 +209,12 @@ void FalseColorModel::processComputationFinished(FalseColoring::Type coloringTyp
 	payload = *payloadIt;
 	assert(payload);
 	payloads.erase(payloadIt);
-	if(success) {
+	if (success) {
 		pixmap = payload->getResult();
-		cache.insert(coloringType,FalseColoringCacheItem(pixmap));
+		cache.insert(coloringType, FalseColoringCacheItem(pixmap));
 	}
 	payload->deleteLater();
-	if(success) {
+	if (success) {
 		//GGDBGM("emitting falseColoringUpdate " << coloringType<<endl);
 		emit falseColoringUpdate(coloringType, pixmap);
 	} else {
@@ -233,8 +226,8 @@ void FalseColorModel::processComputationFinished(FalseColoring::Type coloringTyp
 void FalseColorModel::computeSpecSim(int x, int y, similarity_measures::SMConfig conf)
 {
 	std::shared_ptr<SimMeasure> distfun(
-	            similarity_measures::SMFactory<multi_img::Value>::spawn(conf));
-	cv::Point point(x,y);
+	    similarity_measures::SMFactory<multi_img::Value>::spawn(conf));
+	cv::Point point(x, y);
 
 	BackgroundTaskPtr taskSpecSim(new SpecSimTbb(
 	                                  shared_img, similarityImg, point, distfun));
@@ -247,6 +240,6 @@ void FalseColorModel::finishSpecSim(bool success)
 {
 	if (success) {
 		QPixmap result = QPixmap::fromImage(**similarityImg);
-		emit computeSpecSimFinished(result);
+		emit    computeSpecSimFinished(result);
 	}
 }

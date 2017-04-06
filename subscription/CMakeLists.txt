@@ -67,6 +67,7 @@ vole_compile_library(
     model/labels_model
 	model/clusterization_model
 	model/falsecolor_model
+	model/falsecolor_task_delegate
 
     distviewcompute_utils
 
@@ -90,6 +91,7 @@ vole_moc_library(
     model/labels_model.h
 	model/clusterization_model.h
 	model/falsecolor_model.h
+	model/falsecolor_task_delegate.h
 
 	task/task_meanshift_sp.h
 	task/task_rgb_display.h

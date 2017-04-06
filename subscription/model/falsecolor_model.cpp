@@ -13,6 +13,8 @@
 
 #include "task/task_rgb_display.h"
 
+#include "falsecolor_task_delegate.h"
+
 QString FalsecolorModel::coloringTypeToString(const FalseColoring::Type &coloringType)
 {
 	switch (coloringType) {
@@ -52,6 +54,8 @@ FalsecolorModel::FalsecolorModel(TaskScheduler *scheduler, QObject *parent)
 	registerData("falsecolor.SOM", { "image.IMG" });
 	registerData("falsecolor.PCAGRAD", { "image.GRAD" });
 	registerData("falsecolor.SOMGRAD", { "image.GRAD" });
+
+	setupDelegates();
 }
 
 void FalsecolorModel::delegateTask(QString id, QString parentId)
@@ -59,10 +63,9 @@ void FalsecolorModel::delegateTask(QString id, QString parentId)
 	requestColoring(stringToColoringType(id));
 }
 
-
 void FalsecolorModel::requestColoring(FalseColoring::Type coloringType, bool recalc)
 {
-	qDebug() << "request for" << coloringType;
+	qDebug() << "request for" << coloringTypeToString(coloringType);
 
 	//cache thing
 	//TBD if neccessary now
@@ -120,11 +123,13 @@ void FalsecolorModel::computeColoring(FalseColoring::Type coloringType)
 	                                                        coloringType));
 	task->setCommand(cmd);
 
-	connect(task.get(), SIGNAL(progressChanged(int)),
-	        this, SIGNAL(progressChanged(int)), Qt::QueuedConnection);
+	(delegates[coloringType])->setTask(task);
 
-	connect(this, &FalsecolorModel::abort,
-	        task.get(), &CommandTask::abort);
+//	connect(task.get(), SIGNAL(progressChanged(int)),
+//	        this, SIGNAL(progressChanged(int)), Qt::QueuedConnection);
+
+//	connect(this, &FalsecolorModel::abort,
+//	        task.get(), &CommandTask::abort);
 
 	sendTask(task);
 }
@@ -133,5 +138,25 @@ void FalsecolorModel::taskFinished(QString id, bool success)
 {
 	Model::taskFinished(id, success);
 
-	emit coloringCompleted();
+	//emit coloringCompleted();
+}
+
+void FalsecolorModel::setupDelegates()
+{
+	for (auto type : FalseColoring::all()) {
+		FalsecolorTaskDelegate *delegate = new FalsecolorTaskDelegate(type, this);
+
+		connect(delegate, &FalsecolorTaskDelegate::taskFinished,
+		        this, &FalsecolorModel::coloringCompleted);
+
+		connect(delegate, &FalsecolorTaskDelegate::taskProgressChanged,
+		        this, &FalsecolorModel::progressChanged);
+
+		delegates[type] = delegate;
+	}
+}
+
+void FalsecolorModel::requestAbort(FalseColoring::Type type)
+{
+	(delegates[type])->requestAbort();
 }

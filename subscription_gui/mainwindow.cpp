@@ -369,6 +369,12 @@ void MainWindow::on_falsecolor_checkbox_toggled(bool checked)
 
 		connect(falsecolorDock, SIGNAL(requestFalseColoring(FalseColoring::Type, bool)),
 		        falsecolorModel, SLOT(requestColoring(FalseColoring::Type, bool)));
+
+		connect(falsecolorModel, SIGNAL(progressChanged(FalseColoring::Type, int)),
+		        falsecolorDock, SLOT(processCalculationProgressChanged(FalseColoring::Type, int)));
+
+		connect(falsecolorDock, SIGNAL(cancelComputation(FalseColoring::Type)),
+		        falsecolorModel, SLOT(requestAbort(FalseColoring::Type)));
 	} else {
 		removeDockWidget(falsecolorDock);
 		falsecolorDock->deleteLater();
