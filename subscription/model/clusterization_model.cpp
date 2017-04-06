@@ -42,23 +42,22 @@ void ClusterizationModel::requestSegmentation(const ClusteringRequest &r)
 	std::shared_ptr<TaskMeanShiftSP> task(new TaskMeanShiftSP("image.NORM", "image.GRAD"));
 
 	if (r.method == ClusteringMethod::FAMS || r.method == ClusteringMethod::PSPMS) {
-		MeanShiftShell   *cmd   = new MeanShiftShell();
-		MeanShiftConfig &config = cmd->config;
-		task->setCommand(cmd);
+	MeanShiftShell   *cmd   = new MeanShiftShell();
+	MeanShiftConfig &config = cmd->config;
+	task->setCommand(cmd);
 
-		config.verbosity = 0;
-		config.use_LSH   = r.lsh;
+	config.verbosity = 0;
+	config.use_LSH   = r.lsh;
 
-		if (r.method == ClusteringMethod::PSPMS) {
-			config.sp_withGrad         = onGradient;
-			config.starting            = SUPERPIXEL;
-			config.superpixel.eqhist   = 1;
-			config.superpixel.c        = 0.05f;
-			config.superpixel.min_size = 5;
-			config.superpixel.similarity.function =
-			    similarity_measures::SPEC_INF_DIV;
-		}
-
+	if (r.method == ClusteringMethod::PSPMS) {
+		config.sp_withGrad         = onGradient;
+		config.starting            = SUPERPIXEL;
+		config.superpixel.eqhist   = 1;
+		config.superpixel.c        = 0.05f;
+		config.superpixel.min_size = 5;
+		config.superpixel.similarity.function =
+		    similarity_measures::SPEC_INF_DIV;
+	}
 	} else if (r.method == ClusteringMethod::FSPMS) {
 		MeanShiftSP      *cmd   = new MeanShiftSP();
 		MeanShiftConfig &config = cmd->config;
@@ -79,7 +78,7 @@ void ClusterizationModel::requestSegmentation(const ClusteringRequest &r)
 	        this, SIGNAL(progressChanged(int)), Qt::QueuedConnection);
 
 	connect(this, &ClusterizationModel::abort,
-	        task.get(), &CommandTask::abort);
+	        task.get(), &CommandTask::cancel);
 
 	sendTask(task);
 }

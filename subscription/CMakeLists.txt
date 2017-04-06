@@ -25,6 +25,7 @@ vole_compile_library(
 
 	task/task
 	task/command_task
+	task/tbb_task
 
 	task/task_a
 	task/task_b
@@ -81,6 +82,8 @@ vole_moc_library(
 
     task/task.h
 	task/command_task.h
+	task/tbb_task.h
+
 	model/model.h
 	model/model_a.h
 	model/model_b.h

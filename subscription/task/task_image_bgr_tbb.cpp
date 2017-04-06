@@ -6,8 +6,10 @@
 #include "multi_img/multi_img_tbb.h"
 #include "multi_img/cieobserver.h"
 
+#include <tbb/parallel_for.h>
+
 TaskImageBgrTbb::TaskImageBgrTbb(QString destId, QString sourceId)
-	: Task(destId, { { "source", { sourceId } } })
+    : TbbTask(destId, { { "source", { sourceId } } })
 {}
 
 bool TaskImageBgrTbb::run()
@@ -42,7 +44,7 @@ bool TaskImageBgrTbb::run()
 	tbb::parallel_for(tbb::blocked_range2d<int>(0, newBgr.rows, 0, newBgr.cols),
 	                  computeBgr, tbb::auto_partitioner(), stopper);
 
-	if (stopper.is_group_execution_cancelled()) {
+	if (isCancelled()) {
 		return false;
 	}
 

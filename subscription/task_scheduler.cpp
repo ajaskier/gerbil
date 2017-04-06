@@ -85,6 +85,20 @@ void TaskScheduler::removeDuplicates(QString id)
 			it++;
 		}
 	}
+
+	{
+		auto it = runningTasks.begin();
+		while (it != runningTasks.end()) {
+			auto    t = (*it).second;
+			QString taskDataId = t->getId();
+
+			if (id == taskDataId) {
+				qDebug() << "cancelling execution of" << taskDataId << "task";
+				t->cancel();
+			}
+			it++;
+		}
+	}
 }
 
 void TaskScheduler::removeDependantTasks(QString dataId)

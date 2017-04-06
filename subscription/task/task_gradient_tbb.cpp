@@ -11,7 +11,8 @@
 #include <tbb/parallel_for.h>
 
 TaskGradientTbb::TaskGradientTbb(bool includecache)
-	: Task("image.GRAD", { { "source", { "image.IMG" } } }), includecache(includecache)
+    : TbbTask("image.GRAD", { { "source", { "image.IMG" } } }),
+    includecache(includecache)
 {}
 
 TaskGradientTbb::~TaskGradientTbb()
@@ -51,7 +52,7 @@ bool TaskGradientTbb::run()
 	rectComplement(source->width, source->height, copySrc, calc);
 
 	multi_img *target = new multi_img(
-		source->height, source->width, source->size() - 1);
+	    source->height, source->width, source->size() - 1);
 
 	if (dest) {
 		if (copyGlob.width > 0 && copyGlob.height > 0) {
@@ -104,8 +105,8 @@ bool TaskGradientTbb::run()
 	for (unsigned int i = 0; i < source->size() - 1; ++i) {
 		if (!source->meta[i].empty && !source->meta[i + 1].empty) {
 			target->meta[i] = multi_img::BandDesc(
-				source->meta[i].center,
-				source->meta[i + 1].center);
+			    source->meta[i].center,
+			    source->meta[i + 1].center);
 		}
 	}
 

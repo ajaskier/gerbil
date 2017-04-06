@@ -10,7 +10,7 @@
 
 
 TaskDataRangeTbb::TaskDataRangeTbb(QString destId)
-	: Task(destId, {})
+    : TbbTask(destId, {})
 {}
 
 TaskDataRangeTbb::~TaskDataRangeTbb()

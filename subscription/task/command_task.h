@@ -26,7 +26,7 @@ public:
 	virtual ~CommandTask() {}
 	virtual bool run() = 0;
 
-	virtual void abort() { ProgressObserver::abort(); }
+	virtual void cancel() { ProgressObserver::abort(); }
 
 	bool update(float report, bool incremental = false);
 

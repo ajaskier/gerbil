@@ -19,7 +19,7 @@ void FalsecolorTaskDelegate::setTask(std::shared_ptr<TaskRGBDisplay> task)
 	        Qt::QueuedConnection);
 
 	connect(this, &FalsecolorTaskDelegate::requestTaskAbort,
-	        task.get(), &CommandTask::abort);
+	        task.get(), &CommandTask::cancel);
 
 	connect(task.get(), &CommandTask::taskFinished,
 	        this, &FalsecolorTaskDelegate::onTaskFinished,
