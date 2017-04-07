@@ -2,7 +2,7 @@
 
 #include "bandview.h"
 #include "modewidget.h"
-//#include "../widgets/graphsegwidget.h"
+#include "graphsegwidget.h"
 #include "widgets/autohideview.h"
 #include <app/gerbilio.h>
 
@@ -78,9 +78,9 @@ void BandDock::initUi()
 	        view, SLOT(fitContentRect(QRect)));
 
 	// add graphseg control widget
-	//gs = new GraphSegWidget(view);
+	gs = new GraphSegWidget(view);
 	bv->offBottom = AutohideWidget::OutOffset;
-	//view->addWidget(AutohideWidget::BOTTOM, gs);
+	view->addWidget(AutohideWidget::BOTTOM, gs);
 
 	connect(bv, SIGNAL(newSizeHint(QSize)),
 	        view, SLOT(updateSizeHint(QSize)));
@@ -91,10 +91,10 @@ void BandDock::initUi()
 	connect(bv, SIGNAL(requestCursor(Qt::CursorShape)),
 	        view, SLOT(applyCursor(Qt::CursorShape)));
 
-	//connect(gs, SIGNAL(requestLoadSeeds()),
-	//        this, SLOT(loadSeeds()));
-	//connect(gs, SIGNAL(requestClearSeeds()),
-	//        bv, SLOT(clearSeeds()));
+	connect(gs, SIGNAL(requestLoadSeeds()),
+	        this, SLOT(loadSeeds()));
+	connect(gs, SIGNAL(requestClearSeeds()),
+	        bv, SLOT(clearSeeds()));
 
 	connect(markerSelector, SIGNAL(currentIndexChanged(int)),
 	        this, SLOT(processMarkerSelectorIndexChanged(int)));
@@ -117,10 +117,10 @@ void BandDock::initUi()
 	// label update is triggered by timer. Hide it for now.
 	applyButton->setVisible(false);
 
-	//connect(gs, SIGNAL(requestToggleSeedMode(bool)),
-	//        this, SLOT(graphSegModeToggled(bool)));
-	//connect(gs, SIGNAL(requestToggleSeedMode(bool)),
-	//        bv, SLOT(toggleSeedMode(bool)));
+	connect(gs, SIGNAL(requestToggleSeedMode(bool)),
+	        this, SLOT(graphSegModeToggled(bool)));
+	connect(gs, SIGNAL(requestToggleSeedMode(bool)),
+	        bv, SLOT(toggleSeedMode(bool)));
 
 	connect(this, SIGNAL(currentLabelChanged(int)),
 	        bv, SLOT(setCurrentLabel(int)));

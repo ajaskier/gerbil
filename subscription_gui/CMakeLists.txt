@@ -28,6 +28,7 @@ vole_compile_library(
         labels/banddock
         labels/bandview
         labels/modewidget
+		labels/graphsegwidget
 
 		clustering/clusteringdock
 
@@ -58,6 +59,7 @@ vole_moc_library(
        labels/banddock.h
        labels/bandview.h
        labels/modewidget.h
+	   labels/graphsegwidget.h
 
 	   clustering/clusteringdock.h
 
@@ -86,6 +88,7 @@ vole_ui_library(
         labels/labeldock.ui
         labels/banddock.ui
         labels/modewidget.ui
+		labels/graphsegwidget.ui
 
 		clustering/clusteringdock.ui
 
