@@ -15,7 +15,7 @@ TaskA::~TaskA()
 
 bool TaskA::run()
 {
-	QThread::msleep(2000);
+	//QThread::msleep(2000);
 
 	Data data;
 	data.num = a;
