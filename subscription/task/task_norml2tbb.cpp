@@ -11,7 +11,7 @@
 #include <tbb/parallel_for.h>
 
 TaskNormL2Tbb::TaskNormL2Tbb()
-	: Task("image.NORM", { { "source", { "image.IMG" } } })
+    : TbbTask("image.NORM", { { "source", { "image.IMG" } } })
 {}
 
 TaskNormL2Tbb::~TaskNormL2Tbb()
@@ -50,7 +50,7 @@ bool TaskNormL2Tbb::run()
 	rectComplement(source->width, source->height, copySrc, calc);
 
 	multi_img* target = new multi_img(
-		source->height, source->width, source->size());
+	    source->height, source->width, source->size());
 
 	if (dest) {
 		if (copyGlob.width > 0 && copyGlob.height > 0) {

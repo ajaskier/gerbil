@@ -8,6 +8,8 @@
 #include <QImage>
 #include <QString>
 
+#include <tbb/parallel_for.h>
+
 class Rgb {
 public:
 	Rgb(cv::Mat_<cv::Vec3f> &bgr, QImage &rgb)
@@ -30,7 +32,7 @@ private:
 };
 
 TaskImageRgbTbb::TaskImageRgbTbb(QString destId, QString sourceId)
-	: Task(destId, { { "source", { sourceId } } })
+    : TbbTask(destId, { { "source", { sourceId } } })
 {}
 
 bool TaskImageRgbTbb::run()

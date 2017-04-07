@@ -23,11 +23,11 @@ private:
 	void taskEnded(QString id, bool success);
 	void removeDependantTasks(QString dataId);
 
+	void removeDuplicates(QString id);
 	void printPool();
 
-	std::list<std::shared_ptr<Task> > taskPool;
-
-	std::map<QString, std::shared_ptr<Task>> runningTasks;
+	std::list<std::shared_ptr<Task> >         taskPool;
+	std::map<QString, std::shared_ptr<Task> > runningTasks;
 
 	SubscriptionManager& sm;
 };

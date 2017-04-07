@@ -4,7 +4,7 @@
 	This file may be licensed under the terms of of the GNU General Public
 	License, version 3, as published by the Free Software Foundation. You can
 	find it here: http://www.gnu.org/licenses/gpl.html
-*/
+ */
 
 #include "rgb.h"
 #include <imginput.h>
@@ -31,13 +31,12 @@
 #endif
 
 namespace rgb {
-
 RGBDisplay::RGBDisplay()
- : Command(
-		"rgb",
-		config,
-		"Johannes Jordan",
-		"johannes.jordan@informatik.uni-erlangen.de")
+    : Command(
+        "rgb",
+        config,
+        "Johannes Jordan",
+        "johannes.jordan@informatik.uni-erlangen.de")
 {}
 
 int RGBDisplay::execute()
@@ -54,39 +53,41 @@ int RGBDisplay::execute()
 		cv::imshow("Result", bgr);
 		cv::waitKey();
 	}
-	
-	cv::imwrite(config.output_file, bgr*255.);
+
+	cv::imwrite(config.output_file, bgr * 255.);
 	return 0;
 }
 
 #ifdef WITH_BOOST
 std::map<std::string, boost::any> RGBDisplay::execute(
-		std::map<std::string, boost::any> &input, ProgressObserver *po)
+    std::map<std::string, boost::any> &input, ProgressObserver *po)
 {
 	// BUG BUG BUG
 	// we need to copy the source image, because the pointer stored in the
 	// shared data object may be deleted.
 	// FIXME TODO gerbil's SharedData concept is broken.
-	multi_img *srcimg;
-	{
-		SharedMultiImgPtr src =
-				boost::any_cast<SharedMultiImgPtr>(input["multi_img"]);
-		SharedDataLock lock(src->mutex);
-		if ((**src).empty())
-			assert(false);
+//	multi_img *srcimg;
+//	{
+//		SharedMultiImgPtr src =
+//				boost::any_cast<SharedMultiImgPtr>(input["multi_img"]);
+//		SharedDataLock lock(src->mutex);
+//		if ((**src).empty())
+//			assert(false);
 
-		// copy, see above
-		srcimg = new multi_img(**src);
-	}
+//		// copy, see above
+//		srcimg = new multi_img(**src);
+//	}
 
-	cv::Mat3f bgr = execute(*srcimg, po);
-	delete srcimg;
+	multi_img_base *basesrc = boost::any_cast<multi_img_base*>(input["multi_img"]);
+	multi_img      * src    = dynamic_cast<multi_img*>(basesrc);
+
+	cv::Mat3f bgr = execute(*src, po);
 
 	if (bgr.empty()) {
 		std::cerr << "RGB::execute(): empty result";
 	}
 	std::map<std::string, boost::any> output;
-	output["multi_img"] = (cv::Mat3f)(bgr*255.0f);
+	output["multi_img"] = (cv::Mat3f)(bgr * 255.0f);
 	return output;
 }
 #endif
@@ -120,10 +121,11 @@ cv::Mat3f RGBDisplay::executePCA(const multi_img& src, ProgressObserver *po)
 {
 	// cover cases of lt 3 channels
 	unsigned int components = std::min((size_t)3, src.size());
-	multi_img pca3 = src.project(src.pca(components));
+	multi_img    pca3       = src.project(src.pca(components));
 
 	bool cont = (!po) || po->update(.7f); // TODO: values
-	if (!cont) return cv::Mat3f();
+	if (!cont)
+		return cv::Mat3f();
 
 	if (config.pca_stretch)
 		pca3.data_stretch_single(0., 1.);
@@ -131,15 +133,16 @@ cv::Mat3f RGBDisplay::executePCA(const multi_img& src, ProgressObserver *po)
 		pca3.data_rescale(0., 1.);
 
 	cont = (!po) || po->update(.8f); // TODO: values
-	if (!cont) return cv::Mat3f();
+	if (!cont)
+		return cv::Mat3f();
 
 	std::vector<cv::Mat> vec(3);
 	// initialize all of them in the case the source had less than 3 channels
 	vec[0] = vec[1] = vec[2] = pca3[0]; // green: component 1
 	if (pca3.size() > 1)
-		vec[2] = pca3[1]; // red: component 2
+		vec[2] = pca3[1];               // red: component 2
 	if (pca3.size() > 2)
-		vec[0] = pca3[2]; // blue: component 3
+		vec[0] = pca3[2];               // blue: component 3
 
 	cv::Mat3f bgr;
 	cv::merge(vec, bgr);
@@ -155,28 +158,28 @@ using namespace som;
 template <bool posToBGR>
 class SomRgbTbb {
 public:
-	typedef cv::Mat_<cv::Vec<GenSOM::value_type, 3> > Mat3;
+	typedef cv::Mat_<cv::Vec<GenSOM::value_type, 3> >   Mat3;
 
 	SomRgbTbb(const SOMClosestN &lookup, const std::vector<float> &weights,
-			  Mat3& output, ProgressObserver *po = 0)
+	          Mat3& output, ProgressObserver *po = 0)
 		: lookup(lookup), weights(weights), output(output), po(po) {}
 
 	void operator()(const tbb::blocked_range2d<int> &r) const
 	{
-		typedef cv::Point3_<GenSOM::value_type> Point3;
+		typedef cv::Point3_<GenSOM::value_type>   Point3;
 
 		// iterate over all pixels in range
-		float done = 0;
+		float done  = 0;
 		float total = (lookup.height * lookup.width);
 		for (int y = r.rows().begin(); y < r.rows().end(); ++y) {
 			for (int x = r.cols().begin(); x < r.cols().end(); ++x) {
 				SOMClosestN::resultAccess closest =
-						lookup.closestN(cv::Point2i(x, y));
+				    lookup.closestN(cv::Point2i(x, y));
 				Point3 weighted(0, 0, 0);
 				std::vector<DistIndexPair>::const_iterator it = closest.first;
 				for (int k = 0; it != closest.last; ++k, ++it) {
 					size_t somidx = it->index;
-					Point3 pos = vec2Point3(lookup.som.getCoord(somidx));
+					Point3 pos    = vec2Point3(lookup.som.getCoord(somidx));
 					weighted += weights[k] * pos;
 				}
 				if (posToBGR) { // 3D coord -> BGR color
@@ -190,7 +193,7 @@ public:
 				done++;
 				if (po && ((int)done % 1000 == 0)) {
 					if (!po->update(done / total, true))
-						return; // abort if told so. This is thread-save.
+						return;  // abort if told so. This is thread-save.
 					done = 0;
 				}
 			}
@@ -200,16 +203,16 @@ public:
 	}
 
 private:
-	const SOMClosestN &lookup;
+	const SOMClosestN &       lookup;
 	const std::vector<float> &weights;
 	Mat3 &output;
 	ProgressObserver *po;
 };
 
 cv::Mat3f RGBDisplay::executeSOM(const multi_img &img, ProgressObserver *po,
-						  boost::shared_ptr<SOMClosestN> lookup)
+                                 boost::shared_ptr<SOMClosestN> lookup)
 {
-	typedef cv::Mat_<cv::Vec<GenSOM::value_type, 3> > Mat3;
+	typedef cv::Mat_<cv::Vec<GenSOM::value_type, 3> >   Mat3;
 
 	Stopwatch total("Total runtime of false-color image generation");
 
@@ -220,7 +223,7 @@ cv::Mat3f RGBDisplay::executeSOM(const multi_img &img, ProgressObserver *po,
 	boost::shared_ptr<GenSOM> som;
 	if (!lookup) {
 		calcPo = (po ? new ChainedProgressObserver(po, .6f) : 0);
-		som = boost::shared_ptr<GenSOM>(GenSOM::create(config.som, img, calcPo));
+		som    = boost::shared_ptr<GenSOM>(GenSOM::create(config.som, img, calcPo));
 		delete calcPo;
 		if (po && !po->update(.6f))
 			return Mat3();
@@ -229,7 +232,7 @@ cv::Mat3f RGBDisplay::executeSOM(const multi_img &img, ProgressObserver *po,
 		// compute lookup cache
 		calcPo = (po ? new ChainedProgressObserver(po, .35f) : 0);
 		lookup = boost::make_shared<SOMClosestN>
-				 (*som, img, config.som_depth, calcPo);
+		             (*som, img, config.som_depth, calcPo);
 		delete calcPo;
 	}
 	if (po && !po->update(.95f))
@@ -240,14 +243,14 @@ cv::Mat3f RGBDisplay::executeSOM(const multi_img &img, ProgressObserver *po,
 	calcPo = (po ? new ChainedProgressObserver(po, .05f) : 0);
 	std::vector<float> weights;
 	if (config.som_linear) {
-		weights = std::vector<float>(lookup->n, 1.f/lookup->n);
+		weights = std::vector<float>(lookup->n, 1.f / lookup->n);
 	} else {
 		weights = neuronWeightsGeometric<float>(lookup->n);
 	}
 	SomRgbTbb<true> comp(*lookup, weights, bgr, calcPo);
 	tbb::parallel_for(tbb::blocked_range2d<int>(0, img.height, // row range
-												0, img.width), // column range
-					  comp);
+	                                            0, img.width), // column range
+	                  comp);
 	// DEBUG: run sequentially (BTW currently it is too fast to profit from TBB)
 	// comp(tbb::blocked_range2d<int>(0, img.height, 0, img.width));
 	delete calcPo;
@@ -256,17 +259,18 @@ cv::Mat3f RGBDisplay::executeSOM(const multi_img &img, ProgressObserver *po,
 }
 #endif // WITH_SOM
 
-void RGBDisplay::printShortHelp() const {
+void RGBDisplay::printShortHelp() const
+{
 	std::cout << "RGB image creation (true-color or false-color)" << std::endl;
 }
 
 
-void RGBDisplay::printHelp() const {
+void RGBDisplay::printHelp() const
+{
 	std::cout << "RGB image creation (true-color or false-color)" << std::endl;
 	std::cout << std::endl;
 	std::cout << "XYZ creates a true-color image using a standard white balancing.\n"
-	             "PCA and SOM perform false-coloring.";
+	"PCA and SOM perform false-coloring.";
 	std::cout << std::endl;
 }
-
 } // module namespace

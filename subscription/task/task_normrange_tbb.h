@@ -1,9 +1,7 @@
 #ifndef TASK_NORMRANGE_TBB_H
 #define TASK_NORMRANGE_TBB_H
 
-#include <task/task.h>
 #include "model/representation.h"
-
 #include "task_datarange_tbb.h"
 
 class TaskNormRangeTbb : public TaskDataRangeTbb
@@ -20,9 +18,9 @@ public:
 private:
 
 	multi_img::NormMode mode;
-	multi_img::Value minval;
-	multi_img::Value maxval;
-	representation::t type;
+	multi_img::Value    minval;
+	multi_img::Value    maxval;
+	representation::t   type;
 	bool update;
 };
 

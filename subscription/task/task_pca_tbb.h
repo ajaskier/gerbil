@@ -2,12 +2,11 @@
 #define TASK_PCA_TBB_H
 
 #include <QObject>
-#include <task/task.h>
-#include <tbb/tbb.h>
+#include <task/tbb_task.h>
 
 #include <opencv2/core/core.hpp>
 
-class TaskPcaTbb : public Task
+class TaskPcaTbb : public TbbTask
 {
 public:
 	explicit TaskPcaTbb(QString sourceId, QString destId,
@@ -18,11 +17,8 @@ public:
 
 private:
 
-	virtual bool isCancelled() { return stopper.is_group_execution_cancelled(); }
-
-	tbb::task_group_context stopper;
 	unsigned int components;
-	bool includecache;
+	bool         includecache;
 };
 
 

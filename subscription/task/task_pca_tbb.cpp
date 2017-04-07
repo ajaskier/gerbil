@@ -10,8 +10,10 @@
 #include <tbb/blocked_range2d.h>
 #include <tbb/parallel_for.h>
 
+#include <tbb/tbb.h>
+
 TaskPcaTbb::TaskPcaTbb(QString sourceId, QString destId, unsigned int components, bool includecache)
-	: Task(destId, { { "source", sourceId } }), components(components),
+    : TbbTask(destId, { { "source", sourceId } }), components(components),
 	includecache(includecache)
 {}
 
@@ -24,7 +26,7 @@ bool TaskPcaTbb::run()
 	multi_img * source = source_lock();
 
 	cv::Mat_<multi_img::Value> pixels(
-		source->size(), source->width * source->height);
+	    source->size(), source->width * source->height);
 	MultiImg2BandMat computePixels(*source, pixels);
 	tbb::parallel_for(tbb::blocked_range<size_t>(0, source->size()),
 	                  computePixels, tbb::auto_partitioner(), stopper);
@@ -32,7 +34,7 @@ bool TaskPcaTbb::run()
 	cv::PCA pca(pixels, cv::noArray(), CV_PCA_DATA_AS_COL, (int)components);
 
 	multi_img *target = new multi_img(
-		source->height, source->width, pca.eigenvectors.rows);
+	    source->height, source->width, pca.eigenvectors.rows);
 	PcaProjection computeProjection(pixels, *target, pca);
 	tbb::parallel_for(tbb::blocked_range<size_t>(0, target->pixels.size()),
 	                  computeProjection, tbb::auto_partitioner(), stopper);

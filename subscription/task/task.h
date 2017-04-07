@@ -25,6 +25,7 @@ public:
 	std::vector<Dependency>& getDependencies() { return dependencies; }
 	QString getId() { return id; }
 	QString targetId();
+	virtual void cancel() {}
 
 signals:
 	void taskFinished(QString id, bool success);

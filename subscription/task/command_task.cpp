@@ -22,3 +22,9 @@ bool CommandTask::update(float report, bool incremental)
 	}
 	return !isAborted();
 }
+
+void CommandTask::cancel()
+{
+	disconnect(this, SIGNAL(progressChanged(int)), 0, 0);
+	ProgressObserver::abort();
+}

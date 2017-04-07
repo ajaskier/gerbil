@@ -28,6 +28,7 @@ public:
 	int getId() { return id; }
 	AccessType getAccessType() { return dependency.accessType; }
 	Dependency getDependency() { return dependency; }
+	QString getDataId() { return dependency.dataId; }
 
 	template <class T1, class T2 = int>
 	class Lock;

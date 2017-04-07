@@ -15,6 +15,7 @@
 #include "model/dist_model.h"
 #include "model/labels_model.h"
 #include "model/clusterization_model.h"
+#include "model/falsecolor_model.h"
 
 #include "normdock.h"
 #include "labels/banddock.h"
@@ -23,6 +24,7 @@
 #include "labels/labeldock.h"
 #include "roi/roidock.h"
 #include "clustering/clusteringdock.h"
+#include "falsecolor/falsecolordock.h"
 
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -38,10 +40,11 @@ void MainWindow::initCrucials()
 	scheduler = new TaskScheduler(sm);
 	DataRegister::init(&sm);
 
-	imageModel          = new ImgModel(false, scheduler, this);
+	imageModel = new ImgModel(false, scheduler, this);
 	labelsModel         = new LabelsModel(scheduler, this);
 	distModel           = new DistModel(scheduler, this);
 	clusterizationModel = new ClusterizationModel(scheduler, this);
+	falsecolorModel     = new FalsecolorModel(scheduler, this);
 	imageModel->setFilename("/home/ocieslak/gerbil_data/fake_and_real_peppers_ms.txt");
 	imgSub =
 	    std::unique_ptr<Subscription>(DataRegister::subscribe(Dependency("image",
@@ -355,5 +358,32 @@ void MainWindow::on_clustering_checkbox_toggled(bool checked)
 	} else {
 		removeDockWidget(clusteringDock);
 		clusteringDock->deleteLater();
+	}
+}
+
+void MainWindow::on_falsecolor_checkbox_toggled(bool checked)
+{
+	if (checked) {
+		falsecolorDock = new FalseColorDock(this);
+		addDockWidget(Qt::TopDockWidgetArea, falsecolorDock);
+
+		connect(falsecolorDock, SIGNAL(requestFalseColoring(FalseColoring::Type, bool)),
+		        falsecolorModel, SLOT(requestColoring(FalseColoring::Type, bool)));
+
+		connect(falsecolorModel, SIGNAL(progressChanged(FalseColoring::Type, int)),
+		        falsecolorDock, SLOT(processCalculationProgressChanged(FalseColoring::Type, int)));
+
+		connect(falsecolorModel, SIGNAL(coloringCancelled(FalseColoring::Type)),
+		        falsecolorDock, SLOT(processComputationCancelled(FalseColoring::Type)));
+
+		connect(falsecolorDock, SIGNAL(cancelComputation(FalseColoring::Type)),
+		        falsecolorModel, SLOT(requestAbort(FalseColoring::Type)));
+
+		connect(falsecolorDock,
+		        SIGNAL(requestComputeSpecSim(int, int, similarity_measures::SMConfig)),
+		        falsecolorModel, SLOT(computeSpecSim(int, int, similarity_measures::SMConfig)));
+	} else {
+		removeDockWidget(falsecolorDock);
+		falsecolorDock->deleteLater();
 	}
 }

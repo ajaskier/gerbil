@@ -25,6 +25,7 @@ vole_compile_library(
 
 	task/task
 	task/command_task
+	task/tbb_task
 
 	task/task_a
 	task/task_b
@@ -60,11 +61,15 @@ vole_compile_library(
     task/labels/task_labels_consolidate
 
 	task/task_meanshift_sp
+	task/task_rgb_display
+	task/task_specsim_tbb
 
     model/img_model
     model/dist_model
     model/labels_model
 	model/clusterization_model
+	model/falsecolor_model
+	model/falsecolor_task_delegate
 
     distviewcompute_utils
 
@@ -78,6 +83,8 @@ vole_moc_library(
 
     task/task.h
 	task/command_task.h
+	task/tbb_task.h
+
 	model/model.h
 	model/model_a.h
 	model/model_b.h
@@ -87,8 +94,11 @@ vole_moc_library(
     model/dist_model.h
     model/labels_model.h
 	model/clusterization_model.h
+	model/falsecolor_model.h
+	model/falsecolor_task_delegate.h
 
 	task/task_meanshift_sp.h
+	task/task_rgb_display.h
 )
 
 vole_add_module()

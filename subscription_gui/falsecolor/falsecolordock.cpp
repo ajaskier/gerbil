@@ -5,16 +5,25 @@
 #include <iostream>
 
 #include "falsecolordock.h"
-#include "../model/falsecolor/falsecoloring.h"
-#include "../widgets/scaledview.h"
-#include "../widgets/autohideview.h"
-#include "../widgets/autohidewidget.h"
-#include "../widgets/similaritywidget.h"
+#include "model/falsecolor/falsecoloring.h"
+#include "widgets/scaledview.h"
+#include "widgets/autohideview.h"
+#include "widgets/autohidewidget.h"
+#include "similaritywidget.h"
 #include <app/gerbilio.h>
+
+#include "data_register.h"
+#include "subscription.h"
+#include "dependency.h"
+#include "lock.h"
+
+#include <memory>
+
+#include "model/falsecolor_model.h"
+#include "falsecolor_subscription_delegate.h"
 
 //#define GGDBG_MODULE
 #include "gerbil_gui_debug.h"
-#include <QDebug>
 
 std::ostream & operator<<(std::ostream& os, const FalseColoringState::Type& state)
 {
@@ -40,8 +49,17 @@ static QStringList prettyFalseColorNames = QStringList()
                                            << "Spectral-gradient SOM";
 
 FalseColorDock::FalseColorDock(QWidget *parent)
-	: QDockWidget(parent), lastShown(FalseColoring::CMF)
+    : QDockWidget(parent)
 {
+	for (auto type : FalseColoring::all()) {
+		FalseColorSubscriptionDelegate *delegate = new FalseColorSubscriptionDelegate(type, this);
+
+		connect(delegate, SIGNAL(coloringUpdated(FalseColoring::Type)),
+		        this, SLOT(coloringUpdated(FalseColoring::Type)));
+
+		subs[type] = delegate;
+	}
+
 	setObjectName("FalseColorDock");
 	/* setup our UI here as it is quite minimalistic */
 	QWidget     *contents = new QWidget(this);
@@ -60,6 +78,12 @@ FalseColorDock::FalseColorDock(QWidget *parent)
 	restoreState();
 }
 
+FalseColorDock::~FalseColorDock()
+{
+	if (sel)
+		sel->deleteLater();
+}
+
 void FalseColorDock::processFalseColoringUpdate(FalseColoring::Type coloringType, QPixmap p)
 {
 	GGDBGM("enterState():" << endl);
@@ -68,6 +92,7 @@ void FalseColorDock::processFalseColoringUpdate(FalseColoring::Type coloringType
 	coloringUpToDate[coloringType] = true;
 	updateTheButton();
 	updateProgressBar();
+
 	sw->doneAction()->setEnabled(false);
 	if (coloringType == selectedColoring()) {
 		//GGDBGM("updating " << coloringType << endl);
@@ -83,17 +108,23 @@ void FalseColorDock::processFalseColoringUpdate(FalseColoring::Type coloringType
 
 void FalseColorDock::processComputationCancelled(FalseColoring::Type coloringType)
 {
-	if (coloringState[coloringType] == FalseColoringState::ABORTING) {
-		coloringProgress[coloringType] = 0;
-		GGDBGM("enterState():" << endl);
-		enterState(coloringType, FalseColoringState::UNKNOWN);
-		updateTheButton();
-		updateProgressBar();
-	} else if (coloringState[coloringType] == FalseColoringState::CALCULATING) {
-		enterState(coloringType, FalseColoringState::UNKNOWN);
-		GGDBGM("restarting cancelled computation" << endl);
-		requestColoring(coloringType);
-	}
+	coloringProgress[coloringType] = 0;
+	GGDBGM("enterState():" << endl);
+	enterState(coloringType, FalseColoringState::UNKNOWN);
+	updateTheButton();
+	updateProgressBar();
+
+//	if (coloringState[coloringType] == FalseColoringState::ABORTING) {
+//		coloringProgress[coloringType] = 0;
+//		GGDBGM("enterState():" << endl);
+//		enterState(coloringType, FalseColoringState::UNKNOWN);
+//		updateTheButton();
+//		updateProgressBar();
+//	} else if (coloringState[coloringType] == FalseColoringState::CALCULATING) {
+//		enterState(coloringType, FalseColoringState::UNKNOWN);
+//		GGDBGM("restarting cancelled computation" << endl);
+//		requestColoring(coloringType);
+//	}
 }
 
 void FalseColorDock::setCalculationInProgress(FalseColoring::Type coloringType)
@@ -107,7 +138,10 @@ void FalseColorDock::setCalculationInProgress(FalseColoring::Type coloringType)
 
 void FalseColorDock::processSelectedColoring()
 {
-	emit unsubscribeFalseColoring(this, lastShown);
+	lastColoring    = currentColoring;
+	currentColoring = selectedColoring();
+
+	//emit unsubscribeFalseColoring(this, lastShown);
 	GGDBGM("requesting false color image " << selectedColoring() << endl);
 	requestColoring(selectedColoring());
 	updateTheButton();
@@ -123,11 +157,13 @@ void FalseColorDock::processApplyClicked()
 		if (lastShown == selectedColoring()) {
 			// Cancel after re-calc
 			enterState(selectedColoring(), FalseColoringState::UNKNOWN);
-			emit unsubscribeFalseColoring(this, selectedColoring());
+			emit cancelComputation(selectedColoring());
+			//emit unsubscribeFalseColoring(this, selectedColoring());
 			updateProgressBar();
 			updateTheButton();
 		} else {
-			emit unsubscribeFalseColoring(this, selectedColoring());
+			//emit unsubscribeFalseColoring(this, selectedColoring());
+			emit cancelComputation(selectedColoring());
 
 			// go back to last shown coloring
 			if (coloringUpToDate[lastShown]) {
@@ -230,6 +266,37 @@ FalseColoring::Type FalseColorDock::selectedColoring()
 	return coloringType;
 }
 
+void FalseColorDock::subscribeColoring(FalseColoring::Type coloringType)
+{
+	if (coloringState[lastColoring] != FalseColoringState::CALCULATING) {
+		subs[lastColoring]->invalidate();
+	}
+
+	if (!subs[coloringType]->established()) {
+		subs[coloringType]->establish();
+	}
+}
+
+void FalseColorDock::coloringUpdated(FalseColoring::Type coloringType)
+{
+	{
+		Subscription *sub = subs[coloringType]->subscription();
+		Subscription::Lock<QPixmap, FalseColoring::Type> lock(*sub);
+
+		//FalseColoring::Type coloringType = *(lock.meta());
+		QPixmap pix(*lock());
+
+		qDebug() << "coloring updated" << FalsecolorModel::coloringTypeToString(coloringType);
+
+
+		processFalseColoringUpdate(coloringType, pix);
+	}
+
+	if (coloringType != currentColoring) {
+		subs[coloringType]->invalidate();
+	}
+}
+
 void FalseColorDock::requestColoring(FalseColoring::Type coloringType, bool recalc)
 {
 	if (coloringState[coloringType] != FalseColoringState::FINISHED || recalc) {
@@ -237,13 +304,18 @@ void FalseColorDock::requestColoring(FalseColoring::Type coloringType, bool reca
 		enterState(coloringType, FalseColoringState::CALCULATING);
 		updateTheButton();
 	}
+
+	subscribeColoring(coloringType);
+
 	if (recalc) {
 		GGDBGM("recalc " << coloringType << endl);
-		emit subscribeFalseColoring(this, coloringType);
+		emit requestFalseColoring(coloringType, recalc);
+		//emit subscribeFalseColoring(this, coloringType);
 		emit falseColoringRecalcRequested(coloringType);
 	} else {
 		GGDBGM("subscribe " << coloringType << endl);
-		emit subscribeFalseColoring(this, coloringType);
+		//emit subscribeFalseColoring(this, coloringType);
+		//emit requestFalseColoring(coloringType, recalc);
 	}
 	updateProgressBar();
 	updateTheButton();
@@ -258,6 +330,9 @@ void FalseColorDock::updateProgressBar()
 		sel->adjust(); // grow accordingly
 		// stay visible
 		sel->scrollIn(true);
+	} else if (coloringProgress[selectedColoring()] != 100) {
+		enterState(selectedColoring(), FalseColoringState::CALCULATING);
+		updateProgressBar();
 	} else {
 		//GGDBGM(selectedColoring() << " not CALCULATING" << endl);
 		uisel->calcProgress->setValue(0);
@@ -308,6 +383,12 @@ void FalseColorDock::enterState(FalseColoring::Type coloringType, FalseColoringS
 {
 	GGDBGM(coloringType << " entering state " << state << endl);
 	coloringState[coloringType] = state;
+
+	if (coloringType == selectedColoring()
+	    && state == FalseColoringState::CALCULATING) {
+		//draw wait message
+		scene->setPixmap(QPixmap(0, 0));
+	}
 }
 
 void FalseColorDock::processVisibilityChanged(bool visible)
@@ -315,17 +396,19 @@ void FalseColorDock::processVisibilityChanged(bool visible)
 	//GGDBG_CALL();
 	if (visible) {
 		requestColoring(selectedColoring());
-	} else {
-		emit unsubscribeFalseColoring(this, selectedColoring());
 	}
 }
-
 
 void FalseColorDock::processCalculationProgressChanged(FalseColoring::Type coloringType,
                                                        int                 percent)
 {
-	qDebug() << coloringType << percent;
+	//qDebug() << FalsecolorModel::coloringTypeToString(coloringType) << percent;
 	coloringProgress[coloringType] = percent;
+
+	if (coloringState[coloringType] != FalseColoringState::CALCULATING) {
+		enterState(coloringType, FalseColoringState::CALCULATING);
+		updateTheButton();
+	}
 
 	if (coloringType == selectedColoring())
 		updateProgressBar();
@@ -353,8 +436,30 @@ bool FalseColorDock::eventFilter(QObject *obj, QEvent *event)
 
 void FalseColorDock::requestSpecSim(int x, int y)
 {
+	specSimSub = std::unique_ptr<Subscription>(DataRegister::subscribe(Dependency("similarity",
+	                                                                              SubscriptionType
+	                                                                              ::READ,
+	                                                                              AccessType::
+	                                                                              DEFERRED),
+	                                                                   this,
+	                                                                   std::bind(&FalseColorDock::
+	                                                                             specSimUpdated,
+	                                                                             this)));
+
 	similarity_measures::SMConfig conf = sw->config();
 	emit requestComputeSpecSim(x, y, conf);
+}
+
+void FalseColorDock::specSimUpdated()
+{
+	QPixmap p;
+	{
+		Subscription::Lock<QImage> lock(*specSimSub);
+		p = QPixmap::fromImage(*lock());
+	}
+	specSimSub.reset(nullptr);
+
+	processSpecSimUpdate(p);
 }
 
 void FalseColorDock::processSpecSimUpdate(QPixmap result)
