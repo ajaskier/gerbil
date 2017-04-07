@@ -10,6 +10,7 @@
 
 #include "model/representation.h"
 #include "multi_img.h"
+#include "graphseg_config.h"
 
 #include "awindow.h"
 #include "bwindow.h"
@@ -25,6 +26,8 @@ class ImgModel;
 class LabelsModel;
 class ClusterizationModel;
 class FalsecolorModel;
+class GraphSegModel;
+
 class BandDock;
 class LabelDock;
 class RoiDock;
@@ -34,6 +37,12 @@ class FalseColorDock;
 namespace Ui {
 class MainWindow;
 }
+
+namespace seg_graphs
+{
+class GraphSegConfig;
+}
+
 
 class MainWindow : public QMainWindow
 {
@@ -61,6 +70,7 @@ private:
 	LabelsModel * labelsModel;
 	ClusterizationModel * clusterizationModel;
 	FalsecolorModel     * falsecolorModel;
+	GraphSegModel       * graphSegModel;
 
 	SubscriptionManager sm;
 	TaskScheduler       * scheduler;
@@ -90,6 +100,16 @@ signals:
 	    multi_img::Range    targetRange
 	    );
 
+	void requestGraphsegBand(representation::t type, int bandId,
+	                         cv::Mat1s seedMap,
+	                         const seg_graphs::GraphSegConfig config,
+	                         bool resetLabel);
+
+	void requestGraphseg(representation::t                type,
+	                     cv::Mat1s                        seedMap,
+	                     const seg_graphs::GraphSegConfig config,
+	                     bool                             resetLabel);
+
 private slots:
 
 	void initCrucials();
@@ -109,6 +129,13 @@ private slots:
 	void on_computeDButton_clicked();
 	void onDistIMGRequest();
 	void onImageIMGRequest();
+
+	void requestGraphsegCurBand(const seg_graphs::GraphSegConfig config,
+	                            bool                             resetLabel);
+
+	void requestGraphseg(representation::t                repr,
+	                     const seg_graphs::GraphSegConfig config,
+	                     bool                             resetLabel);
 
 	void onNormalizationParametersChanged(
 	    representation::t   type,

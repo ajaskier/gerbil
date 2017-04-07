@@ -24,7 +24,7 @@ public:
 	// separate entity and not just a GUI element. This is cleaner than
 	// duplicating the entire BandView interface in BandDock.
 	BandView *bandView() { return bv; }
-//	GraphSegWidget *graphSegWidget() { return gs; }
+	GraphSegWidget *graphSegWidget() { return gs; }
 
 	// get bandId of currently shown band
 	representation::t getCurRepresentation() { return curRepr; }

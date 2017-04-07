@@ -28,11 +28,11 @@ signals:
 	void requestToggleSeedMode(bool toggle);
 	void requestClearSeeds();
 	void requestLoadSeeds();
-	void requestGraphseg(representation::t                 type,
-	                     const seg_graphs::GraphSegConfig &config,
-	                     bool                              resetLabel);
-	void requestGraphsegCurBand(const seg_graphs::GraphSegConfig &config,
-	                            bool                              resetLabel);
+	void requestGraphseg(representation::t                type,
+	                     const seg_graphs::GraphSegConfig config,
+	                     bool                             resetLabel);
+	void requestGraphsegCurBand(const seg_graphs::GraphSegConfig config,
+	                            bool                             resetLabel);
 
 public slots:
 	void processSeedingDone();

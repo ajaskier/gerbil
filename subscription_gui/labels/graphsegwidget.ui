@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>451</width>
-    <height>138</height>
+    <height>147</height>
    </rect>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
@@ -45,7 +45,7 @@
         <string/>
        </property>
        <property name="icon">
-        <iconset resource="../gerbil.qrc">
+        <iconset resource="../../gui/gerbil.qrc">
          <normaloff>:/basic/pencil</normaloff>:/basic/pencil</iconset>
        </property>
        <property name="iconSize">
@@ -112,7 +112,7 @@
            <string/>
           </property>
           <property name="pixmap">
-           <pixmap resource="../gerbil.qrc">:/basic/mouse-left</pixmap>
+           <pixmap resource="../../gui/gerbil.qrc">:/basic/mouse-left</pixmap>
           </property>
          </widget>
         </item>
@@ -151,7 +151,7 @@
            <string/>
           </property>
           <property name="pixmap">
-           <pixmap resource="../gerbil.qrc">:/basic/mouse-right</pixmap>
+           <pixmap resource="../../gui/gerbil.qrc">:/basic/mouse-right</pixmap>
           </property>
          </widget>
         </item>
@@ -341,7 +341,7 @@
   </customwidget>
  </customwidgets>
  <resources>
-  <include location="../gerbil.qrc"/>
+  <include location="../../gui/gerbil.qrc"/>
  </resources>
  <connections/>
 </ui>
