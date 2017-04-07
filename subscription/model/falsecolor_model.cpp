@@ -6,14 +6,14 @@
 #include "data_register.h"
 #include "data.h"
 #include "lock.h"
+#include "falsecolor_task_delegate.h"
 
 #include "qtopencv.h"
 
 #include <QVector>
 
 #include "task/task_rgb_display.h"
-
-#include "falsecolor_task_delegate.h"
+#include "task/task_specsim_tbb.h"
 
 QString FalsecolorModel::coloringTypeToString(const FalseColoring::Type &coloringType)
 {
@@ -55,12 +55,23 @@ FalsecolorModel::FalsecolorModel(TaskScheduler *scheduler, QObject *parent)
 	registerData("falsecolor.PCAGRAD", { "image.GRAD" });
 	registerData("falsecolor.SOMGRAD", { "image.GRAD" });
 
+	registerData("similarity", { "image.IMG" });
+
 	setupDelegates();
 }
 
 void FalsecolorModel::delegateTask(QString id, QString parentId)
 {
-	requestColoring(stringToColoringType(id));
+	if (id == "similarity") {
+		// actually do nothing
+	} else {
+		requestColoring(stringToColoringType(id));
+	}
+}
+
+void FalsecolorModel::computeSpecSim(int x, int y, similarity_measures::SMConfig conf)
+{
+	sendTask<TaskSpecSimTbb>(x, y, conf);
 }
 
 void FalsecolorModel::requestColoring(FalseColoring::Type coloringType, bool recalc)

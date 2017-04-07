@@ -40,7 +40,7 @@ void MainWindow::initCrucials()
 	scheduler = new TaskScheduler(sm);
 	DataRegister::init(&sm);
 
-	imageModel          = new ImgModel(false, scheduler, this);
+	imageModel = new ImgModel(false, scheduler, this);
 	labelsModel         = new LabelsModel(scheduler, this);
 	distModel           = new DistModel(scheduler, this);
 	clusterizationModel = new ClusterizationModel(scheduler, this);
@@ -378,6 +378,10 @@ void MainWindow::on_falsecolor_checkbox_toggled(bool checked)
 
 		connect(falsecolorDock, SIGNAL(cancelComputation(FalseColoring::Type)),
 		        falsecolorModel, SLOT(requestAbort(FalseColoring::Type)));
+
+		connect(falsecolorDock,
+		        SIGNAL(requestComputeSpecSim(int, int, similarity_measures::SMConfig)),
+		        falsecolorModel, SLOT(computeSpecSim(int, int, similarity_measures::SMConfig)));
 	} else {
 		removeDockWidget(falsecolorDock);
 		falsecolorDock->deleteLater();

@@ -62,6 +62,7 @@ vole_compile_library(
 
 	task/task_meanshift_sp
 	task/task_rgb_display
+	task/task_specsim_tbb
 
     model/img_model
     model/dist_model

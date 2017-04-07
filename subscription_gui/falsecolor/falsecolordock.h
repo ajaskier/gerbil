@@ -28,6 +28,7 @@ class FalseColorDock : public QDockWidget {
 	Q_OBJECT
 public:
 	explicit FalseColorDock(QWidget *parent = 0);
+	virtual ~FalseColorDock();
 
 signals:
 	/** Request re-calculation of non-determinitstic representation (e.g. SOM). */
@@ -66,6 +67,7 @@ protected slots:
 	void saveState();
 
 	void coloringUpdated(FalseColoring::Type coloringType);
+	void specSimUpdated();
 
 protected:
 	void initUi();
@@ -97,7 +99,6 @@ protected:
 	FalseColoring::Type currentColoring = FalseColoring::CMF;
 	FalseColoring::Type lastColoring    = FalseColoring::CMF;
 
-	//std::map<FalseColoring::Type, std::unique_ptr<Subscription> > subs;
 	std::map<FalseColoring::Type, FalseColorSubscriptionDelegate*> subs;
 
 	// viewport and scene
@@ -108,7 +109,7 @@ protected:
 	AutohideWidget          *sel;
 	SimilarityWidget        *sw;
 
-	//std::unique_ptr<Subscription> sub;
+	std::unique_ptr<Subscription> specSimSub;
 };
 
 #endif // FALSECOLORDOCK_H

@@ -78,6 +78,12 @@ FalseColorDock::FalseColorDock(QWidget *parent)
 	restoreState();
 }
 
+FalseColorDock::~FalseColorDock()
+{
+	if (sel)
+		sel->deleteLater();
+}
+
 void FalseColorDock::processFalseColoringUpdate(FalseColoring::Type coloringType, QPixmap p)
 {
 	GGDBGM("enterState():" << endl);
@@ -264,27 +270,10 @@ void FalseColorDock::subscribeColoring(FalseColoring::Type coloringType)
 {
 	if (coloringState[lastColoring] != FalseColoringState::CALCULATING) {
 		subs[lastColoring]->invalidate();
-		//subs[lastColoring].reset(nullptr);
 	}
 
 	if (!subs[coloringType]->established()) {
 		subs[coloringType]->establish();
-
-//		QString dataSub = "falsecolor." + FalsecolorModel::coloringTypeToString(coloringType);
-//		subs[coloringType].reset(
-//		    DataRegister::subscribe(Dependency(dataSub, SubscriptionType::READ,
-//		                                       AccessType::DEFERRED),
-//		                            this, std::bind(&FalseColorDock::
-//		                                            coloringUpdated, this)));
-
-
-//		if (sub) {
-//			if (sub->getDataId() == dataSub)
-//				return;
-
-//			sub.reset(nullptr);
-//			//sub->deleteLater();
-//		}
 	}
 }
 
@@ -407,11 +396,8 @@ void FalseColorDock::processVisibilityChanged(bool visible)
 	//GGDBG_CALL();
 	if (visible) {
 		requestColoring(selectedColoring());
-	} else {
-		//emit unsubscribeFalseColoring(this, selectedColoring());
 	}
 }
-
 
 void FalseColorDock::processCalculationProgressChanged(FalseColoring::Type coloringType,
                                                        int                 percent)
@@ -450,8 +436,30 @@ bool FalseColorDock::eventFilter(QObject *obj, QEvent *event)
 
 void FalseColorDock::requestSpecSim(int x, int y)
 {
+	specSimSub = std::unique_ptr<Subscription>(DataRegister::subscribe(Dependency("similarity",
+	                                                                              SubscriptionType
+	                                                                              ::READ,
+	                                                                              AccessType::
+	                                                                              DEFERRED),
+	                                                                   this,
+	                                                                   std::bind(&FalseColorDock::
+	                                                                             specSimUpdated,
+	                                                                             this)));
+
 	similarity_measures::SMConfig conf = sw->config();
 	emit requestComputeSpecSim(x, y, conf);
+}
+
+void FalseColorDock::specSimUpdated()
+{
+	QPixmap p;
+	{
+		Subscription::Lock<QImage> lock(*specSimSub);
+		p = QPixmap::fromImage(*lock());
+	}
+	specSimSub.reset(nullptr);
+
+	processSpecSimUpdate(p);
 }
 
 void FalseColorDock::processSpecSimUpdate(QPixmap result)

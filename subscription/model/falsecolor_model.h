@@ -36,6 +36,7 @@ signals:
 public slots:
 	void requestColoring(FalseColoring::Type coloringType, bool recalc = false);
 	void requestAbort(FalseColoring::Type type);
+	void computeSpecSim(int x, int y, similarity_measures::SMConfig conf);
 
 private:
 	void computeColoring(FalseColoring::Type coloringType);
