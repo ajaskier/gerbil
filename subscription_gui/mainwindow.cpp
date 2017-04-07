@@ -16,10 +16,12 @@
 #include "model/labels_model.h"
 #include "model/clusterization_model.h"
 #include "model/falsecolor_model.h"
+#include "model/graph_seg_model.h"
 
 #include "normdock.h"
 #include "labels/banddock.h"
 #include "labels/bandview.h"
+#include "labels/graphsegwidget.h"
 
 #include "labels/labeldock.h"
 #include "roi/roidock.h"
@@ -40,11 +42,12 @@ void MainWindow::initCrucials()
 	scheduler = new TaskScheduler(sm);
 	DataRegister::init(&sm);
 
-	imageModel = new ImgModel(false, scheduler, this);
+	imageModel          = new ImgModel(false, scheduler, this);
 	labelsModel         = new LabelsModel(scheduler, this);
 	distModel           = new DistModel(scheduler, this);
 	clusterizationModel = new ClusterizationModel(scheduler, this);
 	falsecolorModel     = new FalsecolorModel(scheduler, this);
+	graphSegModel       = new GraphSegModel(scheduler, this);
 	imageModel->setFilename("/home/ocieslak/gerbil_data/fake_and_real_peppers_ms.txt");
 	imgSub =
 	    std::unique_ptr<Subscription>(DataRegister::subscribe(Dependency("image",
@@ -290,10 +293,55 @@ void MainWindow::on_labels_checkbox_toggled(bool checked)
 
 		connect(bandDock->bandView(), SIGNAL(newLabeling(cv::Mat1s)),
 		        labelsModel, SLOT(setLabels(const cv::Mat1s &)));
+
+		connect(bandDock->graphSegWidget(),
+		        SIGNAL(requestGraphseg(representation::t, seg_graphs::GraphSegConfig, bool)),
+		        this, SLOT(requestGraphseg(representation::t, seg_graphs::GraphSegConfig, bool)));
+
+		connect(this,
+		        SIGNAL(requestGraphseg(representation::t, cv::Mat1s, seg_graphs::GraphSegConfig,
+		                               bool)),
+		        graphSegModel,
+		        SLOT(runGraphseg(representation::t, cv::Mat1s, seg_graphs::GraphSegConfig, bool)));
+
+		connect(bandDock->graphSegWidget(),
+		        SIGNAL(requestGraphsegCurBand(seg_graphs::GraphSegConfig, bool)),
+		        this, SLOT(requestGraphsegCurBand(seg_graphs::GraphSegConfig, bool)));
+
+		connect(this,
+		        SIGNAL(requestGraphsegBand(representation::t, int, cv::Mat1s,
+		                                   seg_graphs::GraphSegConfig,
+		                                   bool)),
+		        graphSegModel,
+		        SLOT(runGraphsegBand(representation::t, int, cv::Mat1s,
+		                             seg_graphs::GraphSegConfig,
+		                             bool)));
+
+		connect(bandDock, SIGNAL(currentLabelChanged(int)),
+		        graphSegModel, SLOT(setCurLabel(int)));
+
+		connect(graphSegModel, SIGNAL(seedingDone()),
+		        bandDock->graphSegWidget(), SLOT(processSeedingDone()));
 	} else {
 		removeDockWidget(bandDock);
 		bandDock->deleteLater();
 	}
+}
+
+void MainWindow::requestGraphsegCurBand(const seg_graphs::GraphSegConfig config, bool resetLabel)
+{
+	representation::t repr = bandDock->getCurRepresentation();
+	int       bandId       = bandDock->getCurBandId();
+	cv::Mat1s seedMap      = bandDock->bandView()->getSeedMap();
+
+	emit requestGraphsegBand(repr, bandId, seedMap, config, resetLabel);
+}
+
+void MainWindow::requestGraphseg(representation::t repr, const seg_graphs::GraphSegConfig config,
+                                 bool resetLabel)
+{
+	cv::Mat1s seedMap = bandDock->bandView()->getSeedMap();
+	emit      requestGraphseg(repr, seedMap, config, resetLabel);
 }
 
 void MainWindow::on_labels_icons_checkbox_toggled(bool checked)

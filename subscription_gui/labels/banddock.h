@@ -24,7 +24,7 @@ public:
 	// separate entity and not just a GUI element. This is cleaner than
 	// duplicating the entire BandView interface in BandDock.
 	BandView *bandView() { return bv; }
-//	GraphSegWidget *graphSegWidget() { return gs; }
+	GraphSegWidget *graphSegWidget() { return gs; }
 
 	// get bandId of currently shown band
 	representation::t getCurRepresentation() { return curRepr; }
@@ -84,7 +84,7 @@ protected:
 
 	// local copies
 	QVector<QColor> labelColors;
-	cv::Rect fullImgSize;
+	cv::Rect        fullImgSize;
 
 	// representation and bandId of currently shown band
 	representation::t curRepr;
@@ -93,8 +93,8 @@ protected:
 	// our band view
 	BandView *bv;
 	// our widget for graph segmentation controls
-	//GraphSegWidget *gs;
-	ModeWidget *mw;
+	GraphSegWidget *gs;
+	ModeWidget     *mw;
 
 	Subscription* bandSub;
 	Subscription* labelsSub;

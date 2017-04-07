@@ -59,10 +59,12 @@ vole_compile_library(
     task/labels/task_add_label
     task/labels/task_merge_labels
     task/labels/task_labels_consolidate
+	task/labels/task_alter_label
 
 	task/task_meanshift_sp
 	task/task_rgb_display
 	task/task_specsim_tbb
+	task/task_graph_seg
 
     model/img_model
     model/dist_model
@@ -70,6 +72,7 @@ vole_compile_library(
 	model/clusterization_model
 	model/falsecolor_model
 	model/falsecolor_task_delegate
+	model/graph_seg_model
 
     distviewcompute_utils
 
@@ -96,6 +99,7 @@ vole_moc_library(
 	model/clusterization_model.h
 	model/falsecolor_model.h
 	model/falsecolor_task_delegate.h
+	model/graph_seg_model.h
 
 	task/task_meanshift_sp.h
 	task/task_rgb_display.h
