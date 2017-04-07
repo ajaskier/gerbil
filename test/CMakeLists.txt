@@ -6,6 +6,7 @@ vole_add_required_dependencies("BOOST" "TBB" "OPENCV" "QT" "Threads")
 vole_add_required_modules("dynamic_any" "subscription")
 
 vole_compile_library(
+  task_test
   task_order_test
 
   task_scheduler_mock
@@ -13,12 +14,16 @@ vole_compile_library(
 )
 
 vole_moc_library(
+  task_test.h
   task_order_test.h
+
 
   task_scheduler_mock.h
 )
 
-# vole_add_test("faketest" "fake/tst_faketest")
-vole_add_test("task_order_test" "task_order_test")
+vole_add_test("testall" "main")
+
+#vole_add_test("task_order_test" "task_order_test")
+#vole_add_test("task_test" "task_test")
 
 vole_add_module()

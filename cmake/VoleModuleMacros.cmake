@@ -228,14 +228,18 @@ macro(vole_add_module)
 				list(GET ${test} 0 test_name)
 				list(GET ${test} 1 test_sources)
 
+
 				if (test_name AND test_sources)
-					set(rcc_sources)
-					qt5_add_resources(rcc_sources ${vole_module_rcc_sources})
+					message("  Adding test \"${test_name}\" with sources \"${test_sources}\".")
+					#set(rcc_sources)
+					#qt5_add_resources(rcc_sources ${vole_module_rcc_sources})
 
-					add_executable(${test_name} ${test_sources} ${rcc_sources})
-					add_test(${test_name} ${test_name})
+					#add_executable(${test_name} ${test_sources} ${rcc_sources})
+					add_executable(${test_name} ${test_sources})
+					#add_executable(${test_name})
+					add_test( NAME ${test_name} COMMAND ${test_name})
 
-					target_link_libraries(${test_name} "core${VOLE_LIBRARY_SUFFIX}")
+					#target_link_libraries(${test_name} "core${VOLE_LIBRARY_SUFFIX}")
 					target_link_libraries(${test_name} ${vole_module_library})
 
 					target_link_libraries(${test_name} Qt5::Test)

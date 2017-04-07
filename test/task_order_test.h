@@ -1,5 +1,7 @@
-#include <QString>
+#ifndef TASK_ORDER_TEST_H
+#define TASK_ORDER_TEST_H
 
+#include <QString>
 #include <QtTest/QtTest>
 
 #include "model/model_a.h"
@@ -15,7 +17,7 @@ class TaskOrderTest : public QObject
 	Q_OBJECT
 
 public:
-	TaskOrderTest();
+	TaskOrderTest() {}
 
 private:
 	ModelA* modelA;
@@ -26,48 +28,43 @@ private:
 	void fakeSlot() {}
 
 private Q_SLOTS:
-	void init();
-	void cleanup();
-	void flow1();
+	void init()
+	{
+		sm = new SubscriptionManager();
+		DataRegister::init(sm);
+		scheduler = new TaskSchedulerMock(*sm);
+
+		modelA = new ModelA(1, scheduler, this);
+	}
+
+	void cleanup()
+	{
+		delete modelA;
+		delete scheduler;
+		delete sm;
+	}
+
+	void flow1()
+	{
+		std::vector<QString> expected;
+		Subscription         * dataASub =
+		    DataRegister::subscribe(Dependency("DATA_A", SubscriptionType::READ,
+		                                       AccessType::DEFERRED),
+		                            this,
+		                            std::bind(&TaskOrderTest::
+		                                      fakeSlot, this));
+
+		QTest::qWait(250);
+		expected = { "DATA_A" };
+		QCOMPARE(scheduler->taskOrder, expected);
+		scheduler->flushVector();
+
+		delete dataASub;
+	}
 };
 
-TaskOrderTest::TaskOrderTest()
-{}
+//QTEST_MAIN(TaskOrderTest)
+//#include "moc_task_test.cpp"
 
-void TaskOrderTest::init()
-{
-	sm = new SubscriptionManager();
-	DataRegister::init(sm);
-	scheduler = new TaskSchedulerMock(*sm);
 
-	modelA = new ModelA(1, scheduler, this);
-}
-
-void TaskOrderTest::cleanup()
-{
-	delete modelA;
-	delete scheduler;
-	delete sm;
-}
-
-void TaskOrderTest::flow1()
-{
-	std::vector<QString> expected;
-	Subscription         * dataASub =
-	    DataRegister::subscribe(Dependency("DATA_A", SubscriptionType::READ,
-	                                       AccessType::DEFERRED),
-	                            this,
-	                            std::bind(&TaskOrderTest::
-	                                      fakeSlot, this));
-
-	QTest::qWait(250);
-	expected = { "DATA_A" };
-	QCOMPARE(scheduler->taskOrder, expected);
-	scheduler->flushVector();
-
-	delete dataASub;
-}
-
-QTEST_MAIN(TaskOrderTest)
-
-//#include "moc_task_order_test.cpp"
+#endif // TASK_ORDER_TEST_H
