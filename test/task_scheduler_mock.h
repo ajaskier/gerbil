@@ -15,7 +15,7 @@ public:
 
 	void pushTask(std::shared_ptr<Task> task)
 	{
-		qDebug() << "got task" << task->getId();
+		//qDebug() << "got task" << task->getId();
 
 		TaskScheduler::pushTask(task);
 	}
@@ -30,7 +30,7 @@ public:
 private slots:
 	void taskEnded(QString id, bool success)
 	{
-		qDebug() << "task ended" << id;
+		//qDebug() << "task ended" << id;
 
 		taskOrder.push_back(id);
 		TaskScheduler::taskEnded(id, success);

@@ -14,6 +14,9 @@
 #include "model/falsecolor/falsecoloringcacheitem.h"
 #include "rgb.h"
 
+#include "similarity_measure.h"
+#include "sm_config.h"
+
 class FalsecolorTaskDelegate;
 
 class FalsecolorModel : public Model
