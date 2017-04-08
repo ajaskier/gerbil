@@ -29,11 +29,9 @@ private:
 private Q_SLOTS:
 	void init();
 	void cleanup();
-	void flow1();
+	void basicFlow();
 };
 
-//QTEST_MAIN(TaskOrderTest)
 //#include "moc_task_test.cpp"
-
 
 #endif // TASK_ORDER_TEST_H

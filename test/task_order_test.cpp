@@ -2,7 +2,6 @@
 
 #include "task_scheduler_mock.h"
 
-
 void TaskOrderTest::init()
 {
 	sm = new SubscriptionManager();
@@ -19,7 +18,7 @@ void TaskOrderTest::cleanup()
 	delete sm;
 }
 
-void TaskOrderTest::flow1()
+void TaskOrderTest::basicFlow()
 {
 	std::vector<QString> expected;
 	Subscription         * dataASub =

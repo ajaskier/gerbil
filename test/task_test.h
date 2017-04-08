@@ -12,7 +12,6 @@ public:
 	TaskTest() {}
 
 private:
-
 	void fakeSlot() {}
 
 private Q_SLOTS:

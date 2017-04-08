@@ -1,6 +1,5 @@
 #include "task_test.h"
 
-
 void TaskTest::tst1()
 {
 	std::vector<QString> expected = { "ala", "mala" };
