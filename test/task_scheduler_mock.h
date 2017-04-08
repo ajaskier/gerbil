@@ -11,7 +11,8 @@ class TaskSchedulerMock : public TaskScheduler {
 
 public:
 
-	TaskSchedulerMock(SubscriptionManager &sm) : TaskScheduler(sm) {}
+	TaskSchedulerMock(SubscriptionManager &sm, QObject* parent = nullptr)
+	    : TaskScheduler(sm, parent) {}
 
 	void pushTask(std::shared_ptr<Task> task)
 	{

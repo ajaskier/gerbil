@@ -36,14 +36,23 @@ private:
 
 	void fakeSlot() {}
 
+	void orderTestCore(QString dataId, std::vector<QString> expected,
+	                   int waitMs = 250);
+
 private Q_SLOTS:
 	void init();
 	void cleanup();
 
 	void basicFlow();
-	void imageGRAD();
-};
 
-//#include "moc_task_test.cpp"
+	void image();
+	void imageIMG();
+	void imageNORM();
+	void imageGRAD();
+	void imageIMGPCA();
+	void imageGRADPCA();
+	void imageBRG();
+	void imageRGB();
+};
 
 #endif // TASK_ORDER_TEST_H

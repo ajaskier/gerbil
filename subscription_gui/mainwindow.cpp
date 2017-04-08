@@ -39,7 +39,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
 void MainWindow::initCrucials()
 {
-	scheduler = new TaskScheduler(sm);
+	scheduler = new TaskScheduler(sm, this);
 	DataRegister::init(&sm);
 
 	imageModel          = new ImgModel(false, scheduler, this);

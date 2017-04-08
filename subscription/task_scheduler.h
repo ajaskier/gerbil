@@ -13,7 +13,7 @@ class TaskScheduler : public QObject
 	Q_OBJECT
 
 public:
-	TaskScheduler(SubscriptionManager& sm);
+	TaskScheduler(SubscriptionManager& sm, QObject* parent = nullptr);
 	virtual void pushTask(std::shared_ptr<Task> task);
 
 protected:

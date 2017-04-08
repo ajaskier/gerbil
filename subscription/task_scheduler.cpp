@@ -7,7 +7,7 @@
 #include "data_register.h"
 #include <QDebug>
 
-TaskScheduler::TaskScheduler(SubscriptionManager &sm) : QObject(), sm(sm) {}
+TaskScheduler::TaskScheduler(SubscriptionManager &sm, QObject *parent) : QObject(parent), sm(sm) {}
 
 void TaskScheduler::pushTask(std::shared_ptr<Task> task)
 {
