@@ -59,6 +59,8 @@ private Q_SLOTS:
 	void labelsIcons();
 
 	void distIMG();
+	void distIMG_ROI_update();
+	void distIMG_imageIMG_update();
 };
 
 #endif // TASK_ORDER_TEST_H

@@ -68,7 +68,7 @@ void TaskOrderTest::imageNORM()
 
 void TaskOrderTest::imageGRAD()
 {
-	orderTestCore("image.GRAD", { "image", "image.IMG", "image.GRAD" });
+	orderTestCore("image.GRAD", { "image", "image.IMG", "image.GRAD" }, 500);
 }
 
 void TaskOrderTest::imageIMGPCA()
@@ -104,6 +104,48 @@ void TaskOrderTest::labelsIcons()
 void TaskOrderTest::distIMG()
 {
 	orderTestCore("dist.IMG", { "image", "image.IMG", "setLabels", "taskAdd" });
+}
+
+void TaskOrderTest::distIMG_ROI_update()
+{
+	std::vector<QString> expected;
+	Subscription         * sub =
+	    DataRegister::subscribe(Dependency("dist.IMG", SubscriptionType::READ,
+	                                       AccessType::DEFERRED), this,
+	                            std::bind(&TaskOrderTest::fakeSlot, this));
+
+	QTest::qWait(500);
+	expected = { "image", "image.IMG", "setLabels", "taskAdd" };
+	QCOMPARE(scheduler->taskOrder, expected);
+	scheduler->flushVector();
+
+	imageModel->setROI(cv::Rect(32, 32, 64, 64));
+	QTest::qWait(500);
+	expected = { "ROI", "setLabels", "taskSub", "image.IMG", "taskAdd" };
+	QCOMPARE(scheduler->taskOrder, expected);
+
+	delete sub;
+}
+
+void TaskOrderTest::distIMG_imageIMG_update()
+{
+	std::vector<QString> expected;
+	Subscription         * sub =
+	    DataRegister::subscribe(Dependency("dist.IMG", SubscriptionType::READ,
+	                                       AccessType::DEFERRED), this,
+	                            std::bind(&TaskOrderTest::fakeSlot, this));
+
+	QTest::qWait(500);
+	expected = { "image", "image.IMG", "setLabels", "taskAdd" };
+	QCOMPARE(scheduler->taskOrder, expected);
+	scheduler->flushVector();
+
+	imageModel->delegateTask("image.IMG");
+	QTest::qWait(500);
+	expected = { "image.IMG", "taskAdd" };
+	QCOMPARE(scheduler->taskOrder, expected);
+
+	delete sub;
 }
 
 QTEST_MAIN(TaskOrderTest)
