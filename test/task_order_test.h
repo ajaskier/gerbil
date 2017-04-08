@@ -33,6 +33,7 @@ private:
 	ModelA     * modelA;
 	ImgModel   * imageModel;
 	LabelsModel* labelsModel;
+	DistModel  * distModel;
 
 	void fakeSlot() {}
 
@@ -53,6 +54,11 @@ private Q_SLOTS:
 	void imageGRADPCA();
 	void imageBRG();
 	void imageRGB();
+
+	void labels();
+	void labelsIcons();
+
+	void distIMG();
 };
 
 #endif // TASK_ORDER_TEST_H

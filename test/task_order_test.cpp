@@ -13,11 +13,13 @@ void TaskOrderTest::init()
 	modelA      = new ModelA(1, scheduler, this);
 	imageModel  = new ImgModel(false, scheduler, this);
 	labelsModel = new LabelsModel(scheduler, this);
+	distModel   = new DistModel(scheduler, this);
+
 	imageModel->setFilename("/home/ocieslak/gerbil_data/fake_and_real_peppers_ms.txt");
 	imageModel->setROI(cv::Rect(0, 0, 128, 128));
 	imageModel->setBandsCount(31);
-//	imageModel->setNormalizationParameters(representation::IMG, multi_img::NORM_THEORETICAL,
-//	                                       multi_img::Range(0.0, 0.0));
+
+	labelsModel->setImageSize(cv::Size(128, 128));
 
 	QTest::qWait(1000);
 	scheduler->flushVector();
@@ -87,6 +89,21 @@ void TaskOrderTest::imageRGB()
 void TaskOrderTest::imageBRG()
 {
 	orderTestCore("image.bgr", { "image", "image.bgr" });
+}
+
+void TaskOrderTest::labels()
+{
+	orderTestCore("labels", { "setLabels" });
+}
+
+void TaskOrderTest::labelsIcons()
+{
+	orderTestCore("labels.icons", { "setLabels", "labels.icons" });
+}
+
+void TaskOrderTest::distIMG()
+{
+	orderTestCore("dist.IMG", { "image", "image.IMG", "setLabels", "taskAdd" });
 }
 
 QTEST_MAIN(TaskOrderTest)
