@@ -4,8 +4,6 @@
 #include <QString>
 #include <QtTest/QtTest>
 
-#include "model/model_a.h"
-
 #include "model/img_model.h"
 #include "model/dist_model.h"
 #include "model/labels_model.h"
@@ -18,6 +16,7 @@
 #include "data_register.h"
 
 #include "task_scheduler_mock.h"
+#include "data_task_chain.h"
 
 class TaskOrderTest : public QObject
 {
@@ -30,21 +29,20 @@ private:
 	SubscriptionManager* sm;
 	TaskSchedulerMock  * scheduler;
 
-	ModelA     * modelA;
-	ImgModel   * imageModel;
-	LabelsModel* labelsModel;
-	DistModel  * distModel;
+	ImgModel    * imageModel;
+	LabelsModel * labelsModel;
+	DistModel   * distModel;
+
+	DataTaskChain dataTaskChain;
 
 	void fakeSlot() {}
 
 	void orderTestCore(QString dataId, std::vector<QString> expected,
-	                   int waitMs = 250);
+	                   int waitMs = -1);
 
 private Q_SLOTS:
 	void init();
 	void cleanup();
-
-	void basicFlow();
 
 	void image();
 	void imageIMG();

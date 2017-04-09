@@ -7,6 +7,7 @@ vole_add_required_modules("subscription")
 
 vole_compile_library(
   task_scheduler_mock
+  data_task_chain
   task_test
   task_order_test
 )
