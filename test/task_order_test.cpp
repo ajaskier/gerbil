@@ -21,15 +21,19 @@ void TaskOrderTest::init()
 
 void TaskOrderTest::cleanup()
 {
-	scheduler->flushVector();
+	imageModel->deleteLater();
+	labelsModel->deleteLater();
+	distModel->deleteLater();
 
 	scheduler->deleteLater();
 	sm->deleteLater();
-	QTest::qWait(250);
+	QTest::qWait(500);
 }
 
 void TaskOrderTest::orderTestCore(QString dataId, std::vector<QString> expected, int waitMs)
 {
+	qDebug() << "requested" << dataId;
+
 	if (std::find(expected.begin(), expected.end(), "ROI") != expected.end()) {
 		imageModel->setROI(cv::Rect(0, 0, 128, 128));
 		QTest::qWait(100);
@@ -41,11 +45,13 @@ void TaskOrderTest::orderTestCore(QString dataId, std::vector<QString> expected,
 	                            std::bind(&TaskOrderTest::fakeSlot, this));
 
 	if (waitMs == -1) {
-		waitMs = 100 * expected.size();
+		waitMs = 150 * expected.size();
 	}
 	QTest::qWait(waitMs);
+	sub->deleteLater();
+	//delete sub;
+
 	QCOMPARE(scheduler->taskOrder, expected);
-	delete sub;
 }
 
 void TaskOrderTest::image()
@@ -95,12 +101,12 @@ void TaskOrderTest::labels()
 
 void TaskOrderTest::labelsIcons()
 {
-	orderTestCore("labels.icons", dataTaskChain("labels.icons"));
+	orderTestCore("labels.icons", dataTaskChain("labels.icons"), 500);
 }
 
 void TaskOrderTest::distIMG()
 {
-	orderTestCore("dist.IMG", dataTaskChain("dist.IMG"));
+	orderTestCore("dist.IMG", dataTaskChain("dist.IMG"), 750);
 }
 
 void TaskOrderTest::distIMG_ROI_update()
@@ -112,17 +118,18 @@ void TaskOrderTest::distIMG_ROI_update()
 	                                       AccessType::DEFERRED), this,
 	                            std::bind(&TaskOrderTest::fakeSlot, this));
 
-	QTest::qWait(1000);
+	QTest::qWait(1500);
 	expected = { "ROI", "image", "image.IMG", "setLabels", "taskAdd" };
 	QCOMPARE(scheduler->taskOrder, expected);
 	scheduler->flushVector();
 
 	imageModel->setROI(cv::Rect(32, 32, 64, 64));
-	QTest::qWait(1000);
+	QTest::qWait(1500);
+	sub->deleteLater();
+	//delete sub;
+
 	expected = { "ROI", "setLabels", "taskSub", "image.IMG", "taskAdd" };
 	QCOMPARE(scheduler->taskOrder, expected);
-
-	delete sub;
 }
 
 void TaskOrderTest::distIMG_imageIMG_update()
@@ -134,17 +141,19 @@ void TaskOrderTest::distIMG_imageIMG_update()
 	                                       AccessType::DEFERRED), this,
 	                            std::bind(&TaskOrderTest::fakeSlot, this));
 
-	QTest::qWait(1000);
+	QTest::qWait(1500);
 	expected = { "ROI", "image", "image.IMG", "setLabels", "taskAdd" };
 	QCOMPARE(scheduler->taskOrder, expected);
 	scheduler->flushVector();
 
 	imageModel->delegateTask("image.IMG");
-	QTest::qWait(500);
+	QTest::qWait(1000);
+	sub->deleteLater();
+
+	//delete sub;
+
 	expected = { "image.IMG", "taskAdd" };
 	QCOMPARE(scheduler->taskOrder, expected);
-
-	delete sub;
 }
 
 QTEST_MAIN(TaskOrderTest)

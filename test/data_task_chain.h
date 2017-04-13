@@ -6,10 +6,68 @@
 
 #include <QDebug>
 #include <QString>
+#include <cstdlib>
+
+struct MultiDataChainResult
+{
+	std::vector<std::vector<QString> > steps;
+	std::vector<QString> totalChain = {};
+};
 
 struct DataTaskChain
 {
 	DataTaskChain()
+	{
+		setUpIds();
+		setUpChain();
+	}
+
+	const std::vector<QString>& operator()(QString id)
+	{
+		return chain[id];
+	}
+	QString randomId()
+	{
+		return ids[rand() % ids.size()];
+	}
+
+	std::vector<QString> randomIds(int size = 10)
+	{
+		std::vector<QString> ids;
+		while (size--) {
+			ids.push_back(randomId());
+		}
+		return ids;
+	}
+
+	MultiDataChainResult multiDataChain(std::vector<QString> dataIds)
+	{
+		MultiDataChainResult result;
+		for (QString& id : dataIds) {
+			auto step = chain[id];
+
+			std::vector<QString> stepTasks;
+			for (QString& sid : step) {
+				bool exists = std::find(result.totalChain.begin(),
+				                        result.totalChain.end(),
+				                        sid) != result.totalChain.end();
+
+				if (!exists) {
+					stepTasks.push_back(sid);
+					result.totalChain.push_back(sid);
+				}
+			}
+			result.steps.push_back(stepTasks);
+		}
+
+		return result;
+	}
+
+	std::map<QString, std::vector<QString> > chain;
+	std::vector<QString> ids;
+
+private:
+	void setUpChain()
 	{
 		chain["ROI"] = {};
 		chain["image"]         = { "image" };
@@ -24,13 +82,23 @@ struct DataTaskChain
 		chain["labels.icons"]  = { "ROI", "setLabels", "labels.icons" };
 		chain["dist.IMG"]      = { "ROI", "image", "image.IMG", "setLabels", "taskAdd" };
 	}
-
-	const std::vector<QString>& operator()(QString id)
+	void    setUpIds()
 	{
-		return chain[id];
-	}
+		ids = { "ROI",           "image",
+		        "image.IMG",     "image.NORM",
+		        "image.GRAD",    "image.IMGPCA",
+		        "image.GRADPCA", "image.rgb",
+		        "image.bgr",     "labels",
+		        "labels.icons",  "dist.IMG" };
 
-	std::map<QString, std::vector<QString> > chain;
+
+//		//without imgage.PCA and image.GRADPCA
+//		ids = { "ROI",          "image",
+//		        "image.IMG",    "image.NORM",
+//		        "image.GRAD",   "image.rgb",
+//		        "image.bgr",    "labels",
+//		        "labels.icons", "dist.IMG" };
+	}
 };
 
 

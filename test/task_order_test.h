@@ -50,8 +50,8 @@ private Q_SLOTS:
 	void imageGRAD();
 	void imageIMGPCA();
 	void imageGRADPCA();
-	void imageBRG();
 	void imageRGB();
+	void imageBRG();
 
 	void labels();
 	void labelsIcons();
