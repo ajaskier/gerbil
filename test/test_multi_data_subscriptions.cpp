@@ -61,29 +61,11 @@ void TestMultiDataSubscriptions::printIds(std::vector<QString> ids)
 
 void TestMultiDataSubscriptions::tst()
 {
-	QSKIP("test");
-
 	std::vector<QString> ids = dataTaskChain.randomIds(5);
 	printIds(ids);
 	MultiDataChainResult expected = dataTaskChain.multiDataChain(ids);
 
 	multiDataOrderTest(ids, expected);
 }
-
-//void TestRandomDataSubscription::multi_tst()
-//{
-//	cleanup();
-
-//	for (int i = 0; i < 5; i++) {
-//		qDebug() << i;
-//		init();
-//		tst();
-//		cleanup();
-
-//		QTest::qWait(200);
-//	}
-
-//	init();
-//}
 
 QTEST_MAIN(TestMultiDataSubscriptions)

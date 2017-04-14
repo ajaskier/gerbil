@@ -33,7 +33,6 @@ private:
 private Q_SLOTS:
 
 	void tst();
-//	void multi_tst();
 };
 
 #endif // TEST_MULTI_DATA_SUBSCRIPTIONS_H

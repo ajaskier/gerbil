@@ -128,16 +128,18 @@ void TaskScheduler::taskEnded(QString id, bool success)
 	if (!success) {
 		qDebug() << "task" << id << "was aborted";
 		std::shared_ptr<Task> t = runningTasks[id];
+		runningTasks.erase(id);
+		//if (t) {
 
-		if (t) {
-			QString targetDataId = t->targetId();
-			removeDependantTasks(targetDataId);
-		}
+		QString targetDataId = t->targetId();
+		removeDependantTasks(targetDataId);
+		//}
 	} else {
+		runningTasks.erase(id);
 		qDebug() << "task" << id << "has finished";
 	}
 
-	runningTasks.erase(id);
+	//runningTasks.erase(id);
 	//checkTaskPool();
 }
 

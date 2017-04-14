@@ -99,21 +99,4 @@ void TestRandomDataSubscription::rand_interval_tst()
 	QCOMPARE(res, true);
 }
 
-//void TestRandomDataSubscription::multi_rand_interval_tst()
-//{
-//	cleanup();
-
-//	for (int i = 0; i < 5; i++) {
-//		init();
-//		rand_interval_tst();
-//		cleanup();
-
-//		QTest::qWait(500);
-
-//		qDebug() << "\n\n\n\n" << i + 1;
-//	}
-
-//	init();
-//}
-
 QTEST_MAIN(TestRandomDataSubscription)

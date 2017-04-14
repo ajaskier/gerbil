@@ -51,11 +51,11 @@ protected:
 		                            std::bind(&TestTaskCore::fakeSlot, this));
 
 		if (waitMs == -1) {
-			waitMs = 100 * dataTaskChain(dataId).size();
+			waitMs = 150 * dataTaskChain(dataId).size();
 		}
 		QTest::qWait(waitMs);
+		sub->deleteLater();
 		QCOMPARE(scheduler->taskOrder, expected);
-		delete sub;
 	}
 
 protected Q_SLOTS:

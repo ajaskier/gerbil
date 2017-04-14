@@ -34,7 +34,6 @@ private:
 private Q_SLOTS:
 
 	void rand_interval_tst();
-	//void multi_rand_interval_tst();
 };
 
 #endif // TEST_RANDOM_DATA_SUBSCRIPTION_H
