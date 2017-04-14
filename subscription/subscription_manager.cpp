@@ -96,7 +96,8 @@ void SubscriptionManager::unsubscribe(QString dataId, SubscriptionType sub,
 		}
 	}
 
-	if (!dataPool[dataId].willWrite && dataPool[dataId].willReads == 0) {
+	if (!dataPool[dataId].willWrite && dataPool[dataId].willReads == 0
+	    && !dataPool[dataId].doWrite && dataPool[dataId].doReads == 0) {
 		if (dataPool[dataId].upToDate) {
 			qDebug() << "data" << dataId << "would be erased but it's valid";
 		} else {

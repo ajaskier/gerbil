@@ -68,6 +68,15 @@ macro(vole_add_executable name)
 	list(APPEND vole_module_executables vole_module_executable_${name})
 endmacro()
 
+macro(vole_add_test name)
+	if(vole_module_test_${name})
+		message(FATAL_ERROR "Test \"${name} added in ${CMAKE_CURRENT_SOURCE_DIR} already exists!")
+	endif()
+
+	list(APPEND vole_module_test_${name} ${name} ${ARGN})
+	list(APPEND vole_module_tests vole_module_test_${name})
+endmacro()
+
 macro(vole_add_python_module name file)
   if (NOT Boost_PYTHON_FOUND)
     vole_debug_message("Python module ${name} will be unavailable due to missing Boost.Python.")
@@ -213,6 +222,28 @@ macro(vole_add_module)
                                         #endif()
 
 				endif()
+			endforeach()
+
+			foreach(test ${vole_module_tests})
+				list(GET ${test} 0 test_name)
+				list(GET ${test} 1 test_sources)
+
+
+				if (test_name AND test_sources)
+					message("  Adding test \"${test_name}\" with sources \"${test_sources}\".")
+					set(rcc_sources)
+					qt5_add_resources(rcc_sources ${vole_module_rcc_sources})
+
+					add_executable(${test_name} ${test_sources} ${rcc_sources})
+					add_test( NAME ${test_name} COMMAND ${test_name})
+
+					target_link_libraries(${test_name} "core${VOLE_LIBRARY_SUFFIX}")
+					target_link_libraries(${test_name} ${vole_module_library})
+
+					target_link_libraries(${test_name} Qt5::Test)
+
+				endif()
+
 			endforeach()
 		endif()
 

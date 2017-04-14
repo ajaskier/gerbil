@@ -13,14 +13,16 @@ class TaskScheduler : public QObject
 	Q_OBJECT
 
 public:
-	TaskScheduler(SubscriptionManager& sm);
-	void pushTask(std::shared_ptr<Task> task);
+	TaskScheduler(SubscriptionManager& sm, QObject* parent = nullptr);
+	virtual void pushTask(std::shared_ptr<Task> task);
+
+protected:
+	virtual void taskEnded(QString id, bool success);
 
 private:
 	void checkTaskPool();
 	void startTask(std::shared_ptr<Task> task);
 	void createSubscriptions(std::shared_ptr<Task> task);
-	void taskEnded(QString id, bool success);
 	void removeDependantTasks(QString dataId);
 
 	void removeDuplicates(QString id);

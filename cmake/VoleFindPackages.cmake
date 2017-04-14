@@ -83,6 +83,9 @@ vole_check_package(QT
 	"${Qt5Widgets_LIBRARIES}"
 )
 
+find_package(Qt5Test)
+enable_testing()
+
 # QtOpenGL 5 (which is a backwards-compatibility module)
 find_package(Qt5OpenGL)
 vole_check_package(QT_OPENGL

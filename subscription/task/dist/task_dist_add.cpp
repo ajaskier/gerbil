@@ -22,8 +22,7 @@ TaskDistAdd::TaskDistAdd(QString destId, SourceDeclaration sourceImgId,
                          bool partialLabelsUpdate,
                          ViewportCtx *args)
     : TaskDistviewBinsTbb("taskAdd", destId, { { "source", sourceImgId }, { "labels", { "labels" } },
-                                               { "ROI",
-                                                 { "ROI" } } },
+                                               { "ROI", { "ROI" } } },
                           illuminant), apply(apply), partialLabelsUpdate(partialLabelsUpdate),
     args(args)
 {}
@@ -34,8 +33,8 @@ TaskDistAdd::TaskDistAdd(QString destId, SourceDeclaration sourceImgId,
                          bool partialLabelsUpdate,
                          ViewportCtx *args)
     : TaskDistviewBinsTbb("taskAdd", destId, { { "source", sourceImgId }, { "temp", sourceTempId },
-                                               { "labels",
-                                                 { "labels" } }, { "ROI", { "ROI" } } }, illuminant),
+                                               { "labels", { "labels" } }, { "ROI", { "ROI" } } },
+                          illuminant),
     apply(apply), partialLabelsUpdate(partialLabelsUpdate),
     args(args)
 {}
